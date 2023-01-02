@@ -381,6 +381,11 @@ namespace surveillance_system
             {
                 peds[i] = new Pedestrian();
             }
+            cars = new Car[N_Car];
+            for (int i = 0; i < N_Car; i++)
+            {
+                cars[i] = new Car();
+            }
 
             if (On_Road_Builder)
             {
@@ -671,7 +676,7 @@ namespace surveillance_system
 
             // 결과(탐지율)
             Console.WriteLine("====== Surveillance Time Result ======");
-            Console.WriteLine("N_CCTV: {0}, N_Ped: {1}", N_CCTV, N_Ped);
+            Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}", N_CCTV, N_Ped, N_Car);
             Console.WriteLine("[Result]");
             Console.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
             Console.WriteLine("[Fail]");

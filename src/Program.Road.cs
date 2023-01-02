@@ -92,7 +92,7 @@ namespace surveillance_system
 
                 setCCTV(n_cctv, wd, lane_num);
                 setPed(n_ped);
-                //setCar(n_car);
+                setCar(n_car);
             }
 
             // 보행자 위치 처음 설정
@@ -254,32 +254,32 @@ namespace surveillance_system
             // set Car object
             public void setCar(int n_car)
             {
-                int[,] pedPos = new int[52,52];
+                int[,] carPos = new int[52,52];
                 for(int i = 0; i < n_car; i++)
                 {
                     Random rand = new Random();
                     int intersectidx = rand.Next(36);
-                    peds[i].X = DST[intersectidx, 0];
-                    peds[i].Y = DST[intersectidx, 1];
+                    cars[i].X = DST[intersectidx, 0];
+                    cars[i].Y = DST[intersectidx, 1];
 
                     int carintersectidx = rand.Next(4); // 0, 1, 2, 3
                     if (carintersectidx == 0) {// down left
-                        peds[i].X -= width/4;
-                        peds[i].Y += width/4;
+                        cars[i].X -= width/4;
+                        cars[i].Y += width/4;
                     }
                     else if(carintersectidx == 1){// up left
-                        peds[i].X += width/4;
-                        peds[i].Y += width/4;
+                        cars[i].X += width/4;
+                        cars[i].Y += width/4;
                     }
                     else if (carintersectidx == 2) {// up right
-                        peds[i].X += width/4;
-                        peds[i].Y -= width/4;
+                        cars[i].X += width/4;
+                        cars[i].Y -= width/4;
                     }
                     else if (carintersectidx == 3) {// down right
-                        peds[i].X -= width/4;
-                        peds[i].Y -= width/4;
+                        cars[i].X -= width/4;
+                        cars[i].Y -= width/4;
                     }
-			        pedPos[Convert.ToInt32((peds[i].Y)/10000), Convert.ToInt32((peds[i].X/10000))] += 1;
+			        carPos[Convert.ToInt32((cars[i].Y)/10000), Convert.ToInt32((cars[i].X/10000))] += 1;
                 }
             }
 
