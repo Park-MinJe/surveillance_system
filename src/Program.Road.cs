@@ -30,7 +30,7 @@ namespace surveillance_system
             public int interval;
             public int width;
 
-            public void roadBuilder(int wd, int intvl, int n_interval, int n_cctv, int n_obj)
+            public void roadBuilder(int wd, int intvl, int n_interval, int n_cctv, int n_ped, int n_car)
             {
                 this.lane_num = n_interval + 1;
                 DST = new double[lane_num * lane_num, 2];
@@ -91,8 +91,8 @@ namespace surveillance_system
                 }
 
                 setCCTV(n_cctv, wd, lane_num);
-                setPed(n_obj);
-                //setCar(n_obj);
+                setPed(n_ped);
+                //setCar(n_car);
             }
 
             // 보행자 위치 처음 설정
@@ -110,19 +110,19 @@ namespace surveillance_system
                     peds[i].X = Math.Round(newPos[0, 0]);
                     peds[i].Y = Math.Round(newPos[0, 1]);
 
-                    //Random rand = new Random();
-                    //double opt = rand.NextDouble();
+                    /*Random rand = new Random();
+                    double opt = rand.NextDouble();
 
-                    //if (opt > 0.5) {
-                    //    peds[i].X = Math.Round(laneVector.Max() * opt);
-                    //    peds[i].Y = lane_h[rand.Next(0, lane_h.GetLength(0)), 0];
-                    //}
-                    //else
-                    //{
-                    //    peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
-                    //    peds[i].Y = Math.Round(laneVector.Max() * opt);
-                    //}
-			              pedPos[Convert.ToInt32((peds[i].Y)/10000), Convert.ToInt32((peds[i].X/10000))] += 1;
+                    if (opt > 0.5) {
+                        peds[i].X = Math.Round(laneVector.Max() * opt);
+                        peds[i].Y = lane_h[rand.Next(0, lane_h.GetLength(0)), 0];
+                    }
+                    else
+                    {
+                        peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
+                        peds[i].Y = Math.Round(laneVector.Max() * opt);
+                    }*/
+                    pedPos[Convert.ToInt32((peds[i].Y)/10000), Convert.ToInt32((peds[i].X/10000))] += 1;
                 }
 		            // for문 끝나고
                 for(int i = 0 ; i < 52; i++) {

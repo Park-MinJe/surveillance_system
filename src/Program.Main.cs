@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace surveillance_system
 {
@@ -12,6 +13,7 @@ namespace surveillance_system
     {
         public static CCTV[] cctvs;
         public static Pedestrian[] peds;
+        public static Car[] cars;
 
         // Configuration: simulation time
         const double aUnitTime = 100 * 0.001; // (sec)
@@ -257,9 +259,19 @@ namespace surveillance_system
             -------------------------------------------------------------------------*/
             // Configuration: surveillance cameras
             // constant
-            const int N_CCTV = 100;
-            const int N_Ped = 10;
 
+
+            /*------------------------------------------------------------------------
+              % Xml Document
+            -------------------------------------------------------------------------*/
+            // XmlDocument xdoc = new XmlDocument();
+            // xdoc.Load(@"XMLFile1.xml");
+
+            const int N_CCTV = 100;
+            const int N_Ped = 5;
+            const int N_Car = 5;
+
+            /* ------------------------------CCTV 제원------------------------------*/
             Random rand = new Random();
             const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
             const double WD = 3.6; // (mm) width, horizontal size of camera sensor
@@ -274,8 +286,34 @@ namespace surveillance_system
             const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
             const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
+            double rotateTerm = 30.0; // sec
+
+            // calculate vertical/horizontal AOV
+            double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
+            double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
+
+            /* double D_AOV = RadToDeg(2 * Math.Atan(Diag / (2 * Lens_FocalLength)));
+            (mm)distance
+             double[] Dist = new double[10000];
+            int dist_len = 100000;
+            double[] Height = new double[10000];
+            for (int i = 0; i < 10000; i++)
+            {
+                Dist[i] = i;
+                Height[i] = i;
+            } */
+            double[] Dist = new double[25000];
+            int dist_len = 100000;
+            double[] Height = new double[25000];
+            for (int i = 0; i < 25000; i++)
+            {
+                Dist[i] = i;
+                Height[i] = i;
+            }
+
+            /* ------------------------------MAP 제원------------------------------*/
             // configuration: road
-            const int Road_WD = 5000; // 이거 안쓰는 변수? Road_Width 존재
+            // const int Road_WD = 5000; // 이거 안쓰는 변수? Road_Width 존재
             bool On_Road_Builder = true; // 0:No road, 1:Grid
           
             int Road_Width = 0;
@@ -288,6 +326,7 @@ namespace surveillance_system
                 Road_N_Interval =5;
             }
 
+            /* ------------------------------PED 설정------------------------------*/
             bool Opt_Observation = false;
             bool Opt_Demo = false;
             int[] log_PED_position = null;
@@ -295,44 +334,42 @@ namespace surveillance_system
             {
                 log_PED_position = new int[5];
             }
-            // time check start
-            // double accTime = 0.0;
+
+            // Configuration: Pedestrian (Target Object)
+            // When Pedestrian is human
+            const int Ped_Width = 900; // (mm)
+            const int Ped_Height = 1700; // (mm)
+            const int Ped_Velocity = 1500; // (mm/s)
+
+            /* ------------------------------CAR 설정------------------------------*/
+            int[] log_CAR_position = null;
+            if (Opt_Demo)
+            {
+                log_CAR_position = new int[5];
+            }
+
+            // Configuration: Pedestrian (Target Object)
+            // When Pedestrian is human
+            const int Car_Width = 1600; // (mm)
+            const int Car_Height = 2000; // (mm)
+            const int Car_Length = 3600; // (mm)
+            const int Car_Velocity = 14000; // (mm/s)
 
             // ped csv file 출력 여부
             bool createPedCSV = false;
 
-            double rotateTerm = 30.0; // sec
+            /* ---------------------------실행 시간 측정---------------------------*/
+            // time check start
+            // double accTime = 0.0;
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Step 1-2) calculate vertical/horizontal AOV
-            double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
-            double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
 
-            // double D_AOV = RadToDeg(2 * Math.Atan(Diag / (2 * Lens_FocalLength)));
-            // (mm) distance
-            // double[] Dist = new double[10000];
-            // int dist_len = 100000;
-            // double[] Height = new double[10000];
-            // for (int i = 0; i < 10000; i++)
-            // {
-            //     Dist[i] = i;
-            //     Height[i] = i;
-            // }
-            double[] Dist = new double[25000];
-            int dist_len = 100000;
-            double[] Height = new double[25000];
-            for (int i = 0; i < 25000; i++)
-            {
-                Dist[i] = i;
-                Height[i] = i;
-            }
-
-            // Configuration: Pedestrian (Target Object)
-            const int Ped_Width = 900; // (mm)
-            const int Ped_Height = 1700; // (mm)
-            const int Ped_Velocity = 1500; // (mm/s)
+            /* -------------------------------------------
+            *  도로 정보 생성 + 보행자/CCTV 초기화 시작
+            ------------------------------------------- */
+            // time check
 
             cctvs = new CCTV[N_CCTV];
             for (int i = 0; i < N_CCTV; i++)
@@ -345,17 +382,10 @@ namespace surveillance_system
                 peds[i] = new Pedestrian();
             }
 
-
-            /* -------------------------------------------
-            *  도로 정보 생성 + 보행자/CCTV 초기화 시작
-            ------------------------------------------- */
-            // time check
-
-
             if (On_Road_Builder)
             {
                 // 도로 정보 생성, 보행자 정보 생성
-                road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped);
+                road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
               
                 /*
                 // debug 220428
@@ -384,7 +414,7 @@ namespace surveillance_system
                 */
 
 
-                //ped init
+                // ped init
                 foreach(Pedestrian ped in peds)
                 {
                     double minDist = 0.0;
@@ -419,10 +449,50 @@ namespace surveillance_system
                         direction = Math.Round(2 * Math.PI - direction, 8); 
                     }
                     */
-                    ped.define_PED(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
+                    ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
                     ped.setDirection();
                     ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
                     ped.printPedInfo();
+                }
+                // car init
+                foreach (Car car in cars)
+                {
+                    double minDist = 0.0;
+                    //int idx_minDist = 0;
+                    //double[] Dist_Map = new double[road.DST.GetLength(0)];
+
+                    // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
+                    // double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
+                    // double dst_x = Math.Round(newPos[0, 0]);
+                    // double dst_y = Math.Round(newPos[0, 1]);
+
+                    // Car object일경우 가까운 도착지 설정
+                    double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
+                    double dst_x = Math.Round(newPos[0, 0]);
+                    double dst_y = Math.Round(newPos[0, 1]);
+
+                    //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+
+                    //double dst_x = road.DST[idx_minDist, 0];
+                    //double dst_y = road.DST[idx_minDist, 1];
+
+                    // 보행자~목적지 벡터
+                    /*
+                    double[] A = new double[2];
+                    A[0] = dst_x - ped.X;
+                    A[1] = dst_y - ped.Y;        
+
+                    double[] B = { 0.001, 0 };
+                    double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
+                    if(ped.Y > dst_y)
+                    {
+                        direction = Math.Round(2 * Math.PI - direction, 8); 
+                    }
+                    */
+                    car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
+                    car.setDirection();
+                    car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
+                    car.printPedInfo();
                 }
                 // cctv init
                 for (int i = 0; i < N_CCTV; i++)

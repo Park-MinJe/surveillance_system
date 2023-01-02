@@ -41,7 +41,7 @@ namespace surveillance_system
             public int N_Surv; //number of surveillance camera viewing this target.
 
             public int TTL;
-            public void define_PED(
+            public void define_TARGET(
                 double Width,
                 double Height,
                 double DST_X,
