@@ -108,7 +108,8 @@ namespace surveillance_system
                 Console.WriteLine("mapsize range rootN intvl {0} {1} {2} {3} ", mapSize, range, rootN, intvl);
                 double startX = DST[0, 0];
                 double startY = DST[0, 1];
-                
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
                 int cctvIdx = 0;
                 for(int i = 0; i < rootN; i ++)
                 {
@@ -117,7 +118,7 @@ namespace surveillance_system
                     {
                         cctvs[cctvIdx].X = (int)startX;
                         cctvs[cctvIdx].Y = (int)startY;
-                        Console.WriteLine("cctv {0} {1} ", cctvs[cctvIdx].X , cctvs[cctvIdx].Y);
+                        Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i * rootN + j, cctvs[cctvIdx].X , cctvs[cctvIdx].Y);
                         // Console.WriteLine("pos arr {0} {1} ", cctvs[i].Y / 10000, cctvs[i].X / 10000);
                         Console.WriteLine();
                         startX += intvl;
@@ -132,19 +133,23 @@ namespace surveillance_system
                     startY += intvl;
                 			// 여기는 cctv 값 넣는 for문 안쪽
                 }
-		            // for문 끝나고
-                for(int i = 0 ; i < 52; i++) {
-                      Console.Write("{0}",i);
+                // for문 끝나고
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print CCTV Position");
+                for (int i = 0 ; i < 52; i++) {
+                      Console.Write("{0, 2}",i);
                 }
                 Console.WriteLine();
                 for(int i = 0 ; i < 52; i++) {
-                  Console.Write("{0} ",i);
+                  Console.Write("{0, 2}",i);
 
                   for(int j = 0 ; j < 52; j++) {
                     if(cctvPos[i,j] <= 0) 
-                      Console.Write(" ", cctvPos[i,j]);
+                      // Console.Write("{0, 2}", " ", cctvPos[i,j]);
+                      Console.Write("{0, 2}", " ");
                     else
-                      Console.Write("*", cctvPos[i,j]);
+                      // Console.Write("{0, 2}", "*", cctvPos[i,j]);
+                      Console.Write("{0, 2}", cctvPos[i, j]);
 
                 }
                   Console.WriteLine();
@@ -181,21 +186,25 @@ namespace surveillance_system
                     pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
                 }
                 // for문 끝나고
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Pedestrian Position");
                 for (int i = 0; i < 52; i++)
                 {
-                    Console.Write("{0}", i);
+                    Console.Write("{0, 2}", i);
                 }
                 Console.WriteLine();
                 for (int i = 0; i < 52; i++)
                 {
-                    Console.Write("{0} ", i);
+                    Console.Write("{0, 2}", i);
 
                     for (int j = 0; j < 52; j++)
                     {
                         if (pedPos[i, j] <= 0)
-                            Console.Write(" ", pedPos[i, j]);
+                            // Console.Write("{0, 2}", " ", pedPos[i, j]);
+                            Console.Write("{0, 2}", " ");
                         else
-                            Console.Write("&", pedPos[i, j]);
+                            // Console.Write("{0, 2}", "&", pedPos[i, j]);
+                            Console.Write("{0, 2}", pedPos[i, j]);
 
                     }
                     Console.WriteLine();
@@ -290,21 +299,25 @@ namespace surveillance_system
                     carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
                 }
                 // for문 끝나고
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Car Position");
                 for (int i = 0; i < 52; i++)
                 {
-                    Console.Write("{0}", i);
+                    Console.Write("{0, 2}", i);
                 }
                 Console.WriteLine();
                 for (int i = 0; i < 52; i++)
                 {
-                    Console.Write("{0} ", i);
+                    Console.Write("{0, 2}", i);
 
                     for (int j = 0; j < 52; j++)
                     {
                         if (carPos[i, j] <= 0)
-                            Console.Write(" ", carPos[i, j]);
+                            // Console.Write("{0, 2}", " ", carPos[i, j]);
+                            Console.Write("{0, 2}", " ");
                         else
-                            Console.Write("$", carPos[i, j]);
+                            // Console.Write("{0, 2}", "$", carPos[i, j]);
+                            Console.Write("{0, 2}", carPos[i, j]);
 
                     }
                     Console.WriteLine();
@@ -401,17 +414,17 @@ namespace surveillance_system
 
             public void printRoadInfo()
             {
-                Console.WriteLine("\n======================== DST ===============================================");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "DST");
                 for (int i = 0; i < DST.GetLength(0); i++)
                 {
                     for (int j = 0; j < 2; j++)
                     {
-                        if (j == 0) Console.Write("DST[{0}].X = {1}      ", i, DST[i, j]);
-                        if (j == 1) Console.Write("DST[{0}].Y = {1}      ", i, DST[i, j]);
+                        if (j == 0) Console.Write("DST[{0, 2}].X = {1, 6}\t", i, DST[i, j]);
+                        if (j == 1) Console.Write("DST[{0, 2}].Y = {1, 6}\t", i, DST[i, j]);
                     }
                     Console.WriteLine();
                 }
-                Console.WriteLine("\n===========================================================================\n");
+                Console.WriteLine("\n========================================================================================\n");
 
                 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
                    Console.WriteLine("\n========================lane Vector========================================");
@@ -423,25 +436,25 @@ namespace surveillance_system
                    Console.WriteLine("\n===========================================================================\n");
                 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-                Console.WriteLine("\n========================lane horizontal======================================");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane horizontal");
                 for (int i = 0; i < lane_h.GetLength(0); i++)
                 {
                     Console.WriteLine("\n{0}번째 가로 도로 정보", i);
                     Console.WriteLine("y좌표 : 위 - 중앙 - 아래");
                     Console.WriteLine("       {0}   {1}   {2}", lane_h_upper[i,0],lane_h[i,0],lane_h_lower[i,0]);
                 }
-                Console.WriteLine("\n===========================================================================\n");
+                Console.WriteLine("\n========================================================================================\n");
 
                 
 
-                Console.WriteLine("\n========================lane vertical========================================");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane vertical");
                 for (int i = 0; i < lane_h.GetLength(0); i++)
                 {
                     Console.WriteLine("\n{0}번째 세로 도로 정보", i);
                     Console.WriteLine("x좌표 : 왼쪽 - 중앙 - 오른쪽");
                     Console.WriteLine("       {0}   {1}   {2}", lane_v_left[i, 0], lane_v[i, 0], lane_v_right[i, 0]);
                 }
-                Console.WriteLine("\n===========================================================================\n");
+                Console.WriteLine("\n========================================================================================\n");
             }
         }
     }

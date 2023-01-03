@@ -628,7 +628,7 @@ namespace surveillance_system
                 }
                 Console.WriteLine("\nCCTV Setting Completed\n");
             }
-            Console.WriteLine("\n=================== Road Setting Completed ==========================================\n");
+            Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Road Setting Completed");
             /* -------------------------------------------
             *  도로 정보 생성 + 보행자/CCTV 초기화 끝
             ------------------------------------------- */
@@ -649,7 +649,7 @@ namespace surveillance_system
             int road_min = 0;
             int road_max = road.mapSize;
 
-            Console.WriteLine("simulatioin start:");
+            Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start");
 
             /* Console.WriteLine("=== 성공 ====");
             Console.WriteLine("print index of CCTV and detected Target\n");
@@ -766,7 +766,7 @@ namespace surveillance_system
                 // Console.WriteLine("while simulation 3");
             }
 
-            Console.WriteLine("\n====================== Simulation Completed =============================================\n");
+            Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulation Completed");
             stopwatch.Stop();
 
             // // create .csv file
@@ -806,27 +806,38 @@ namespace surveillance_system
             // Console.WriteLine("Execution time : {0}\n", (accTime / 1000.0 ) + " sec");
 
             // 결과(탐지 결과)
-            Console.Write("Do you want Target Detection List(Y/N)? ");
-            String printDetectionList = Console.ReadLine();
-
-            if (printDetectionList == "Y" || printDetectionList == "y")
+            while (true)
             {
-                Console.WriteLine("\n====== Surveillance Target Result ======");
-                Console.WriteLine("print index of CCTV and detected Target\n");
-                Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", "CCTV", "TARGET", "X", "Y", "V");
-                for (int i = 0; i < N_CCTV; i++)
+                Console.Write("Do you want Target Detection List(Y/N)? ");
+                String printDetectionList = Console.ReadLine();
+
+                if (printDetectionList == "Y" || printDetectionList == "y")
                 {
-                    foreach (int j in cctvs[i].detectedPedIndex)
+                    Console.WriteLine("\n====== Surveillance Target Result ======");
+                    Console.WriteLine("print index of CCTV and detected Target\n");
+                    Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", "CCTV", "TARGET", "X", "Y", "V");
+                    for (int i = 0; i < N_CCTV; i++)
                     {
-                        if (j < N_Ped)
+                        foreach (int j in cctvs[i].detectedPedIndex)
                         {
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
-                        }
-                        else
-                        {
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
+                            if (j < N_Ped)
+                            {
+                                Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
+                            }
+                            else
+                            {
+                                Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
+                            }
                         }
                     }
+                }
+                else if (printDetectionList == "N" || printDetectionList == "n")
+                {
+                    break;
+                }
+                else
+                {
+                    continue;
                 }
             }
         }
