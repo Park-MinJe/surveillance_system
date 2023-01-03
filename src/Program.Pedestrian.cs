@@ -202,7 +202,7 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived())
+                if (isArrived() || outOfRange())
                 {
                     updateDestination();
                     setDirection();
@@ -211,7 +211,9 @@ namespace surveillance_system
 
             public void updateDestination()
             {
+                // Console.WriteLine("update destination1");
                 double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(X, Y), X, Y);
+                // Console.WriteLine("update destination2");
                 DST_X = Math.Round(newPos[0, 0]);
                 DST_Y = Math.Round(newPos[0, 1]);
             }

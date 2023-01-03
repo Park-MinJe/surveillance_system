@@ -95,54 +95,6 @@ namespace surveillance_system
                 setCar(n_car);
             }
 
-            // 보행자 위치 처음 설정
-            public void setPed(int n_ped)
-            {
-                int[,] pedPos = new int[52,52];
-                for(int i = 0; i < n_ped; i++)
-                {
-                    Random rand = new Random();
-                    // int intersectidx = rand.Next(9);
-                    int intersectidx = rand.Next(36);
-
-                    // Console.WriteLine(intersectidx);
-                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
-                    peds[i].X = Math.Round(newPos[0, 0]);
-                    peds[i].Y = Math.Round(newPos[0, 1]);
-
-                    /*Random rand = new Random();
-                    double opt = rand.NextDouble();
-
-                    if (opt > 0.5) {
-                        peds[i].X = Math.Round(laneVector.Max() * opt);
-                        peds[i].Y = lane_h[rand.Next(0, lane_h.GetLength(0)), 0];
-                    }
-                    else
-                    {
-                        peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
-                        peds[i].Y = Math.Round(laneVector.Max() * opt);
-                    }*/
-                    pedPos[Convert.ToInt32((peds[i].Y)/10000), Convert.ToInt32((peds[i].X/10000))] += 1;
-                }
-		            // for문 끝나고
-                for(int i = 0 ; i < 52; i++) {
-                      Console.Write("{0}",i);
-                }
-                Console.WriteLine();
-                for(int i = 0 ; i < 52; i++) {
-                  Console.Write("{0} ",i);
-
-                  for(int j = 0 ; j < 52; j++) {
-                    if(pedPos[i,j] <= 0) 
-                      Console.Write(" ", pedPos[i,j]);
-                    else
-                      Console.Write("&", pedPos[i,j]);
-
-                }
-                  Console.WriteLine();
-                }
-            }
-
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
                 int[,] cctvPos = new int[52,52];
@@ -171,7 +123,7 @@ namespace surveillance_system
                         startX += intvl;
 
                         //debug
-			                  cctvPos[(cctvs[cctvIdx].Y)/10000, (cctvs[cctvIdx].X)/10000] += 1;
+			            cctvPos[(cctvs[cctvIdx].Y)/10000, (cctvs[cctvIdx].X)/10000] += 1;
                         
                         cctvIdx++;
 
@@ -196,6 +148,57 @@ namespace surveillance_system
 
                 }
                   Console.WriteLine();
+                }
+            }
+
+            // 보행자 위치 처음 설정
+            public void setPed(int n_ped)
+            {
+                int[,] pedPos = new int[52, 52];
+                for (int i = 0; i < n_ped; i++)
+                {
+                    Random rand = new Random();
+                    // int intersectidx = rand.Next(9);
+                    int intersectidx = rand.Next(lane_num * lane_num);
+
+                    // Console.WriteLine(intersectidx);
+                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
+                    peds[i].X = Math.Round(newPos[0, 0]);
+                    peds[i].Y = Math.Round(newPos[0, 1]);
+
+                    /*Random rand = new Random();
+                    double opt = rand.NextDouble();
+
+                    if (opt > 0.5) {
+                        peds[i].X = Math.Round(laneVector.Max() * opt);
+                        peds[i].Y = lane_h[rand.Next(0, lane_h.GetLength(0)), 0];
+                    }
+                    else
+                    {
+                        peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
+                        peds[i].Y = Math.Round(laneVector.Max() * opt);
+                    }*/
+                    pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
+                }
+                // for문 끝나고
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0} ", i);
+
+                    for (int j = 0; j < 52; j++)
+                    {
+                        if (pedPos[i, j] <= 0)
+                            Console.Write(" ", pedPos[i, j]);
+                        else
+                            Console.Write("&", pedPos[i, j]);
+
+                    }
+                    Console.WriteLine();
                 }
             }
 
@@ -244,6 +247,7 @@ namespace surveillance_system
                 {
                     if(x>=intersectionArea[i,0] && x<=intersectionArea[i,1] && y>=intersectionArea[i,2] && y <= intersectionArea[i, 3])
                     {
+                        // Console.WriteLine("getIdxIntersection return {0}", i);
                         return i;
                     }
                 }
@@ -254,32 +258,56 @@ namespace surveillance_system
             // set Car object
             public void setCar(int n_car)
             {
-                int[,] carPos = new int[52,52];
-                for(int i = 0; i < n_car; i++)
+                int[,] carPos = new int[52, 52];
+                for (int i = 0; i < n_car; i++)
                 {
                     Random rand = new Random();
-                    int intersectidx = rand.Next(36);
+                    int intersectidx = rand.Next(lane_num * lane_num);
                     cars[i].X = DST[intersectidx, 0];
                     cars[i].Y = DST[intersectidx, 1];
 
                     int carintersectidx = rand.Next(4); // 0, 1, 2, 3
-                    if (carintersectidx == 0) {// down left
-                        cars[i].X -= width/4;
-                        cars[i].Y += width/4;
+                    if (carintersectidx == 0)
+                    {// down left
+                        cars[i].X -= width / 4;
+                        cars[i].Y += width / 4;
                     }
-                    else if(carintersectidx == 1){// up left
-                        cars[i].X += width/4;
-                        cars[i].Y += width/4;
+                    else if (carintersectidx == 1)
+                    {// up left
+                        cars[i].X += width / 4;
+                        cars[i].Y += width / 4;
                     }
-                    else if (carintersectidx == 2) {// up right
-                        cars[i].X += width/4;
-                        cars[i].Y -= width/4;
+                    else if (carintersectidx == 2)
+                    {// up right
+                        cars[i].X += width / 4;
+                        cars[i].Y -= width / 4;
                     }
-                    else if (carintersectidx == 3) {// down right
-                        cars[i].X -= width/4;
-                        cars[i].Y -= width/4;
+                    else if (carintersectidx == 3)
+                    {// down right
+                        cars[i].X -= width / 4;
+                        cars[i].Y -= width / 4;
                     }
-			        carPos[Convert.ToInt32((cars[i].Y)/10000), Convert.ToInt32((cars[i].X/10000))] += 1;
+                    carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
+                }
+                // for문 끝나고
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0} ", i);
+
+                    for (int j = 0; j < 52; j++)
+                    {
+                        if (carPos[i, j] <= 0)
+                            Console.Write(" ", carPos[i, j]);
+                        else
+                            Console.Write("$", carPos[i, j]);
+
+                    }
+                    Console.WriteLine();
                 }
             }
 
@@ -295,6 +323,8 @@ namespace surveillance_system
                 double midY = DST[currAreaIdx, 1];
 
                 Random rand = new Random();
+
+                // Console.WriteLine("getPointOfAdjacentIntersection x: {0}, y: {1}, midX: {2}, midY: {3}", x, y, midX, midY);
                 do
                 {
                     i = currAreaIdx / lane_num;
@@ -302,12 +332,15 @@ namespace surveillance_system
                     curX = x;
                     curY = y;
 
-                    int opt = rand.Next(0, 1);
+                    int opt = rand.Next(0, 2);
 
-                    if ( x < midX && y > midY ){ // 0 down left
+                    // 이 부분 수정 필요
+                    if ( x < midX && y >= midY ){ // 0 down left
                         if (opt == 0)// down
-                        { 
+                        {
                             curY -= width/2;
+                            // curY -= (interval + width / 2);
+                            // j -= 1;
                         }
                         else if (opt == 1) //left
                         { 
@@ -315,7 +348,7 @@ namespace surveillance_system
                             i -= 1;
                         }
                     }
-                    else if ( x > midX && y > midY ){ // 1 up left
+                    else if ( x >= midX && y >= midY ){ // 1 up left
                         if (opt == 0) // up
                         {   
                             curY += (interval + width/2);
@@ -324,12 +357,16 @@ namespace surveillance_system
                         else if (opt == 1) // left
                         {
                             curX -= width/2;
-                        }                        
+                            // curX -= (interval + width / 2);
+                            // i -= 1;
+                        }
                     }
-                    else if ( x > midX && y < midY ){ // 2 up right
+                    else if ( x >= midX && y < midY ){ // 2 up right
                         if (opt == 0) // up
                         {
                             curY += width/2;
+                            // curY += (interval + width / 2);
+                            // j += 1;
                         }
                         else if (opt == 1) // right
                         {
@@ -346,7 +383,9 @@ namespace surveillance_system
                         else if (opt == 1) // right
                         {
                             curX += width/2;
-                        }                        
+                            // curX += (interval + width / 2);
+                            // i += 1;
+                        }
                     }
 
                 } while (i< 0 || i >= lane_num || j < 0|| j >=  lane_num);
