@@ -169,11 +169,17 @@ namespace surveillance_system
             }
             public void downVelocity()
             {
-                this.Velocity -= 0.01f;
+                if (this.Velocity > 0.01f && this.Velocity < 4000)
+                    this.Velocity -= 0.01f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public void upVelocity()
             {
-                this.Velocity += 0.01f;
+                if (this.Velocity > 0.01f && this.Velocity < 4000)
+                    this.Velocity += 0.01f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public  void  updateDestination()
             {      
@@ -220,11 +226,17 @@ namespace surveillance_system
             
             public void downVelocity()
             {
-                this.Velocity -= 0.1f;
+                if (this.Velocity > 0.1f && this.Velocity < 33333)
+                    this.Velocity -= 0.1f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public void upVelocity()
             {
-                this.Velocity += 0.1f;
+                if (this.Velocity > 0.1f && this.Velocity < 33333)
+                    this.Velocity += 0.1f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
         }
 

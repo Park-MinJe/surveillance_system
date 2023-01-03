@@ -283,9 +283,15 @@ namespace surveillance_system
 
                         // print detected intex of CCTV:Target
                         if (j < N_Ped)
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", i, j, peds[j].X, peds[j].Y);
+                        {
+                            peds[j].upVelocity();
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
+                        }
                         else
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y);
+                        {
+                            cars[j - N_Ped].upVelocity();
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
+                        }
                     }
                     else
                     {
@@ -647,7 +653,7 @@ namespace surveillance_system
 
             Console.WriteLine("=== 성공 ====");
             Console.WriteLine("print index of CCTV and detected Target\n");
-            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", "CCTV", "TARGET", "X", "Y");
+            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", "CCTV", "TARGET", "X", "Y", "V");
             // Console.WriteLine("Now: {0}, Sim_Time: {1}, routine times: {2}\n", Now, Sim_Time, (Sim_Time - Now) / aUnitTime);
             // simulation
             while (Now < Sim_Time)
