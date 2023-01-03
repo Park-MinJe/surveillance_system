@@ -120,7 +120,7 @@ namespace surveillance_system
 
                     // 거리상 미탐지면 넘어감 
                     if (candidate_detected_target_h[i, j] != 1 || candidate_detected_target_v[i, j] != 1)
-                    {                      
+                    {
                         continue;
                     }
                     
@@ -225,7 +225,7 @@ namespace surveillance_system
 
                         returnArr[j] = 1;
                         // 220407
-                        cctvs[i].detectedPedIndex.Add(j);
+                        // cctvs[i].detectedPedIndex.Add(j);
                     }
                     // 방향 미스 (h or v 중 하나라도 방향이 맞지 않는 경우)
                     else // cctv[i]가 보행자[j]를 h or v 탐지 실패 여부 추가
@@ -262,25 +262,30 @@ namespace surveillance_system
             int[] cctv_missing_count_v = new int[N_CCTV];
 
             for(int i = 0 ; i < N_CCTV; i++)
-            for(int j = 0 ; j < N_Ped; j++)
+            for(int j = 0 ; j < N_Target; j++)
             {
                 cctv_missing_count_h[i] += missed_map_h[i, j];
                 cctv_missing_count_v[i] += missed_map_v[i, j];
             }
             // 보행자를 탐지한 cctv 수
-            int[] detecting_cctv_cnt = new int[N_Ped];
+            int[] detecting_cctv_cnt = new int[N_Target];
             // 보행자를 탐지하지 못한 cctv 수
-            int[] missing_cctv_cnt = new int[N_Ped];
+            int[] missing_cctv_cnt = new int[N_Target];
 
-            //Console.WriteLine("=== 성공 ====");
             // detection 결과 출력 
             for (int i = 0; i < N_CCTV; i++)
             {
-                for (int j = 0; j < N_Ped; j++)
+                for (int j = 0; j < N_Target; j++)
                 {
                     if (detected_map[i, j] == 1)
                     {
                         detecting_cctv_cnt[j]++;
+
+                        // print detected intex of CCTV:Target
+                        if (j < N_Ped)
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", i, j, peds[j].X, peds[j].Y);
+                        else
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y);
                     }
                     else
                     {
@@ -324,8 +329,8 @@ namespace surveillance_system
             // XmlDocument xdoc = new XmlDocument();
             // xdoc.Load(@"XMLFile1.xml");
 
-            bool getPedFromUser = true;
-            bool getCarFromUser = true;
+            bool getPedFromUser = false;
+            bool getCarFromUser = false;
 
             int N_CCTV = 100;
             int N_Ped = 5;
@@ -639,6 +644,10 @@ namespace surveillance_system
             int road_max = road.mapSize;
 
             Console.WriteLine("simulatioin start:");
+
+            Console.WriteLine("=== 성공 ====");
+            Console.WriteLine("print index of CCTV and detected Target\n");
+            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}", "CCTV", "TARGET", "X", "Y");
             // Console.WriteLine("Now: {0}, Sim_Time: {1}, routine times: {2}\n", Now, Sim_Time, (Sim_Time - Now) / aUnitTime);
             // simulation
             while (Now < Sim_Time)
