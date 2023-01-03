@@ -225,7 +225,7 @@ namespace surveillance_system
 
                         returnArr[j] = 1;
                         // 220407
-                        // cctvs[i].detectedPedIndex.Add(j);
+                        cctvs[i].detectedPedIndex.Add(j);
                     }
                     // 방향 미스 (h or v 중 하나라도 방향이 맞지 않는 경우)
                     else // cctv[i]가 보행자[j]를 h or v 탐지 실패 여부 추가
@@ -285,12 +285,12 @@ namespace surveillance_system
                         if (j < N_Ped)
                         {
                             peds[j].upVelocity();
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
+                            // Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
                         }
                         else
                         {
                             cars[j - N_Ped].upVelocity();
-                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
+                            // Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
                         }
                     }
                     else
@@ -651,9 +651,9 @@ namespace surveillance_system
 
             Console.WriteLine("simulatioin start:");
 
-            Console.WriteLine("=== 성공 ====");
+            /* Console.WriteLine("=== 성공 ====");
             Console.WriteLine("print index of CCTV and detected Target\n");
-            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", "CCTV", "TARGET", "X", "Y", "V");
+            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", "CCTV", "TARGET", "X", "Y", "V");*/
             // Console.WriteLine("Now: {0}, Sim_Time: {1}, routine times: {2}\n", Now, Sim_Time, (Sim_Time - Now) / aUnitTime);
             // simulation
             while (Now < Sim_Time)
@@ -800,10 +800,35 @@ namespace surveillance_system
             // 결과(시간)
             // Console.WriteLine("Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
             // accTime += stopwatch.ElapsedMilliseconds;
-            
+
             // Console.WriteLine("\n============ RESULT ============");
             // Console.WriteLine("CCTV: {0}, Ped: {1}", N_CCTV, N_Ped);
             // Console.WriteLine("Execution time : {0}\n", (accTime / 1000.0 ) + " sec");
+
+            // 결과(탐지 결과)
+            Console.Write("Do you want Target Detection List(Y/N)? ");
+            String printDetectionList = Console.ReadLine();
+
+            if (printDetectionList == "Y" || printDetectionList == "y")
+            {
+                Console.WriteLine("\n====== Surveillance Target Result ======");
+                Console.WriteLine("print index of CCTV and detected Target\n");
+                Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", "CCTV", "TARGET", "X", "Y", "V");
+                for (int i = 0; i < N_CCTV; i++)
+                {
+                    foreach (int j in cctvs[i].detectedPedIndex)
+                    {
+                        if (j < N_Ped)
+                        {
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, peds[j].X, peds[j].Y, peds[j].Velocity);
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4, 18}", i, j, cars[j - N_Ped].X, cars[j - N_Ped].Y, cars[j - N_Ped].Velocity);
+                        }
+                    }
+                }
+            }
         }
     }
 }
