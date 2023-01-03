@@ -324,10 +324,23 @@ namespace surveillance_system
             // XmlDocument xdoc = new XmlDocument();
             // xdoc.Load(@"XMLFile1.xml");
 
-            const int N_CCTV = 100;
-            const int N_Ped = 5;
-            const int N_Car = 5;
-            const int N_Target = N_Ped + N_Car;
+            bool getPedFromUser = true;
+            bool getCarFromUser = true;
+
+            int N_CCTV = 100;
+            int N_Ped = 5;
+            if (getPedFromUser)
+            {
+                Console.Write("input number of Pedestrian: ");
+                N_Ped = Convert.ToInt32(Console.ReadLine());
+            }
+            int N_Car = 5;
+            if (getCarFromUser)
+            {
+                Console.Write("input number of Car: ");
+                N_Car = Convert.ToInt32(Console.ReadLine());
+            }
+            int N_Target = N_Ped + N_Car;
 
             /* ------------------------------CCTV 제원------------------------------*/
             Random rand = new Random();
