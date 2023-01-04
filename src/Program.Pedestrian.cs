@@ -41,7 +41,7 @@ namespace surveillance_system
             public int N_Surv; //number of surveillance camera viewing this target.
 
             public int TTL;
-            public void define_PED(
+            public void define_TARGET(
                 double Width,
                 double Height,
                 double DST_X,
@@ -104,7 +104,7 @@ namespace surveillance_system
                 else return false;
             }
 
-            public void printPedInfo()
+            public void printTargetInfo()
             {
                 Console.WriteLine("======================Info======================");
                 Console.WriteLine("출발지 : ({0},{1}) \n", this.X, this.Y);
@@ -169,11 +169,17 @@ namespace surveillance_system
             }
             public void downVelocity()
             {
-                this.Velocity -= 0.01f;
+                if (this.Velocity > 0.01f && this.Velocity < 4000)
+                    this.Velocity -= 0.01f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public void upVelocity()
             {
-                this.Velocity += 0.01f;
+                if (this.Velocity > 0.01f && this.Velocity < 4000)
+                    this.Velocity += 0.01f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public  void  updateDestination()
             {      
@@ -202,7 +208,7 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived())
+                if (isArrived() || outOfRange())
                 {
                     updateDestination();
                     setDirection();
@@ -211,18 +217,26 @@ namespace surveillance_system
 
             public void updateDestination()
             {
+                // Console.WriteLine("update destination1");
                 double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(X, Y), X, Y);
+                // Console.WriteLine("update destination2");
                 DST_X = Math.Round(newPos[0, 0]);
                 DST_Y = Math.Round(newPos[0, 1]);
             }
             
             public void downVelocity()
             {
-                this.Velocity -= 0.1f;
+                if (this.Velocity > 0.1f && this.Velocity < 33333)
+                    this.Velocity -= 0.1f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
             public void upVelocity()
             {
-                this.Velocity += 0.1f;
+                if (this.Velocity > 0.1f && this.Velocity < 33333)
+                    this.Velocity += 0.1f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
         }
 
