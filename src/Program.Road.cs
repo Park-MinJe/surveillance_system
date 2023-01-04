@@ -211,59 +211,6 @@ namespace surveillance_system
                 }
             }
 
-            public double[,] getPointOfAdjacentRoad(int currAreaIdx)
-            {
-                if(currAreaIdx == -1)
-                {
-                    return new double[,] { { 0, 0 } };
-                }
-
-                int i, j;
-                Random rand = new Random();
-
-                do
-                {
-                    i = currAreaIdx / lane_num;
-                    j = currAreaIdx % lane_num;
-
-                    int opt = rand.Next(0, 4);
-                    if (opt == 0) j += 1; // up
-                    else if(opt == 1) j -= 1; // down
-                    else if (opt == 2)  i -= 1; // left
-                    else if(opt == 3) i += 1; // right
-
-                } while (i< 0 || i >= lane_num || j < 0|| j >=  lane_num);
-
-                int idx = lane_num * i + j;
-                double[,] newPos = new double[1, 2];
-                // newPos[0,0] = DST[idx, 0] + rand.Next(-width, width) * rand.NextDouble();
-                // newPos[0,1] = DST[idx, 1] + rand.Next(-width, width) * rand.NextDouble();
-
-                //20220512
-                // newPos[0, 0] = rand.Next((int)intersectionArea[idx, 0], (int)intersectionArea[idx, 1]);
-                // newPos[0, 1] = rand.Next((int)intersectionArea[idx, 2], (int)intersectionArea[idx, 3]);
-
-                newPos[0, 0] = DST[idx, 0] ;
-                newPos[0, 1] = DST[idx, 1];
-
-                // Console.WriteLine("newpos {0} {1}", newPos[0, 0], newPos[0, 1]);
-                return newPos;
-            }
-
-            public int getIdxOfIntersection(double x, double y)
-            {
-                for(int i = 0; i < intersectionArea.GetLength(0);  i++)
-                {
-                    if(x>=intersectionArea[i,0] && x<=intersectionArea[i,1] && y>=intersectionArea[i,2] && y <= intersectionArea[i, 3])
-                    {
-                        // Console.WriteLine("getIdxIntersection return {0}", i);
-                        return i;
-                    }
-                }
-
-                return -1;
-            }
-
             // set Car object
             public void setCar(int n_car)
             {
@@ -322,6 +269,59 @@ namespace surveillance_system
                     }
                     Console.WriteLine();
                 }
+            }
+
+            public double[,] getPointOfAdjacentRoad(int currAreaIdx)
+            {
+                if (currAreaIdx == -1)
+                {
+                    return new double[,] { { 0, 0 } };
+                }
+
+                int i, j;
+                Random rand = new Random();
+
+                do
+                {
+                    i = currAreaIdx / lane_num;
+                    j = currAreaIdx % lane_num;
+
+                    int opt = rand.Next(0, 4);
+                    if (opt == 0) j += 1; // up
+                    else if (opt == 1) j -= 1; // down
+                    else if (opt == 2) i -= 1; // left
+                    else if (opt == 3) i += 1; // right
+
+                } while (i < 0 || i >= lane_num || j < 0 || j >= lane_num);
+
+                int idx = lane_num * i + j;
+                double[,] newPos = new double[1, 2];
+                // newPos[0,0] = DST[idx, 0] + rand.Next(-width, width) * rand.NextDouble();
+                // newPos[0,1] = DST[idx, 1] + rand.Next(-width, width) * rand.NextDouble();
+
+                //20220512
+                // newPos[0, 0] = rand.Next((int)intersectionArea[idx, 0], (int)intersectionArea[idx, 1]);
+                // newPos[0, 1] = rand.Next((int)intersectionArea[idx, 2], (int)intersectionArea[idx, 3]);
+
+                newPos[0, 0] = DST[idx, 0];
+                newPos[0, 1] = DST[idx, 1];
+
+                // Console.WriteLine("newpos {0} {1}", newPos[0, 0], newPos[0, 1]);
+                return newPos;
+            }
+
+            public int getIdxOfIntersection(double x, double y)
+            {
+                for (int i = 0; i < intersectionArea.GetLength(0); i++)
+                {
+                    if (x >= intersectionArea[i, 0] && x <= intersectionArea[i, 1] && y >= intersectionArea[i, 2] && y <= intersectionArea[i, 3])
+                    {
+                        // Console.WriteLine("getIdxIntersection return {0}", i);
+                        return i;
+                    }
+                }
+
+                return -1;
             }
 
             public double[,] getPointOfAdjacentIntersection(int currAreaIdx, double x, double y)

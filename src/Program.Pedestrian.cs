@@ -104,7 +104,7 @@ namespace surveillance_system
                 else return false;
             }
 
-            public void printPedInfo()
+            public void printTargetInfo()
             {
                 Console.WriteLine("======================Info======================");
                 Console.WriteLine("출발지 : ({0},{1}) \n", this.X, this.Y);

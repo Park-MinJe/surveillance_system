@@ -214,7 +214,28 @@ namespace surveillance_system
 
             public FOV V_FOV;
 
-            public List<int> detectedPedIndex;
+            // record detected Target Info
+            public class detectedTarget
+            {
+                private int idx;
+                private double x;
+                private double y;
+                private double v;
+                private double t;
+
+                public void setIdx(int idx) { this.idx = idx; }
+                public void setX(double x) { this.x = x; }
+                public void setY(double y) { this.y = y; }
+                public void setV(double v) { this.v = v; }
+                public void setT(double t) { this.t = t; }
+
+                public int getIdx() { return idx; }
+                public double getX() { return x; }
+                public double getY() { return y; }
+                public double getV() { return v; }
+                public double getT() { return t; }
+            }
+            public List<detectedTarget> detectedTargets;
 
             public void setZ(int z)
             {
