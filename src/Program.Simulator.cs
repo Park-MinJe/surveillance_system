@@ -22,13 +22,16 @@ namespace surveillance_system
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
-            private bool getPedFromUser = false;
-            private bool getCarFromUser = false;
+            private bool getCCTVNumFromUser = false;
+            private bool getPedNumFromUser = false;
+            private bool getCarNumFromUser = false;
 
             private int N_CCTV = 100;
             private int N_Ped = 5;
             private int N_Car = 5;
             private int N_Target;
+
+            public int getNCCTV() { return N_CCTV; }
 
             // ped csv file 출력 여부
             private bool createPedCSV = false;
@@ -37,19 +40,6 @@ namespace surveillance_system
 
             private double Sim_Time = 600;
             private double Now = 0;
-
-            // Console.WriteLine(">>> Simulating . . . \n");
-            private int[] R_Surv_Time;      // 탐지 
-            private int[] directionError;   // 방향 미스
-            private int[] outOfRange;       // 거리 범위 밖
-
-            private string[] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
-            private string[] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
-            private string[] detection;     // csv 파일 출력 위한 추적여부
-            private string header;
-
-            private int road_min = 0;
-            private int road_max;
 
             Stopwatch stopwatch;
 
@@ -86,6 +76,9 @@ namespace surveillance_system
             private int Road_Interval = 0;
             private int Road_N_Interval = 0;
 
+            private int road_min = 0;
+            private int road_max;
+
             /* ------------------------------PED 설정------------------------------*/
             private bool Opt_Observation = false;
             private bool Opt_Demo = false;
@@ -107,8 +100,21 @@ namespace surveillance_system
                                             // const int Car_Length = 3600; // (mm)
             private const int Car_Velocity = 14000; // (mm/s)
 
+            /* ---------------------------시뮬레이션 결과----------------------------*/
+            // Console.WriteLine(">>> Simulating . . . \n");
+            private int[] R_Surv_Time;      // 탐지 
+            private int[] directionError;   // 방향 미스
+            private int[] outOfRange;       // 거리 범위 밖
 
-            public void simulate()
+            private string[] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
+            private string[] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
+            private string[] detection;     // csv 파일 출력 위한 추적여부
+            private string header;
+
+            /* --------------------------------------
+             * 전체 시뮬레이션 함수
+            -------------------------------------- */
+            public double simulateAll(int cctvMode)
             {
                 /*------------------------------------------------------------------------
                   % note 1) To avoid confusing, all input parameters for a distance has a unit as a milimeter
@@ -124,49 +130,46 @@ namespace surveillance_system
                 // xdoc.Load(@"XMLFile1.xml");
 
                 /* ---------------------------변수 초기화------------------------------*/
+                this.setgetCCTVNumFromUser();
+                this.setgetPedNumFromUser();
+                this.setgetCarNumFromUser();
+
                 this.initVariables();
 
-                /* ---------------------------실행 시간 측정---------------------------*/
-                // time check start
-                // double accTime = 0.0;
 
-                stopwatch = new Stopwatch();
-                stopwatch.Start();
+                /* ---------------------------실행 시간 측정---------------------------*/
+                this.initTimer();
+                this.startTimer();
 
 
                 /* -------------------------------------------
                 *  도로 정보 생성 + 보행자/CCTV 초기화 시작
+                *  타이머 작동
                 ------------------------------------------- */
-                // time check
+                this.initMap(cctvMode);
+                road.printRoadInfo();
 
-                if (this.initSim())
-                {
-                    Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Road Setting Completed");
-                }
-                else
-                {
-                    Console.WriteLine("Err while initializing Simulator\n");
-                }
                 /* -------------------------------------------
                 *  도로 정보 생성 + 보행자/CCTV 초기화 끝
                 ------------------------------------------- */
 
                 // Console.WriteLine(">>> Simulating . . . \n");
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start");
 
+                /* -------------------------------------------
+                *  시뮬레이션 진행
+                ------------------------------------------- */
                 this.operateSim();
-
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulation Completed");
-                stopwatch.Stop();
+                this.stopTimer();
+                /* -------------------------------------------
+                *  시뮬레이션 종료
+                *  타이머 stop
+                ------------------------------------------- */
 
                 // create .csv file
-                if (createPedCSV)
-                {
-                    printResultAsFile();
-                }
+                this.printResultAsCSV();
 
                 // 결과(탐지율)
-                this.printResultRate();
+                double successRate = this.printResultRate();
 
                 // 결과(탐지 결과)
                 // 시뮬레이션 결과, 탐지된 기록을 출력한다.
@@ -179,20 +182,162 @@ namespace surveillance_system
                 // Console.WriteLine("\n============ RESULT ============");
                 // Console.WriteLine("CCTV: {0}, Ped: {1}", N_CCTV, N_Ped);
                 // Console.WriteLine("Execution time : {0}\n", (accTime / 1000.0 ) + " sec");
+
+                return successRate;
+            }
+
+            /* --------------------------------------
+             * 입력 활성화 함수
+            -------------------------------------- */
+            public void setgetCCTVNumFromUser()
+            {
+                while (true)
+                {
+                    Console.Write("Do you want to enter CCTV Numbers(Y/N)? ");
+                    String input = Console.ReadLine();
+
+                    if (input == "Y" || input == "y")
+                    {
+                        getCCTVNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getCCTVNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            public void setgetCCTVNumFromUser(string input)
+            {
+                while (true)
+                {
+                    if (input == "Y" || input == "y")
+                    {
+                        getCCTVNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getCCTVNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            public void setgetPedNumFromUser()
+            {
+                while (true)
+                {
+                    Console.Write("Do you want to enter Pedestrian Numbers(Y/N)? ");
+                    String input = Console.ReadLine();
+
+                    if (input == "Y" || input == "y")
+                    {
+                        getPedNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getPedNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            public void setgetPedNumFromUser(string input)
+            {
+                while (true)
+                {
+                    if (input == "Y" || input == "y")
+                    {
+                        getPedNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getPedNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            public void setgetCarNumFromUser()
+            {
+                while (true)
+                {
+                    Console.Write("Do you want to enter Car Numbers(Y/N)? ");
+                    String input = Console.ReadLine();
+
+                    if (input == "Y" || input == "y")
+                    {
+                        getCarNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getCarNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            public void setgetCarNumFromUser(string input)
+            {
+                while (true)
+                {
+                    if (input == "Y" || input == "y")
+                    {
+                        getCarNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getCarNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
             }
 
             /* --------------------------------------
              * 초기화 함수
             -------------------------------------- */
-            private void initVariables()
+            public void initVariables()
             {
                 /* ---------------------------시뮬레이션 조건----------------------------*/
-                if (getPedFromUser)
+                if (getCCTVNumFromUser)
+                {
+                    Console.Write("input number of CCTV: ");
+                    N_CCTV = Convert.ToInt32(Console.ReadLine());
+                }
+                if (getPedNumFromUser)
                 {
                     Console.Write("input number of Pedestrian: ");
                     N_Ped = Convert.ToInt32(Console.ReadLine());
                 }
-                if (getCarFromUser)
+                if (getCarNumFromUser)
                 {
                     Console.Write("input number of Car: ");
                     N_Car = Convert.ToInt32(Console.ReadLine());
@@ -237,32 +382,33 @@ namespace surveillance_system
                 {
                     log_CAR_position = new int[5];
                 }
+
+                cctvs = new CCTV[N_CCTV];
+                for (int i = 0; i < N_CCTV; i++)
+                {
+                    cctvs[i] = new CCTV();
+                }
+                peds = new Pedestrian[N_Ped];
+                for (int i = 0; i < N_Ped; i++)
+                {
+                    peds[i] = new Pedestrian();
+                }
+                cars = new Car[N_Car];
+                for (int i = 0; i < N_Car; i++)
+                {
+                    cars[i] = new Car();
+                }
             }
 
-            private bool initSim()
+            public void initMap(int cctvMode)
             {
+                // mode 0: pos cctv as grid    1: pos cctv as random
                 try
                 {
-                    cctvs = new CCTV[N_CCTV];
-                    for (int i = 0; i < N_CCTV; i++)
-                    {
-                        cctvs[i] = new CCTV();
-                    }
-                    peds = new Pedestrian[N_Ped];
-                    for (int i = 0; i < N_Ped; i++)
-                    {
-                        peds[i] = new Pedestrian();
-                    }
-                    cars = new Car[N_Car];
-                    for (int i = 0; i < N_Car; i++)
-                    {
-                        cars[i] = new Car();
-                    }
-
                     if (On_Road_Builder)
                     {
                         // 도로 정보 생성, 보행자 정보 생성
-                        road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
+                        road.roadBuilder(cctvMode, Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
 
                         /*
                         // debug 220428
@@ -273,7 +419,7 @@ namespace surveillance_system
 
                         }
                         */
-                        road.printRoadInfo();
+                        // road.printRoadInfo();
 
                         /*
 
@@ -291,45 +437,24 @@ namespace surveillance_system
 
 
                         // ped init
-                        if (this.initPed())
-                        {
-                            Console.WriteLine("PED Setting Completed\n");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Err while initializing Pedestrians\n");
-                        }
+                        this.initPed();
 
                         // car init
-                        if (this.initCar())
-                        {
-                            Console.WriteLine("CAR Setting Completed\n");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Err while initializing Cars\n");
-                        }
+                        this.initCar();
 
                         // cctv init
-                        if (this.initCCTV())
-                        {
-                            Console.WriteLine("\nCCTV Setting Completed\n");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Err while initializing CCTVs\n");
-                        }
+                        this.initCCTV();
                     }
                 }
                 catch(Exception ex)
                 {
+                    Console.WriteLine("Err while initializing Simulator\n");
                     Console.WriteLine(ex.Message);
-                    return false;
                 }
-                return true;
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Road Setting Completed");
             }
 
-            private bool initPed()
+            public void initPed()
             {
                 try
                 {
@@ -370,18 +495,18 @@ namespace surveillance_system
                         ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
                         ped.setDirection();
                         ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
-                        ped.printTargetInfo();
+                        // ped.printTargetInfo();
                     }
                 }
                 catch(Exception ex)
                 {
+                    Console.WriteLine("Err while initializing Pedestrians\n");
                     Console.WriteLine(ex.Message);
-                    return false;
                 }
-                return true;
+                Console.WriteLine("PED Setting Completed\n");
             }
 
-            private bool initCar()
+            public void initCar()
             {
                 try
                 {
@@ -406,18 +531,18 @@ namespace surveillance_system
                         // debug
                         // Console.WriteLine("setDirection Completed\n");
                         car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
-                        car.printTargetInfo();
+                        // car.printTargetInfo();
                     }
                 }
                 catch(Exception ex)
                 {
+                    Console.WriteLine("Err while initializing Cars\n");
                     Console.WriteLine(ex.Message);
-                    return false;
                 }
-                return true;
+                Console.WriteLine("CAR Setting Completed\n");
             }
 
-            private bool initCCTV()
+            public void initCCTV()
             {
                 try
                 {
@@ -481,16 +606,43 @@ namespace surveillance_system
                 }
                 catch(Exception ex)
                 {
+                    Console.WriteLine("Err while initializing CCTVs\n");
                     Console.WriteLine(ex.Message);
-                    return false;
                 }
-                return true;
+                Console.WriteLine("\nCCTV Setting Completed\n");
+            }
+
+            /* --------------------------------------
+             * 타이머 함수
+            -------------------------------------- */
+            public void initTimer()
+            {
+                stopwatch = new Stopwatch();
+            }
+
+            public void startTimer()
+            {
+                /* ---------------------------실행 시간 측정---------------------------*/
+                // time check start
+                // double accTime = 0.0;
+
+                stopwatch.Start();
+            }
+
+            public void stopTimer()
+            {
+                stopwatch.Stop();
+            }
+
+            public void resetTimer()
+            {
+                stopwatch.Reset();
             }
 
             /* --------------------------------------
              * 시뮬레이션 수행 함수
             -------------------------------------- */
-            private void operateSim()
+            public void operateSim()
             {
                 R_Surv_Time = new int[N_Target]; // 탐지 
                 directionError = new int[N_Target]; // 방향 미스
@@ -504,14 +656,18 @@ namespace surveillance_system
                 road_min = 0;
                 road_max = road.mapSize;
 
+                Now = 0;
+
                 /* Console.WriteLine("=== 성공 ====");
                 Console.WriteLine("print index of CCTV and detected Target\n");
                 Console.WriteLine("{0, 4}\t{1, 5}\t{2, 18}\t{3, 18}\t{4}", "CCTV", "TARGET", "X", "Y", "V");*/
                 // Console.WriteLine("Now: {0}, Sim_Time: {1}, routine times: {2}\n", Now, Sim_Time, (Sim_Time - Now) / aUnitTime);
+
                 // simulation
+                // Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start");
                 while (Now < Sim_Time)
                 {
-                    //Console.WriteLine(".");
+                    Console.Write(".");
                     // 추적 검사
                     int[] res = this.checkDetection(Now, N_CCTV, N_Ped, N_Car);
                     // debug
@@ -552,12 +708,14 @@ namespace surveillance_system
                     // debug
                     // Console.WriteLine("while simulation 3");
                 }
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulation Completed");
             }
 
             /* --------------------------------------
              * 추적 여부 검사 함수
             -------------------------------------- */
-            private int[] checkDetection(double nowTime, int N_CCTV, int N_Ped, int N_Car)
+            public int[] checkDetection(double nowTime, int N_CCTV, int N_Ped, int N_Car)
             {
 
                 int N_Target = N_Ped + N_Car;
@@ -871,7 +1029,7 @@ namespace surveillance_system
             /* --------------------------------------
              * 시뮬레이션 모듈 함수
             -------------------------------------- */
-            private void moveTarget()
+            public void moveTarget()
             {
                 int pedLen = peds.Length;
                 int carLen = cars.Length;
@@ -932,7 +1090,7 @@ namespace surveillance_system
                 // Console.WriteLine("while simulation 2");
             }
 
-            private void rotateCCTVs()
+            public void rotateCCTVs()
             {
                 // 220317 cctv rotation
                 for (int i = 0; i < N_CCTV; i++)
@@ -958,24 +1116,30 @@ namespace surveillance_system
             /* --------------------------------------
              * 결과 출력 함수
             -------------------------------------- */
-            private void printResultAsFile()
+            public void printResultAsCSV()
             {
-                for (int i = 0; i < peds.Length + cars.Length; i++)
+                if (createPedCSV)
                 {
-                    string fileName = "target" + i + ".csv";
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                    for (int i = 0; i < peds.Length + cars.Length; i++)
                     {
-                        file.WriteLine(header);
-                        file.WriteLine(traffic_x[i]);
-                        file.WriteLine(traffic_y[i]);
-                        file.WriteLine(detection[i]);
+                        string fileName = "target" + i + ".csv";
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                        {
+                            file.WriteLine(header);
+                            file.WriteLine(traffic_x[i]);
+                            file.WriteLine(traffic_y[i]);
+                            file.WriteLine(detection[i]);
+                        }
                     }
                 }
             }
 
-            private void printResultRate()
+            public double printResultRate()
             {
                 double totalSimCount = Sim_Time / aUnitTime * N_Target;
+                double outOfRangeRate = 100 * outOfRange.Sum() / totalSimCount;
+                double directionErrorRate = 100 * directionError.Sum() / totalSimCount;
+                double successRate = 100 * R_Surv_Time.Sum() / totalSimCount;
 
                 // 결과(탐지율)
                 Console.WriteLine("====== Surveillance Time Result ======");
@@ -983,13 +1147,15 @@ namespace surveillance_system
                 Console.WriteLine("[Result]");
                 Console.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
                 Console.WriteLine("[Fail]");
-                Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", 100 * outOfRange.Sum() / totalSimCount, outOfRange.Sum(), totalSimCount);
-                Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", 100 * directionError.Sum() / totalSimCount, directionError.Sum(), totalSimCount);
+                Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
+                Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
                 Console.WriteLine("[Success]");
-                Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", 100 * R_Surv_Time.Sum() / totalSimCount, R_Surv_Time.Sum(), totalSimCount);
+                Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
+
+                return successRate;
             }
 
-            private void printDetectedResults()
+            public void printDetectedResults()
             {
                 while (true)
                 {
