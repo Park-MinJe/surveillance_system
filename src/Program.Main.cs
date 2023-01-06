@@ -10,7 +10,8 @@ namespace surveillance_system
     {
         static void Main(string[] args)
         {
-            int cctvMode = 0, 
+            int nCctv = 0, nPed = 0, nCar = 0, 
+                cctvMode = 0, 
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
             string inputNCctvOption = "N",
@@ -55,8 +56,8 @@ namespace surveillance_system
                 Console.Write("Do you want to enter Pedestrian Numbers(Y/N)? ");
                 inputNPedOption = Console.ReadLine();
 
-                if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
-                else if (inputNCctvOption == "Y" || inputNCctvOption == "y") { break; }
+                if (inputNPedOption == "N" || inputNPedOption == "n") { break; }
+                else if (inputNPedOption == "Y" || inputNPedOption == "y") { break; }
                 else { continue; }
             }
 
@@ -65,9 +66,29 @@ namespace surveillance_system
                 Console.Write("Do you want to enter Car Numbers(Y/N)? ");
                 inputNCarOption = Console.ReadLine();
 
-                if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
-                else if (inputNCctvOption == "Y" || inputNCctvOption == "y") { break; }
+                if (inputNCarOption == "N" || inputNCarOption == "n") { break; }
+                else if (inputNCarOption == "Y" || inputNCarOption == "y") { break; }
                 else { continue; }
+            }
+
+            Console.WriteLine("");
+
+            if (inputNCctvOption == "Y" || inputNCctvOption == "y")
+            {
+                Console.Write("input number of CCTV: ");
+                nCctv = Convert.ToInt32(Console.ReadLine());
+            }
+
+            if (inputNPedOption == "Y" || inputNPedOption == "y")
+            {
+                Console.Write("input number of Pedestrian: ");
+                nPed = Convert.ToInt32(Console.ReadLine());
+            }
+
+            if (inputNCarOption == "Y" || inputNCarOption == "y")
+            {
+                Console.Write("input number of Car: ");
+                nCar = Convert.ToInt32(Console.ReadLine());
             }
 
 
@@ -79,6 +100,10 @@ namespace surveillance_system
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
+
+                sims[i].initNCctv(nCctv);
+                sims[i].initNPed(nPed);
+                sims[i].initNCar(nCar);
 
                 sims[i].initVariables();
 
@@ -101,6 +126,10 @@ namespace surveillance_system
                     cars = carAtSim[j];
                     sims[i].startTimer();
                     if (j == 0)
+                    {
+                        road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
+                    }
+                    if (j == 1)
                     {
                         switch (cctvMode) {
                             case 0:

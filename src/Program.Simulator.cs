@@ -324,24 +324,60 @@ namespace surveillance_system
             /* --------------------------------------
              * 초기화 함수
             -------------------------------------- */
-            public void initVariables()
+
+            /* ---------------------------시뮬레이션 조건----------------------------*/
+            public void initNCctv()
             {
-                /* ---------------------------시뮬레이션 조건----------------------------*/
                 if (getCCTVNumFromUser)
                 {
                     Console.Write("input number of CCTV: ");
                     N_CCTV = Convert.ToInt32(Console.ReadLine());
                 }
+            }
+            public void initNCctv(int nCctv)
+            {
+                if (getCCTVNumFromUser)
+                {
+                    N_CCTV = nCctv;
+                }
+            }
+
+            public void initNPed()
+            {
                 if (getPedNumFromUser)
                 {
                     Console.Write("input number of Pedestrian: ");
                     N_Ped = Convert.ToInt32(Console.ReadLine());
                 }
+            }
+            public void initNPed(int nPed)
+            {
+                if (getPedNumFromUser)
+                {
+                    N_Ped = nPed;
+                }
+            }
+
+            public void initNCar()
+            {
                 if (getCarNumFromUser)
                 {
                     Console.Write("input number of Car: ");
                     N_Car = Convert.ToInt32(Console.ReadLine());
                 }
+            }
+            public void initNCar(int nCar)
+            {
+                if (getCarNumFromUser)
+                {
+                    N_Car = nCar;
+                }
+            }
+
+            /* ---------------------------시뮬레이션 조건----------------------------*/
+
+            public void initVariables()
+            {
                 N_Target = N_Ped + N_Car;
 
                 rand = new Random();
@@ -383,6 +419,7 @@ namespace surveillance_system
                     log_CAR_position = new int[5];
                 }
 
+                /* ---------------------------전역 변수 할당---------------------------*/
                 cctvs = new CCTV[N_CCTV];
                 for (int i = 0; i < N_CCTV; i++)
                 {
