@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using static surveillance_system.Program;
 
 namespace surveillance_system
 {
@@ -30,7 +31,14 @@ namespace surveillance_system
             public int interval;
             public int width;
 
-            public void roadBuilder(int wd, int intvl, int n_interval, int n_cctv, int n_ped, int n_car)
+            // CCTV 위치
+            public int[,] cctvPos;
+            // Ped 위치
+            public int[,] pedPos;
+            // Car 위치
+            public int[,] carPos;
+
+            public void roadBuilder(int cctvMode, int wd, int intvl, int n_interval, int n_cctv, int n_ped, int n_car)
             {
                 this.lane_num = n_interval + 1;
                 DST = new double[lane_num * lane_num, 2];
@@ -90,14 +98,24 @@ namespace surveillance_system
                     lane_v_right[i, 0] = lane_h[i, 0] + wd / 2;
                 }
 
-                setCCTV(n_cctv, wd, lane_num);
+                // mode 0: pos cctv as grid    1: pos cctv as random    2: use prepared as random cctv set
+                /* switch (cctvMode)
+                {
+                    case 0:
+                        setCCTV(n_cctv, wd, lane_num); break;
+                    case 1:
+                        setCCTVForBrute(n_cctv); break;
+                    case 2:
+                        break;
+
+                }*/
                 setPed(n_ped);
                 setCar(n_car);
             }
 
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
-                int[,] cctvPos = new int[52,52];
+                cctvPos = new int[52,52];
 
 
                 double range = mapSize - width;
@@ -118,9 +136,9 @@ namespace surveillance_system
                     {
                         cctvs[cctvIdx].X = (int)startX;
                         cctvs[cctvIdx].Y = (int)startY;
-                        Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i * rootN + j, cctvs[cctvIdx].X , cctvs[cctvIdx].Y);
-                        // Console.WriteLine("pos arr {0} {1} ", cctvs[i].Y / 10000, cctvs[i].X / 10000);
-                        Console.WriteLine();
+                        // Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i * rootN + j, cctvs[cctvIdx].X , cctvs[cctvIdx].Y);
+                        // Console.WriteLine("pos arr {0} {1} ", cctvs[i].Y / 10000, cctvs[i].X / 10000);   // 사용 안함
+                        // Console.WriteLine();
                         startX += intvl;
 
                         //debug
@@ -135,31 +153,38 @@ namespace surveillance_system
                 }
                 // for문 끝나고
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print CCTV Position");
-                for (int i = 0 ; i < 52; i++) {
-                      Console.Write("{0, 2}",i);
-                }
-                Console.WriteLine();
-                for(int i = 0 ; i < 52; i++) {
-                  Console.Write("{0, 2}",i);
+                // this.printCctvPos();
+            }
+            // 교차로에만 설치하는 경우
+            // 교차로 중 설치 위치는 랜덤
+            public void setCCTVForBrute(int n_cctv)
+            {
+                cctvPos = new int[52, 52];
 
-                  for(int j = 0 ; j < 52; j++) {
-                    if(cctvPos[i,j] <= 0) 
-                      // Console.Write("{0, 2}", " ", cctvPos[i,j]);
-                      Console.Write("{0, 2}", " ");
-                    else
-                      // Console.Write("{0, 2}", "*", cctvPos[i,j]);
-                      Console.Write("{0, 2}", cctvPos[i, j]);
+                Console.WriteLine("mapsize {0} ", mapSize);
 
+                // Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
+                for (int i = 0; i < n_cctv; i++)
+                {
+                    Random rand = new Random();
+                    int intersectidx = rand.Next(lane_num * lane_num);
+                    cctvs[i].X = (int)Math.Truncate(DST[intersectidx, 0]);
+                    cctvs[i].Y = (int)Math.Truncate(DST[intersectidx, 1]);
+
+                    // Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
+                    // Console.WriteLine();
+
+                    //debug
+                    cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
                 }
-                  Console.WriteLine();
-                }
+
+                // this.printCctvPos();
             }
 
             // 보행자 위치 처음 설정
             public void setPed(int n_ped)
             {
-                int[,] pedPos = new int[52, 52];
+                pedPos = new int[52, 52];
                 for (int i = 0; i < n_ped; i++)
                 {
                     Random rand = new Random();
@@ -187,34 +212,13 @@ namespace surveillance_system
                 }
                 // for문 끝나고
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Pedestrian Position");
-                for (int i = 0; i < 52; i++)
-                {
-                    Console.Write("{0, 2}", i);
-                }
-                Console.WriteLine();
-                for (int i = 0; i < 52; i++)
-                {
-                    Console.Write("{0, 2}", i);
-
-                    for (int j = 0; j < 52; j++)
-                    {
-                        if (pedPos[i, j] <= 0)
-                            // Console.Write("{0, 2}", " ", pedPos[i, j]);
-                            Console.Write("{0, 2}", " ");
-                        else
-                            // Console.Write("{0, 2}", "&", pedPos[i, j]);
-                            Console.Write("{0, 2}", pedPos[i, j]);
-
-                    }
-                    Console.WriteLine();
-                }
+                // this.printPedPos();
             }
 
             // set Car object
             public void setCar(int n_car)
             {
-                int[,] carPos = new int[52, 52];
+                carPos = new int[52, 52];
                 for (int i = 0; i < n_car; i++)
                 {
                     Random rand = new Random();
@@ -247,28 +251,7 @@ namespace surveillance_system
                 }
                 // for문 끝나고
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Car Position");
-                for (int i = 0; i < 52; i++)
-                {
-                    Console.Write("{0, 2}", i);
-                }
-                Console.WriteLine();
-                for (int i = 0; i < 52; i++)
-                {
-                    Console.Write("{0, 2}", i);
-
-                    for (int j = 0; j < 52; j++)
-                    {
-                        if (carPos[i, j] <= 0)
-                            // Console.Write("{0, 2}", " ", carPos[i, j]);
-                            Console.Write("{0, 2}", " ");
-                        else
-                            // Console.Write("{0, 2}", "$", carPos[i, j]);
-                            Console.Write("{0, 2}", carPos[i, j]);
-
-                    }
-                    Console.WriteLine();
-                }
+                // this.printCarPos();
             }
 
             public double[,] getPointOfAdjacentRoad(int currAreaIdx)
@@ -352,8 +335,6 @@ namespace surveillance_system
                         if (opt == 0)// down
                         {
                             curY -= width/2;
-                            // curY -= (interval + width / 2);
-                            // j -= 1;
                         }
                         else if (opt == 1) //left
                         { 
@@ -370,16 +351,12 @@ namespace surveillance_system
                         else if (opt == 1) // left
                         {
                             curX -= width/2;
-                            // curX -= (interval + width / 2);
-                            // i -= 1;
                         }
                     }
                     else if ( x >= midX && y < midY ){ // 2 up right
                         if (opt == 0) // up
                         {
                             curY += width/2;
-                            // curY += (interval + width / 2);
-                            // j += 1;
                         }
                         else if (opt == 1) // right
                         {
@@ -396,8 +373,6 @@ namespace surveillance_system
                         else if (opt == 1) // right
                         {
                             curX += width/2;
-                            // curX += (interval + width / 2);
-                            // i += 1;
                         }
                     }
 
@@ -455,6 +430,91 @@ namespace surveillance_system
                     Console.WriteLine("       {0}   {1}   {2}", lane_v_left[i, 0], lane_v[i, 0], lane_v_right[i, 0]);
                 }
                 Console.WriteLine("\n========================================================================================\n");
+            }
+
+            public void printCctvPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
+
+                for(int i = 0; i < cctvs.Length; i++)
+                {
+                    Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
+                }
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print CCTV Position");
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+
+                    for (int j = 0; j < 52; j++)
+                    {
+                        if (cctvPos[i, j] <= 0)
+                            // Console.Write("{0, 2}", " ", cctvPos[i,j]);
+                            Console.Write("{0, 2}", " ");
+                        else
+                            // Console.Write("{0, 2}", "*", cctvPos[i,j]);
+                            Console.Write("{0, 2}", cctvPos[i, j]);
+
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            public void printPedPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Pedestrian Position");
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+
+                    for (int j = 0; j < 52; j++)
+                    {
+                        if (pedPos[i, j] <= 0)
+                            // Console.Write("{0, 2}", " ", pedPos[i, j]);
+                            Console.Write("{0, 2}", " ");
+                        else
+                            // Console.Write("{0, 2}", "&", pedPos[i, j]);
+                            Console.Write("{0, 2}", pedPos[i, j]);
+
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            public void printCarPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Car Position");
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < 52; i++)
+                {
+                    Console.Write("{0, 2}", i);
+
+                    for (int j = 0; j < 52; j++)
+                    {
+                        if (carPos[i, j] <= 0)
+                            // Console.Write("{0, 2}", " ", carPos[i, j]);
+                            Console.Write("{0, 2}", " ");
+                        else
+                            // Console.Write("{0, 2}", "$", carPos[i, j]);
+                            Console.Write("{0, 2}", carPos[i, j]);
+
+                    }
+                    Console.WriteLine();
+                }
             }
         }
     }
