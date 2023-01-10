@@ -23,7 +23,7 @@ namespace surveillance_system
             List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
             List<Car[]> carAtSim = new List<Car[]>();
 
-            List<int[,]> cctvPosAtSim = new List<int[,]>();
+            List<Road> roadAtSim = new List<Road>();
 
             Console.Write("input Number of CCTV set: ");
             numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
@@ -34,7 +34,7 @@ namespace surveillance_system
             Console.WriteLine("\ninput CCTV collocating mode: ");
             while (true)
             {
-                Console.Write("(0: pos cctv as grid    1: pos cctv as random at DST    2: pos cctv as random in int)? ");
+                Console.Write("(0: pos cctv as grid    1: pos cctv as random)? ");
                 cctvMode = Convert.ToInt32(Console.ReadLine());
 
                 if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2) { break; }
@@ -111,6 +111,7 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
+                roadAtSim.Add(road);
                 pedestrianAtSim.Add(peds);
                 carAtSim.Add(cars);
                 // sims[i].stopTimer();
@@ -126,29 +127,20 @@ namespace surveillance_system
                     sims[i].startTimer();
                     if (j == 0)
                     {
-                        if (i == 0 && numberOfCCTVSet != 1)
-                        {
-                            road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
-                        }
-                        else
-                        {
-                            switch (cctvMode)
-                            {
-                                case 0:
-                                    road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
-                                    break;
-                                case 1:
-                                    road.setCCTVForBrute(sims[i].getNCCTV());
-                                    break;
-                                case 2:
-                                    road.setCCTVbyRandom(sims[i].getNCCTV());
-                                    break;
-                            }
-                        }
-                        cctvAtSim.Add(cctvs);
-                        cctvPosAtSim.Add(road.cctvPos);
+                        road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
                     }
-                    road.printCctvPos();
+                    if (j == 1)
+                    {
+                        switch (cctvMode) {
+                            case 0:
+                                road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
+                                break;
+                            case 1:
+                                road.setCCTVForBrute(sims[i].getNCCTV());
+                                break;
+                        }
+                    }
+                    cctvAtSim.Add(cctvs);
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();
@@ -174,13 +166,6 @@ namespace surveillance_system
             Console.WriteLine("\n\n====== Best CCTV set ======");
             int bestCCTVIdx = successRates.IndexOf(successRates.Max());
 
-            Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-            printPos(cctvPosAtSim[bestCCTVIdx]);
-        }
-
-        // 도로 구성의 위치 출력
-        public static void printPos(int[,] pos)
-        {
             for (int i = 0; i < 52; i++)
             {
                 Console.Write("{0, 2}", i);
@@ -192,10 +177,12 @@ namespace surveillance_system
 
                 for (int j = 0; j < 52; j++)
                 {
-                    if (pos[i, j] <= 0)
+                    if (road.cctvPos[i, j] <= 0)
+                        // Console.Write("{0, 2}", " ", cctvPos[i,j]);
                         Console.Write("{0, 2}", " ");
                     else
-                        Console.Write("{0, 2}", pos[i, j]);
+                        // Console.Write("{0, 2}", "*", cctvPos[i,j]);
+                        Console.Write("{0, 2}", roadAtSim[bestCCTVIdx].cctvPos[i, j]);
 
                 }
                 Console.WriteLine();
