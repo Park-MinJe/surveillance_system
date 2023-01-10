@@ -157,7 +157,7 @@ namespace surveillance_system
             }
             // 교차로에만 설치하는 경우
             // 교차로 중 설치 위치는 랜덤
-            public void setCCTVForBrute(int n_cctv)
+            public void setCCTVbyRandomInDST(int n_cctv)
             {
                 cctvPos = new int[52, 52];
 
@@ -181,7 +181,7 @@ namespace surveillance_system
                 // this.printCctvPos();
             }
 
-            public void setCCTVbyRandom(int n_cctv)
+            public void setCCTVbyRandomInInt(int n_cctv)
             {
                 cctvPos = new int[52, 52];
 

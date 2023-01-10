@@ -25,11 +25,23 @@ namespace surveillance_system
 
             List<int[,]> cctvPosAtSim = new List<int[,]>();
 
-            Console.Write("input Number of CCTV set: ");
-            numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
+            while (true)
+            {
+                Console.Write("input Number of CCTV set( 1~ ): ");
+                numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
 
-            Console.Write("input Simulation times for Each CCTV set: ");
-            simulationTimesForCCTVSet = Convert.ToInt32(Console.ReadLine());
+                if (numberOfCCTVSet < 1) { continue; }
+                else { break; }
+            }
+
+            while (true)
+            {
+                Console.Write("input Simulation times for Each CCTV set( 1~ ): ");
+                simulationTimesForCCTVSet = Convert.ToInt32(Console.ReadLine());
+
+                if(simulationTimesForCCTVSet < 1) { continue; }
+                else { break; }
+            }
 
             Console.WriteLine("\ninput CCTV collocating mode: ");
             while (true)
@@ -126,7 +138,7 @@ namespace surveillance_system
                     sims[i].startTimer();
                     if (j == 0)
                     {
-                        if (i == 0 && numberOfCCTVSet != 1)
+                        if (i == 0 && numberOfCCTVSet > 1)
                         {
                             road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
                         }
@@ -138,10 +150,10 @@ namespace surveillance_system
                                     road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
                                     break;
                                 case 1:
-                                    road.setCCTVForBrute(sims[i].getNCCTV());
+                                    road.setCCTVbyRandomInDST(sims[i].getNCCTV());
                                     break;
                                 case 2:
-                                    road.setCCTVbyRandom(sims[i].getNCCTV());
+                                    road.setCCTVbyRandomInInt(sims[i].getNCCTV());
                                     break;
                             }
                         }
