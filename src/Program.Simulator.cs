@@ -41,8 +41,6 @@ namespace surveillance_system
             // ped csv file 출력 여부
             public bool createPedCSV = false;
 
-            public DataManger dataManager;
-
             public Random rand;
 
             public double Sim_Time = 600;
@@ -388,8 +386,6 @@ namespace surveillance_system
             {
                 N_Target = N_Ped + N_Car;
 
-                dataManager = new DataManger();
-
                 rand = new Random();
 
                 /* ------------------------------CCTV 제원------------------------------*/
@@ -672,42 +668,6 @@ namespace surveillance_system
                     Console.WriteLine(ex.Message);
                 }
                 Console.WriteLine("\nCCTV Setting Completed\n");
-            }
-
-            /* --------------------------------------
-             * XML 함수
-            -------------------------------------- */
-            public void writeInitialPedsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
-                dataManager.writePedsToXml(path);
-            }
-            public void writePedsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Peds" + this.idx + ".xml";
-                dataManager.writePedsToXml(path);
-            }
-
-            public void writeInitialCarsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialCars" + this.idx + ".xml";
-                dataManager.writeCarsToXml(path);
-            }
-            public void writeCarsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cars" + this.idx + ".xml";
-                dataManager.writeCarsToXml(path);
-            }
-
-            public void writeInitialCctvsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
-                dataManager.writeCctvsToXml(path);
-            }
-            public void writeCctvsToXML()
-            {
-                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
-                dataManager.writeCctvsToXml(path);
             }
 
             /* --------------------------------------

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using static surveillance_system.Program;
+using System.Xml.Serialization;
 
 namespace surveillance_system
 {
@@ -10,6 +11,9 @@ namespace surveillance_system
     {
         public class Road
         {
+            [XmlAttribute("idx")]
+            public int idx;
+
             public double[] laneVector;
 
             // 가로 도로 좌표

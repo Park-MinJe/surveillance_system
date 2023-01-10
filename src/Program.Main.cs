@@ -10,20 +10,23 @@ namespace surveillance_system
 {
     public partial class Program
     {
+        // Main에서 사용할 Object To Xml 객체
+        public static DataManger ObjToXml = new DataManger();
+
         static void Main(string[] args)
         {
             int nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
                 numberOfCCTVSet = 1, 
-                simulationTimesForCCTVSet = 100;
+                simulationTimesForCCTVSet = 10;
             string inputNCctvOption = "N",
                 inputNPedOption = "N",
                 inputNCarOption = "N";
 
             List<double> successRates = new List<double>();
             List<CCTV[]> cctvAtSim = new List<CCTV[]>();
-            List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
-            List<Car[]> carAtSim = new List<Car[]>();
+            // List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
+            // List<Car[]> carAtSim = new List<Car[]>();
 
             List<Road> roadAtSim = new List<Road>();
 
@@ -114,14 +117,20 @@ namespace surveillance_system
                 sims[i].initTimer();
 
                 // sims[i].startTimer();
+                sims[i].idx = i;
                 sims[i].initMap(cctvMode);
                 roadAtSim.Add(road);
-                pedestrianAtSim.Add(peds);
-                sims[i].writeInitialPedsToXML();
-                sims[i].writePedsToXML();
-                carAtSim.Add(cars);
-                sims[i].writeInitialCarsToXML();
-                sims[i].writeCarsToXML();
+                // 다차원 배열로 인해 serialize 어려움
+                // writeInitialRoadToXML(i);
+
+                // pedestrianAtSim.Add(peds);
+                writeInitialPedsToXML(i);
+                // writePedsToXML(i);
+
+                // carAtSim.Add(cars);
+                writeInitialCarsToXML(i);
+                // writeCarsToXML(i);
+
                 // sims[i].stopTimer();
             }
 
@@ -130,8 +139,13 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    peds = pedestrianAtSim[j];
-                    cars = carAtSim[j];
+                    // 다차원 배열로 인해 serialize 어려움
+                    road = roadAtSim[j];
+                    // road = readInitialRoadFromXML(j);
+
+                    peds = readInitialPedsFromXML(j);
+                    cars = readInitialCarsFromXML(j);
+
                     if (j == 0)
                     {
                         if (i == 0 && numberOfCCTVSet != 1)
@@ -152,11 +166,12 @@ namespace surveillance_system
                         }
 
                         cctvAtSim.Add(cctvs);
-                        sims[j].writeInitialCctvsToXML();
-                        sims[j].writeCctvsToXML();
+                        // writeInitialCctvsToXML(i);
+                        // writeCctvsToXML(i);
                     }
                     else
                     {
+                        // 다차원 배열로 인해 serialize 어려움
                         cctvs = cctvAtSim[i];
                     }
 
@@ -206,6 +221,88 @@ namespace surveillance_system
                 }
                 Console.WriteLine();
             }
+        }
+
+
+
+        /* --------------------------------------
+         * XML 함수 - Write
+        -------------------------------------- */
+        public static void writeInitialRoadToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
+            string path = @"data\InitialRoad" + idx + ".xml";
+            ObjToXml.writeRoadToXml(path);
+        }
+
+        public static void writeInitialPedsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
+            string path = @"data\InitialPeds" + idx + ".xml";
+            ObjToXml.writePedsToXml(path);
+        }
+        public static void writePedsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Peds" + this.idx + ".xml";
+            string path = @"data\Peds" + idx + ".xml";
+            ObjToXml.writePedsToXml(path);
+        }
+
+        public static void writeInitialCarsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialCars" + this.idx + ".xml";
+            string path = @"data\InitialCars" + idx + ".xml";
+            ObjToXml.writeCarsToXml(path);
+        }
+        public static void writeCarsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cars" + this.idx + ".xml";
+            string path = @"data\Cars" + idx + ".xml";
+            ObjToXml.writeCarsToXml(path);
+        }
+
+        public static void writeInitialCctvsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
+            string path = @"data\InitialCctvs" + idx + ".xml";
+            ObjToXml.writeCctvsToXml(path);
+        }
+        public static void writeCctvsToXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
+            string path = @"data\Cctvs" + idx + ".xml";
+            ObjToXml.writeCctvsToXml(path);
+        }
+
+        /* --------------------------------------
+         * XML 함수 - Read
+        -------------------------------------- */
+        public static Road readInitialRoadFromXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
+            string path = @"data\InitialRoad" + idx + ".xml";
+            return ObjToXml.readRoadFromXml(path);
+        }
+
+        public static Pedestrian[] readInitialPedsFromXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
+            string path = @"data\InitialPeds" + idx + ".xml";
+            return ObjToXml.readPedsFromXml(path);
+        }
+
+        public static Car[] readInitialCarsFromXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialCars" + this.idx + ".xml";
+            string path = @"data\InitialCars" + idx + ".xml";
+            return ObjToXml.readCarsFromXml(path);
+        }
+
+        public static CCTV[] readInitialCctvsFromXML(int idx)
+        {
+            // string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
+            string path = @"data\InitialCctvs" + idx + ".xml";
+            return ObjToXml.readCctvsFromXml(path);
         }
     }
 }

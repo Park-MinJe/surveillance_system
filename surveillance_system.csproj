@@ -7,8 +7,5 @@
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="data\" />
-  </ItemGroup>
 
 </Project>
