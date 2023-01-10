@@ -6,6 +6,9 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
+using System.IO;
+using System.Xml.Serialization;
+using static surveillance_system.Program;
 
 namespace surveillance_system
 {
@@ -22,94 +25,98 @@ namespace surveillance_system
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
-            private bool getCCTVNumFromUser = false;
-            private bool getPedNumFromUser = false;
-            private bool getCarNumFromUser = false;
+            public int idx = 0;
 
-            private int N_CCTV = 100;
-            private int N_Ped = 5;
-            private int N_Car = 5;
-            private int N_Target;
+            public bool getCCTVNumFromUser = false;
+            public bool getPedNumFromUser = false;
+            public bool getCarNumFromUser = false;
+
+            public int N_CCTV = 100;
+            public int N_Ped = 5;
+            public int N_Car = 5;
+            public int N_Target;
 
             public int getNCCTV() { return N_CCTV; }
 
             // ped csv file 출력 여부
-            private bool createPedCSV = false;
+            public bool createPedCSV = false;
 
-            private Random rand;
+            public DataManger dataManager;
 
-            private double Sim_Time = 600;
-            private double Now = 0;
+            public Random rand;
+
+            public double Sim_Time = 600;
+            public double Now = 0;
 
             Stopwatch stopwatch;
 
             /* ------------------------------CCTV 제원------------------------------*/
-            private const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
-            private const double WD = 3.6; // (mm) width, horizontal size of camera sensor
-            private const double HE = 2.7; // (mm) height, vertical size of camera sensor
+            public const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
+            public const double WD = 3.6; // (mm) width, horizontal size of camera sensor
+            public const double HE = 2.7; // (mm) height, vertical size of camera sensor
 
             // const double Diag = Math.Sqrt(WD*WD + HE*HE), diagonal size
-            private const double imW = 1920; // (pixels) image width
-            private const double imH = 1080; // (pixels) image height
+            public const double imW = 1920; // (pixels) image width
+            public const double imH = 1080; // (pixels) image height
 
-            private const double cctv_rotate_degree = 90; // 30초에 한바퀴
+            public const double cctv_rotate_degree = 90; // 30초에 한바퀴
                                                     // Installation [line_23]
-            private const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
-            private const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
+            public const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
+            public const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
-            private double rotateTerm = 30.0; // sec
+            public double rotateTerm = 30.0; // sec
 
             // calculate vertical/horizontal AOV
-            private double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
-            private double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
+            public double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
+            public double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
 
-            private double[] Dist = new double[25000];
-            private int dist_len = 100000;
-            private double[] Height = new double[25000];
+            public double[] Dist = new double[25000];
+            public int dist_len = 100000;
+            public double[] Height = new double[25000];
 
             /* ------------------------------MAP 제원------------------------------*/
             // configuration: road
             // const int Road_WD = 5000; // 이거 안쓰는 변수? Road_Width 존재
-            private bool On_Road_Builder = true; // 0:No road, 1:Grid
+            public bool On_Road_Builder = true; // 0:No road, 1:Grid
 
-            private int Road_Width = 0;
-            private int Road_Interval = 0;
-            private int Road_N_Interval = 0;
+            public int Road_Width = 0;
+            public int Road_Interval = 0;
+            public int Road_N_Interval = 0;
 
-            private int road_min = 0;
-            private int road_max;
+            public int road_min = 0;
+            public int road_max;
 
             /* ------------------------------PED 설정------------------------------*/
-            private bool Opt_Observation = false;
-            private bool Opt_Demo = false;
-            private int[] log_PED_position = null;
+            public bool Opt_Observation = false;
+            public bool Opt_Demo = false;
+            public int[] log_PED_position = null;
 
             // Configuration: Pedestrian (Target Object)
             // When Pedestrian
-            private const int Ped_Width = 900; // (mm)
-            private const int Ped_Height = 1700; // (mm)
-            private const int Ped_Velocity = 1500; // (mm/s)
+            public const int Ped_Width = 900; // (mm)
+            public const int Ped_Height = 1700; // (mm)
+            public const int Ped_Velocity = 1500; // (mm/s)
 
             /* ------------------------------CAR 설정------------------------------*/
-            private int[] log_CAR_position = null;
+            public int[] log_CAR_position = null;
 
             // Configuration: Pedestrian (Target Object)
             // When Car
-            private const int Car_Width = 1600; // (mm)
-            private const int Car_Height = 2000; // (mm)
+            public const int Car_Width = 1600; // (mm)
+            public const int Car_Height = 2000; // (mm)
                                             // const int Car_Length = 3600; // (mm)
-            private const int Car_Velocity = 14000; // (mm/s)
+            public const int Car_Velocity = 14000; // (mm/s)
 
             /* ---------------------------시뮬레이션 결과----------------------------*/
             // Console.WriteLine(">>> Simulating . . . \n");
-            private int[] R_Surv_Time;      // 탐지 
-            private int[] directionError;   // 방향 미스
-            private int[] outOfRange;       // 거리 범위 밖
+            public int[] R_Surv_Time;      // 탐지 
+            public int[] directionError;   // 방향 미스
+            public int[] outOfRange;       // 거리 범위 밖
 
-            private string[] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
-            private string[] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
-            private string[] detection;     // csv 파일 출력 위한 추적여부
-            private string header;
+            public string[] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
+            public string[] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
+            public string[] detection;     // csv 파일 출력 위한 추적여부
+            public string header;
 
             /* --------------------------------------
              * 전체 시뮬레이션 함수
@@ -374,11 +381,14 @@ namespace surveillance_system
                 }
             }
 
-            /* ---------------------------시뮬레이션 조건----------------------------*/
+            /* ---------------------------시뮬레이션 변수----------------------------*/
+            public void setIdx(int idx) { this.idx = idx; }
 
             public void initVariables()
             {
                 N_Target = N_Ped + N_Car;
+
+                dataManager = new DataManger();
 
                 rand = new Random();
 
@@ -493,10 +503,13 @@ namespace surveillance_system
 
             public void initPed()
             {
+                int pedIdx = 0;
                 try
                 {
                     foreach (Pedestrian ped in peds)
                     {
+                        ped.idx = pedIdx;
+
                         double minDist = 0.0;
                         //int idx_minDist = 0;
                         //double[] Dist_Map = new double[road.DST.GetLength(0)];
@@ -533,6 +546,8 @@ namespace surveillance_system
                         ped.setDirection();
                         ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
                         // ped.printTargetInfo();
+
+                        pedIdx++;
                     }
                 }
                 catch(Exception ex)
@@ -545,10 +560,13 @@ namespace surveillance_system
 
             public void initCar()
             {
+                int carIdx = 0;
                 try
                 {
                     foreach (Car car in cars)
                     {
+                        car.idx = carIdx;
+
                         double minDist = 0.0;
 
                         // Car object일경우 가까운 도착지 설정
@@ -569,6 +587,8 @@ namespace surveillance_system
                         // Console.WriteLine("setDirection Completed\n");
                         car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
                         // car.printTargetInfo();
+
+                        carIdx++;
                     }
                 }
                 catch(Exception ex)
@@ -581,10 +601,13 @@ namespace surveillance_system
 
             public void initCCTV()
             {
+                int cctvIdx = 0;
                 try
                 {
                     for (int i = 0; i < N_CCTV; i++)
                     {
+                        cctvs[i].idx = cctvIdx;
+
                         // 220317
                         // Height.Max() 는 고정값 (=대충 10000)..
                         // 상수로 바꿔도 될듯??
@@ -639,6 +662,8 @@ namespace surveillance_system
                         cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
                         cctvs[i].get_V_FOV(Dist, cctvs[i].HE, cctvs[i].Focal_Length, cctvs[i].ViewAngleV, cctvs[i].X, cctvs[i].Z);
                         // cctvs[i].printCCTVInfo();
+
+                        cctvIdx++;
                     }
                 }
                 catch(Exception ex)
@@ -647,6 +672,42 @@ namespace surveillance_system
                     Console.WriteLine(ex.Message);
                 }
                 Console.WriteLine("\nCCTV Setting Completed\n");
+            }
+
+            /* --------------------------------------
+             * XML 함수
+            -------------------------------------- */
+            public void writeInitialPedsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialPeds" + this.idx + ".xml";
+                dataManager.writePedsToXml(path);
+            }
+            public void writePedsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Peds" + this.idx + ".xml";
+                dataManager.writePedsToXml(path);
+            }
+
+            public void writeInitialCarsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\InitialCars" + this.idx + ".xml";
+                dataManager.writeCarsToXml(path);
+            }
+            public void writeCarsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cars" + this.idx + ".xml";
+                dataManager.writeCarsToXml(path);
+            }
+
+            public void writeInitialCctvsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
+                dataManager.writeCctvsToXml(path);
+            }
+            public void writeCctvsToXML()
+            {
+                string path = @"C:\Users\win11\학교\22-계절\개별연구\2021-2_SurveillanceSystem-main\surveillance_system\data\Cctvs" + this.idx + ".xml";
+                dataManager.writeCctvsToXml(path);
             }
 
             /* --------------------------------------
@@ -956,15 +1017,15 @@ namespace surveillance_system
 
                             // record detected Target & increase velocity when detected
                             CCTV.detectedTarget detectedTargetInfo = new CCTV.detectedTarget();
-                            detectedTargetInfo.setIdx(j);
-                            detectedTargetInfo.setT(nowTime);
+                            detectedTargetInfo.idx = j;
+                            detectedTargetInfo.t = nowTime;
 
                             if (j < N_Ped)
                             {
                                 // Record Detected Target
-                                detectedTargetInfo.setX(peds[j].X);
-                                detectedTargetInfo.setY(peds[j].Y);
-                                detectedTargetInfo.setV(peds[j].Velocity);
+                                detectedTargetInfo.x = peds[j].X;
+                                detectedTargetInfo.y = peds[j].Y;
+                                detectedTargetInfo.v = peds[j].Velocity;
                                 cctvs[i].detectedTargets.Add(detectedTargetInfo);
 
                                 // Increase Velocity
@@ -973,9 +1034,9 @@ namespace surveillance_system
                             else
                             {
                                 // Record Detected Target
-                                detectedTargetInfo.setX(cars[j - N_Ped].X);
-                                detectedTargetInfo.setY(cars[j - N_Ped].Y);
-                                detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
+                                detectedTargetInfo.x = cars[j - N_Ped].X;
+                                detectedTargetInfo.y = cars[j - N_Ped].Y;
+                                detectedTargetInfo.v = cars[j - N_Ped].Velocity;
                                 cctvs[i].detectedTargets.Add(detectedTargetInfo);
 
                                 // Increase Velocity
@@ -1209,13 +1270,13 @@ namespace surveillance_system
                         {
                             foreach (CCTV.detectedTarget dt in cctvs[i].detectedTargets)
                             {
-                                if (dt.getIdx() < N_Ped)
+                                if (dt.idx < N_Ped)
                                 {
-                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.getIdx(), dt.getX(), dt.getY(), dt.getV(), dt.getT());
+                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.idx, dt.x, dt.y, dt.v, dt.t);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.getIdx(), dt.getX(), dt.getY(), dt.getV(), dt.getT());
+                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.idx, dt.x, dt.y, dt.v, dt.t);
                                 }
                             }
                         }

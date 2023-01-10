@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace surveillance_system
 {
     public partial class Program
     {
-        public class SurveillanceTarget {
+        public class SurveillanceTarget
+        {
+            [XmlAttribute("idx")]
+            public int idx;
+
             public double X;
             public double Y;
 
@@ -41,6 +46,7 @@ namespace surveillance_system
             public int N_Surv; //number of surveillance camera viewing this target.
 
             public int TTL;
+
             public void define_TARGET(
                 double Width,
                 double Height,

@@ -163,7 +163,7 @@ namespace surveillance_system
 
                 Console.WriteLine("mapsize {0} ", mapSize);
 
-                // Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position Random");
                 for (int i = 0; i < n_cctv; i++)
                 {
                     Random rand = new Random();

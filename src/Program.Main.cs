@@ -3,6 +3,8 @@ using static surveillance_system.Program;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace surveillance_system
 {
@@ -97,6 +99,8 @@ namespace surveillance_system
             for(int i = 0; i < simulationTimesForCCTVSet; i++)
             {
                 sims[i] = new Simulator();
+                sims[i].setIdx(i);
+
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
@@ -113,7 +117,11 @@ namespace surveillance_system
                 sims[i].initMap(cctvMode);
                 roadAtSim.Add(road);
                 pedestrianAtSim.Add(peds);
+                sims[i].writeInitialPedsToXML();
+                sims[i].writePedsToXML();
                 carAtSim.Add(cars);
+                sims[i].writeInitialCarsToXML();
+                sims[i].writeCarsToXML();
                 // sims[i].stopTimer();
             }
 
@@ -124,24 +132,35 @@ namespace surveillance_system
                 {
                     peds = pedestrianAtSim[j];
                     cars = carAtSim[j];
-                    sims[i].startTimer();
                     if (j == 0)
                     {
-                        road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
-                    }
-                    if (j == 1)
-                    {
-                        switch (cctvMode) {
-                            case 0:
-                                road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
-                                break;
-                            case 1:
-                                road.setCCTVForBrute(sims[i].getNCCTV());
-                                break;
+                        if (i == 0 && numberOfCCTVSet != 1)
+                        {
+                            road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
                         }
-                    }
-                    cctvAtSim.Add(cctvs);
+                        else
+                        {
+                            switch (cctvMode)
+                            {
+                                case 0:
+                                    road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
+                                    break;
+                                case 1:
+                                    road.setCCTVForBrute(sims[j].getNCCTV());
+                                    break;
+                            }
+                        }
 
+                        cctvAtSim.Add(cctvs);
+                        sims[j].writeInitialCctvsToXML();
+                        sims[j].writeCctvsToXML();
+                    }
+                    else
+                    {
+                        cctvs = cctvAtSim[i];
+                    }
+
+                    sims[j].startTimer();
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();
                     sims[j].stopTimer();

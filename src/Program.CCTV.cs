@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace surveillance_system
 {
@@ -19,6 +20,8 @@ namespace surveillance_system
             public double[] Angle_1;
 
             public double[] Angle_2;
+
+            public Angle3D() { }
 
             public Angle3D(int size)
             {
@@ -170,6 +173,9 @@ namespace surveillance_system
 
         public class CCTV
         {
+            [XmlAttribute("idx")]
+            public int idx;
+
             public int X;
 
             public int Y;
@@ -210,30 +216,19 @@ namespace surveillance_system
 
             // new FOV class member
 
+            [XmlIgnore]
             public FOV H_FOV;
-
+            [XmlIgnore]
             public FOV V_FOV;
 
             // record detected Target Info
             public class detectedTarget
             {
-                private int idx;
-                private double x;
-                private double y;
-                private double v;
-                private double t;
-
-                public void setIdx(int idx) { this.idx = idx; }
-                public void setX(double x) { this.x = x; }
-                public void setY(double y) { this.y = y; }
-                public void setV(double v) { this.v = v; }
-                public void setT(double t) { this.t = t; }
-
-                public int getIdx() { return idx; }
-                public double getX() { return x; }
-                public double getY() { return y; }
-                public double getV() { return v; }
-                public double getT() { return t; }
+                public int idx;
+                public double x;
+                public double y;
+                public double v;
+                public double t;
             }
             public List<detectedTarget> detectedTargets;
 
@@ -480,9 +475,9 @@ namespace surveillance_system
             public double[] SurvDist_H;
 
             public double[] SurvDist_V;
-
+            [XmlIgnore]
             public double[] PPM_H;
-
+            [XmlIgnore]
             public double[] PPM_V;
 
             public void get_PixelDensity(
