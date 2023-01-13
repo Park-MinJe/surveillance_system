@@ -27,6 +27,7 @@ namespace surveillance_system
             public double[,] DST; // 도로 교차점
             public double[,] intersectionArea; // 도로 교차구간
             public int mapSize;
+            public int grid_num;
             public int lane_num;
             public int interval;
             public int width;
@@ -47,6 +48,7 @@ namespace surveillance_system
                 this.width = wd;
 
                 this.mapSize = n_interval * intvl + wd * lane_num;
+                this.grid_num = this.mapSize / 10000 + 2;
                 // 교차점, 교차구간 설정
                 int idx = 0;
                 for (int i = 0; i < lane_num; i++)
@@ -115,7 +117,7 @@ namespace surveillance_system
 
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
-                cctvPos = new int[52,52];
+                cctvPos = new int[grid_num,grid_num];
 
 
                 double range = mapSize - width;
@@ -159,7 +161,7 @@ namespace surveillance_system
             // 교차로 중 설치 위치는 랜덤
             public void setCCTVbyRandomInDST(int n_cctv)
             {
-                cctvPos = new int[52, 52];
+                cctvPos = new int[grid_num, grid_num];
 
                 Console.WriteLine("mapsize {0} ", mapSize);
 
@@ -183,7 +185,7 @@ namespace surveillance_system
 
             public void setCCTVbyRandomInInt(int n_cctv)
             {
-                cctvPos = new int[52, 52];
+                cctvPos = new int[grid_num, grid_num];
 
                 Console.WriteLine("mapsize {0} ", mapSize);
 
@@ -207,7 +209,7 @@ namespace surveillance_system
             // 보행자 위치 처음 설정
             public void setPed(int n_ped)
             {
-                pedPos = new int[52, 52];
+                pedPos = new int[grid_num, grid_num];
                 for (int i = 0; i < n_ped; i++)
                 {
                     Random rand = new Random();
@@ -241,7 +243,7 @@ namespace surveillance_system
             // set Car object
             public void setCar(int n_car)
             {
-                carPos = new int[52, 52];
+                carPos = new int[grid_num, grid_num];
                 for (int i = 0; i < n_car; i++)
                 {
                     Random rand = new Random();

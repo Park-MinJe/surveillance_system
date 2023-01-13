@@ -193,16 +193,16 @@ namespace surveillance_system
         // 도로 구성의 위치 출력
         public static void printPos(int[,] pos)
         {
-            for (int i = 0; i < 52; i++)
+            for (int i = 0; i < road.grid_num; i++)
             {
                 Console.Write("{0, 2}", i);
             }
             Console.WriteLine();
-            for (int i = 0; i < 52; i++)
+            for (int i = 0; i < road.grid_num; i++)
             {
                 Console.Write("{0, 2}", i);
 
-                for (int j = 0; j < 52; j++)
+                for (int j = 0; j < road.grid_num; j++)
                 {
                     if (pos[i, j] <= 0)
                         Console.Write("{0, 2}", " ");
