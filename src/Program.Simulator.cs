@@ -34,7 +34,7 @@ namespace surveillance_system
             public int getNCCTV() { return N_CCTV; }
 
             // ped csv file 출력 여부
-            private bool createPedCSV = false;
+            private bool createPedCSV = true;
 
             private Random rand;
 
@@ -106,10 +106,12 @@ namespace surveillance_system
             private int[] directionError;   // 방향 미스
             private int[] outOfRange;       // 거리 범위 밖
 
-            private string[] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
-            private string[] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
-            private string[] detection;     // csv 파일 출력 위한 추적여부
-            private string header;
+            private int trace_len;          // csv 파일 출력 길이
+            private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
+            private double[,] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
+            private int[,] detection;     // csv 파일 출력 위한 추적여부
+            private double[] header;
+            int stCnt;
 
             /* --------------------------------------
              * 전체 시뮬레이션 함수
@@ -312,6 +314,33 @@ namespace surveillance_system
                     else if (input == "N" || input == "n")
                     {
                         getCarNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            /* --------------------------------------
+             * 입력 활성화 함수
+            -------------------------------------- */
+            public void setcreatePedCSV()
+            {
+                while (true)
+                {
+                    Console.Write("Do you wand results as csv file(Y/N)? ");
+                    String input = Console.ReadLine();
+
+                    if (input == "Y" || input == "y")
+                    {
+                        createPedCSV = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        createPedCSV = false;
                         break;
                     }
                     else
@@ -685,10 +714,16 @@ namespace surveillance_system
                 directionError = new int[N_Target]; // 방향 미스
                 outOfRange = new int[N_Target]; // 거리 범위 밖
 
-                traffic_x = new string[(int)(Sim_Time / aUnitTime)]; // csv 파일 출력 위한 보행자별 x좌표
-                traffic_y = new string[(int)(Sim_Time / aUnitTime)]; // csv 파일 출력 위한 보행자별 y좌표
-                detection = new string[(int)(Sim_Time / aUnitTime)]; // csv 파일 출력 위한 추적여부
-                header = "";
+                if (createPedCSV)
+                {
+                    trace_len = (int)(Sim_Time / aUnitTime);
+                    traffic_x = new double[N_Target, trace_len]; // csv 파일 출력 위한 보행자별 x좌표
+                    traffic_y = new double[N_Target, trace_len]; // csv 파일 출력 위한 보행자별 y좌표
+                    detection = new int[N_Target, trace_len]; // csv 파일 출력 위한 추적여부
+                    header = new double[trace_len];
+
+                    stCnt = 0;
+                }
 
                 road_min = 0;
                 road_max = road.mapSize;
@@ -717,7 +752,8 @@ namespace surveillance_system
 
                     for (int i = 0; i < res.Length; i++)
                     {
-                        detection[i] += Convert.ToString(res[i]) + ",";
+                        if (createPedCSV)
+                            detection[i, stCnt] = res[i];
 
                         if (res[i] == 0) outOfRange[i]++;
                         else if (res[i] == -1) directionError[i]++;
@@ -740,8 +776,12 @@ namespace surveillance_system
                     this.rotateCCTVs();
 
 
-                    header += Convert.ToString(Math.Round(Now, 1)) + ",";
+                    if (createPedCSV) {
+                        header[stCnt] = Math.Round(Now, 1);
+                        stCnt++;
+                    }
                     Now += aUnitTime;
+
                     // debug
                     // Console.WriteLine("while simulation 3");
                 }
@@ -1076,44 +1116,54 @@ namespace surveillance_system
                     {
                         // debug
                         // Console.WriteLine("ped[{0}]", i);
-                        if (peds[i].X < road_min || peds[i].X > road_max)
+                        if (createPedCSV)
                         {
-                            traffic_x[i] += "Out of range,";
-                        }
-                        else
-                        {
-                            traffic_x[i] += Math.Round(peds[i].X, 2) + ",";
-                        }
+                            if (peds[i].X < road_min || peds[i].X > road_max)
+                            {
+                                //traffic_x[i] += "Out of range,";
+                                traffic_x[i, stCnt] = -1;
+                            }
+                            else
+                            {
+                                traffic_x[i, stCnt] = Math.Round(peds[i].X, 2);
+                            }
 
-                        if (peds[i].Y < road_min || peds[i].Y > road_max)
-                        {
-                            traffic_y[i] += "Out of range,";
-                        }
-                        else
-                        {
-                            traffic_y[i] += Math.Round(peds[i].Y, 2) + ",";
+                            if (peds[i].Y < road_min || peds[i].Y > road_max)
+                            {
+                                //traffic_y[i] += "Out of range,";
+                                traffic_y[i, stCnt] = -1;
+                            }
+                            else
+                            {
+                                traffic_y[i, stCnt] = Math.Round(peds[i].Y, 2);
+                            }
                         }
 
                         peds[i].move();
                     }
                     else
                     {
-                        if (cars[i - pedLen].X < road_min || cars[i - pedLen].X > road_max)
+                        if (createPedCSV)
                         {
-                            traffic_x[i] += "Out of range,";
-                        }
-                        else
-                        {
-                            traffic_x[i] += Math.Round(cars[i - pedLen].X, 2) + ",";
-                        }
+                            if (cars[i - pedLen].X < road_min || cars[i - pedLen].X > road_max)
+                            {
+                                //traffic_x[i] += "Out of range,";
+                                traffic_x[i, stCnt] = -1;
+                            }
+                            else
+                            {
+                                traffic_x[i, stCnt] = Math.Round(cars[i - pedLen].X, 2);
+                            }
 
-                        if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
-                        {
-                            traffic_y[i] += "Out of range,";
-                        }
-                        else
-                        {
-                            traffic_y[i] += Math.Round(cars[i - pedLen].Y, 2) + ",";
+                            if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
+                            {
+                                //traffic_y[i] += "Out of range,";
+                                traffic_y[i, stCnt] = -1;
+                            }
+                            else
+                            {
+                                traffic_y[i, stCnt] = Math.Round(cars[i - pedLen].Y, 2);
+                            }
                         }
 
                         // debug
@@ -1159,13 +1209,14 @@ namespace surveillance_system
                 {
                     for (int i = 0; i < peds.Length + cars.Length; i++)
                     {
-                        string fileName = "target" + i + ".csv";
+                        string fileName = "target\\target" + i + ".csv";
                         using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                         {
-                            file.WriteLine(header);
-                            file.WriteLine(traffic_x[i]);
-                            file.WriteLine(traffic_y[i]);
-                            file.WriteLine(detection[i]);
+                            file.WriteLine("header,traffic_x,traffic_y,detection");
+                            for(int j = 0; j < trace_len; j++)
+                            {
+                                file.WriteLine("{0},{1},{2},{3}", header[j], traffic_x[i, j], traffic_y[i, j], detection[i, j]);
+                            }
                         }
                     }
                 }

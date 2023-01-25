@@ -109,6 +109,7 @@ namespace surveillance_system
             for(int i = 0; i < simulationTimesForCCTVSet; i++)
             {
                 sims[i] = new Simulator();
+                sims[i].setcreatePedCSV();
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
@@ -168,7 +169,7 @@ namespace surveillance_system
                     sims[j].printResultAsCSV();
                     double successRate = sims[j].printResultRate();
                     successRateForCCTVSet += successRate;
-                    // s.printDetectedResults();
+                    sims[j].printDetectedResults();
 
                     sims[j].resetTimer();
                 }
