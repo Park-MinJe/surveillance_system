@@ -16,7 +16,8 @@ namespace surveillance_system
                 simulationTimesForCCTVSet = 100;
             string inputNCctvOption = "N",
                 inputNPedOption = "N",
-                inputNCarOption = "N";
+                inputNCarOption = "N",
+                InputcreateCSV = "N";
 
             List<double> successRates = new List<double>();
             List<CCTV[]> cctvAtSim = new List<CCTV[]>();
@@ -83,6 +84,16 @@ namespace surveillance_system
                 else { continue; }
             }
 
+            while (true)
+            {
+                Console.Write("Do you wand results as csv file(Y/N)? ");
+                InputcreateCSV = Console.ReadLine();
+
+                if (InputcreateCSV == "N" || InputcreateCSV == "n") { break; }
+                else if (InputcreateCSV == "Y" || InputcreateCSV == "y") { break; }
+                else { continue; }
+            }
+
             Console.WriteLine("");
 
             if (inputNCctvOption == "Y" || inputNCctvOption == "y")
@@ -109,7 +120,7 @@ namespace surveillance_system
             for(int i = 0; i < simulationTimesForCCTVSet; i++)
             {
                 sims[i] = new Simulator();
-                sims[i].setcreatePedCSV();
+                sims[i].setcreateCSV(InputcreateCSV);
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
@@ -124,6 +135,8 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
+                sims[i].initialPedsToCSV(i);
+                sims[i].initialCarsToCSV(i);
                 pedestrianAtSim.Add(peds);
                 carAtSim.Add(cars);
                 // sims[i].stopTimer();
@@ -136,25 +149,25 @@ namespace surveillance_system
                 {
                     peds = pedestrianAtSim[j];
                     cars = carAtSim[j];
-                    sims[i].startTimer();
+                    sims[j].startTimer();
                     if (j == 0)
                     {
                         if (i == 0 && numberOfCCTVSet > 1)
                         {
-                            road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
+                            road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
                         }
                         else
                         {
                             switch (cctvMode)
                             {
                                 case 0:
-                                    road.setCCTV(sims[i].getNCCTV(), road.width, road.lane_num);
+                                    road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
                                     break;
                                 case 1:
-                                    road.setCCTVbyRandomInDST(sims[i].getNCCTV());
+                                    road.setCCTVbyRandomInDST(sims[j].getNCCTV());
                                     break;
                                 case 2:
-                                    road.setCCTVbyRandomInInt(sims[i].getNCCTV());
+                                    road.setCCTVbyRandomInInt(sims[j].getNCCTV());
                                     break;
                             }
                         }
@@ -166,10 +179,10 @@ namespace surveillance_system
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();
                     sims[j].stopTimer();
-                    sims[j].printResultAsCSV();
+                    sims[j].TraceLogToCSV(i, j);
                     double successRate = sims[j].printResultRate();
                     successRateForCCTVSet += successRate;
-                    sims[j].printDetectedResults();
+                    //sims[j].printDetectedResults();
 
                     sims[j].resetTimer();
                 }

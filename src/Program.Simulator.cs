@@ -19,6 +19,8 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
+        public static TargetDataManager tdm;
+
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
@@ -34,14 +36,14 @@ namespace surveillance_system
             public int getNCCTV() { return N_CCTV; }
 
             // ped csv file 출력 여부
-            private bool createPedCSV = true;
+            private bool createCSV = true;
 
             private Random rand;
 
             private double Sim_Time = 600;
             private double Now = 0;
 
-            Stopwatch stopwatch;
+            private Stopwatch stopwatch;
 
             /* ------------------------------CCTV 제원------------------------------*/
             private const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
@@ -106,11 +108,11 @@ namespace surveillance_system
             private int[] directionError;   // 방향 미스
             private int[] outOfRange;       // 거리 범위 밖
 
-            private int trace_len;          // csv 파일 출력 길이
-            private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
-            private double[,] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
-            private int[,] detection;     // csv 파일 출력 위한 추적여부
-            private double[] header;
+            //private int trace_idx;          // csv 파일 출력 index
+            //private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
+            //private double[,] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
+            //private int[,] detection;     // csv 파일 출력 위한 추적여부
+            //private double[] header;
             int stCnt;
 
             /* --------------------------------------
@@ -168,7 +170,7 @@ namespace surveillance_system
                 ------------------------------------------- */
 
                 // create .csv file
-                this.printResultAsCSV();
+                this.TraceLogToCSV(0, 0);
 
                 // 결과(탐지율)
                 double successRate = this.printResultRate();
@@ -216,22 +218,13 @@ namespace surveillance_system
             }
             public void setgetCCTVNumFromUser(string input)
             {
-                while (true)
+                if (input == "Y" || input == "y")
                 {
-                    if (input == "Y" || input == "y")
-                    {
-                        getCCTVNumFromUser = true;
-                        break;
-                    }
-                    else if (input == "N" || input == "n")
-                    {
-                        getCCTVNumFromUser = false;
-                        break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    getCCTVNumFromUser = true;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    getCCTVNumFromUser = false;
                 }
             }
 
@@ -260,22 +253,13 @@ namespace surveillance_system
             }
             public void setgetPedNumFromUser(string input)
             {
-                while (true)
+                if (input == "Y" || input == "y")
                 {
-                    if (input == "Y" || input == "y")
-                    {
-                        getPedNumFromUser = true;
-                        break;
-                    }
-                    else if (input == "N" || input == "n")
-                    {
-                        getPedNumFromUser = false;
-                        break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    getPedNumFromUser = true;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    getPedNumFromUser = false;
                 }
             }
 
@@ -304,29 +288,20 @@ namespace surveillance_system
             }
             public void setgetCarNumFromUser(string input)
             {
-                while (true)
+                if (input == "Y" || input == "y")
                 {
-                    if (input == "Y" || input == "y")
-                    {
-                        getCarNumFromUser = true;
-                        break;
-                    }
-                    else if (input == "N" || input == "n")
-                    {
-                        getCarNumFromUser = false;
-                        break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    getCarNumFromUser = true;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    getCarNumFromUser = false;
                 }
             }
 
             /* --------------------------------------
-             * 입력 활성화 함수
+             * 출력 활성화 함수
             -------------------------------------- */
-            public void setcreatePedCSV()
+            public void setcreateCSV()
             {
                 while (true)
                 {
@@ -335,18 +310,29 @@ namespace surveillance_system
 
                     if (input == "Y" || input == "y")
                     {
-                        createPedCSV = true;
+                        createCSV = true;
                         break;
                     }
                     else if (input == "N" || input == "n")
                     {
-                        createPedCSV = false;
+                        createCSV = false;
                         break;
                     }
                     else
                     {
                         continue;
                     }
+                }
+            }
+            public void setcreateCSV(string input)
+            {
+                if (input == "Y" || input == "y")
+                {
+                    createCSV = true;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    createCSV = false;
                 }
             }
 
@@ -403,7 +389,7 @@ namespace surveillance_system
                 }
             }
 
-            /* ---------------------------시뮬레이션 조건----------------------------*/
+            /* ---------------------------시뮬레이션 환경----------------------------*/
 
             public void initVariables()
             {
@@ -714,13 +700,14 @@ namespace surveillance_system
                 directionError = new int[N_Target]; // 방향 미스
                 outOfRange = new int[N_Target]; // 거리 범위 밖
 
-                if (createPedCSV)
+                if (createCSV)
                 {
-                    trace_len = (int)(Sim_Time / aUnitTime);
-                    traffic_x = new double[N_Target, trace_len]; // csv 파일 출력 위한 보행자별 x좌표
-                    traffic_y = new double[N_Target, trace_len]; // csv 파일 출력 위한 보행자별 y좌표
-                    detection = new int[N_Target, trace_len]; // csv 파일 출력 위한 추적여부
-                    header = new double[trace_len];
+                    //trace_idx = (int)(Sim_Time / aUnitTime);
+                    //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
+                    //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
+                    //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
+                    //header = new double[trace_idx];
+                    tdm = new TargetDataManager(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
                     stCnt = 0;
                 }
@@ -752,8 +739,11 @@ namespace surveillance_system
 
                     for (int i = 0; i < res.Length; i++)
                     {
-                        if (createPedCSV)
-                            detection[i, stCnt] = res[i];
+                        if (createCSV)
+                        {
+                            //detection[i, stCnt] = res[i];
+                            tdm.addDetection(i, stCnt, res[i]);
+                        }
 
                         if (res[i] == 0) outOfRange[i]++;
                         else if (res[i] == -1) directionError[i]++;
@@ -776,7 +766,7 @@ namespace surveillance_system
                     this.rotateCCTVs();
 
 
-                    if (createPedCSV) {
+                    if (createCSV) {
                         header[stCnt] = Math.Round(Now, 1);
                         stCnt++;
                     }
@@ -1116,26 +1106,30 @@ namespace surveillance_system
                     {
                         // debug
                         // Console.WriteLine("ped[{0}]", i);
-                        if (createPedCSV)
+                        if (createCSV)
                         {
                             if (peds[i].X < road_min || peds[i].X > road_max)
                             {
                                 //traffic_x[i] += "Out of range,";
-                                traffic_x[i, stCnt] = -1;
+                                //traffic_x[i, stCnt] = -1;
+                                tdm.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
-                                traffic_x[i, stCnt] = Math.Round(peds[i].X, 2);
+                                //traffic_x[i, stCnt] = Math.Round(peds[i].X, 2);
+                                tdm.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
                             }
 
                             if (peds[i].Y < road_min || peds[i].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
-                                traffic_y[i, stCnt] = -1;
+                                //traffic_y[i, stCnt] = -1;
+                                tdm.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
-                                traffic_y[i, stCnt] = Math.Round(peds[i].Y, 2);
+                                //traffic_y[i, stCnt] = Math.Round(peds[i].Y, 2);
+                                tdm.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
                             }
                         }
 
@@ -1143,26 +1137,30 @@ namespace surveillance_system
                     }
                     else
                     {
-                        if (createPedCSV)
+                        if (createCSV)
                         {
                             if (cars[i - pedLen].X < road_min || cars[i - pedLen].X > road_max)
                             {
                                 //traffic_x[i] += "Out of range,";
-                                traffic_x[i, stCnt] = -1;
+                                //traffic_x[i, stCnt] = -1;
+                                tdm.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
-                                traffic_x[i, stCnt] = Math.Round(cars[i - pedLen].X, 2);
+                                //traffic_x[i, stCnt] = Math.Round(cars[i - pedLen].X, 2);
+                                tdm.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
                             }
 
                             if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
-                                traffic_y[i, stCnt] = -1;
+                                //traffic_y[i, stCnt] = -1;
+                                tdm.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
-                                traffic_y[i, stCnt] = Math.Round(cars[i - pedLen].Y, 2);
+                                //traffic_y[i, stCnt] = Math.Round(cars[i - pedLen].Y, 2);
+                                tdm.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
                             }
                         }
 
@@ -1203,23 +1201,22 @@ namespace surveillance_system
             /* --------------------------------------
              * 결과 출력 함수
             -------------------------------------- */
-            public void printResultAsCSV()
+            public void initialPedsToCSV(int simIdx)
             {
-                if (createPedCSV)
-                {
-                    for (int i = 0; i < peds.Length + cars.Length; i++)
-                    {
-                        string fileName = "target\\target" + i + ".csv";
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
-                        {
-                            file.WriteLine("header,traffic_x,traffic_y,detection");
-                            for(int j = 0; j < trace_len; j++)
-                            {
-                                file.WriteLine("{0},{1},{2},{3}", header[j], traffic_x[i, j], traffic_y[i, j], detection[i, j]);
-                            }
-                        }
-                    }
-                }
+                if (createCSV)
+                    tdm.initialPedsToCSV(simIdx, N_Ped);
+            }
+
+            public void initialCarsToCSV(int simIdx)
+            {
+                if (createCSV)
+                    tdm.initialCarsToCSV(simIdx, N_Car);
+            }
+
+            public void TraceLogToCSV(int cctvSetIdx, int simIdx)
+            {
+                if (createCSV)
+                    tdm.TraceLogToCSV(cctvSetIdx, simIdx, trace_idx, header, traffic_x, traffic_y, detection);
             }
 
             public double printResultRate()
