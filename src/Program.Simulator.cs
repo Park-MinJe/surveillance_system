@@ -767,7 +767,8 @@ namespace surveillance_system
 
 
                     if (createCSV) {
-                        header[stCnt] = Math.Round(Now, 1);
+                        //header[stCnt] = Math.Round(Now, 1);
+                        tdm.addHeader()
                         stCnt++;
                     }
                     Now += aUnitTime;
