@@ -174,7 +174,7 @@ namespace surveillance_system
                             }
                         }
                         //cctvAtSim.Add(cctvs);
-                        tw.initialCctvsToCSV(i);
+                        cw.initialCctvsToCSV(i);
                         //cctvPosAtSim.Add(road.cctvPos);
                     }
                     road.printCctvPos();

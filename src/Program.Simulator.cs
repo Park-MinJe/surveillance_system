@@ -22,6 +22,9 @@ namespace surveillance_system
         public static TargetCSVWriter tw = new TargetCSVWriter();
         public static TargetCSVReader tr = new TargetCSVReader();
 
+        public static CctvCSVWriter cw = new CctvCSVWriter();
+        public static CctvCSVReader cr = new CctvCSVReader();
+
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
@@ -458,8 +461,9 @@ namespace surveillance_system
                     //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
                     //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
                     //header = new double[trace_idx];
-                    tw.setTargetCSVWriter(N_Ped, N_Car, N_CCTV, (int)(Sim_Time / aUnitTime));
+                    tw.setTargetCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
                 }
+                cw.setCctvCSVWriter(N_CCTV);
             }
 
             public void initMap(int cctvMode)

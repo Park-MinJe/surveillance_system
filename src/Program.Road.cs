@@ -157,7 +157,7 @@ namespace surveillance_system
 
             public void setCctvswithCSV(int cctvSetIdx)
             {
-                tr.initialCctvsFromCSV(cctvSetIdx);
+                cr.initialCctvsFromCSV(cctvSetIdx);
 
                 for (int i = 0; i < grid_num; i++)
                 {

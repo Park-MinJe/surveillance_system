@@ -14,8 +14,6 @@ namespace surveillance_system
             private int N_Car;
             private int N_Target;
 
-            private int N_Cctv;
-
             private int trace_idx;          // csv 파일 출력 index
             private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
             private double[,] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
@@ -31,13 +29,11 @@ namespace surveillance_system
             /* --------------------------------------
              * Set Data
             -------------------------------------- */
-            public void setTargetCSVWriter(int N_Ped, int N_Car, int N_Cctv, int trace_idx)
+            public void setTargetCSVWriter(int N_Ped, int N_Car, int trace_idx)
             {
                 this.N_Ped = N_Ped;
                 this.N_Car = N_Car;
                 this.N_Target = N_Ped + N_Car;
-
-                this.N_Cctv = N_Cctv;
 
                 this.trace_idx = trace_idx;
                 this.traffic_x = new double[N_Target, trace_idx];
@@ -82,7 +78,7 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\target\\pos\\Sim" + simIdx + ".Peds.csv";
+                fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
@@ -105,26 +101,13 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\target\\pos\\Sim" + simIdx + ".Cars.csv";
+                fileName = "object\\target\\Sim" + simIdx + ".Cars.Pos.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
                     for (int j = 0; j < N_Ped; j++)
                     {
                         file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, cars[j].Pos_H1[0], cars[j].Pos_H1[1], cars[j].Pos_H2[0], cars[j].Pos_H2[0], cars[j].Pos_V1[0], cars[j].Pos_V1[1], cars[j].Pos_V2[0], cars[j].Pos_V2[1]);
-                    }
-                }
-            }
-
-            public void initialCctvsToCSV(int cctvSetIdx)
-            {
-                string fileName = "object\\cctv\\CctvSet" + cctvSetIdx + ".csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
-                {
-                    file.WriteLine("#idx,X,Y,Z,WD,HE,H_AOV,V_AOV,imW,imH,Focal_Length,ViewAngleH,ViewAngleV,Eff_Dist_From,Eff_Dist_To,Direction,isFixed,Max_Dist");
-                    for (int j = 0; j < N_Cctv; j++)
-                    {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}", j, cctvs[j].X, cctvs[j].Y, cctvs[j].Z, cctvs[j].WD, cctvs[j].HE, cctvs[j].H_AOV, cctvs[j].V_AOV, cctvs[j].imW, cctvs[j].imH, cctvs[j].Focal_Length, cctvs[j].ViewAngleH, cctvs[j].ViewAngleV, cctvs[j].Eff_Dist_From, cctvs[j].Eff_Dist_To, cctvs[j].Direction, cctvs[j].isFixed, cctvs[j].Max_Dist);
                     }
                 }
             }
@@ -201,7 +184,7 @@ namespace surveillance_system
                         }
                     }
 
-                    fileName = "object\\target\\pos\\Sim" + simIdx + ".Peds.csv";
+                    fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
                     using (FileStream fs = new FileStream(@fileName, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
@@ -296,7 +279,7 @@ namespace surveillance_system
                         }
                     }
 
-                    fileName = "object\\target\\pos\\Sim" + simIdx + ".Cars.csv";
+                    fileName = "object\\target\\Sim" + simIdx + ".Cars.Pos.csv";
                     using (FileStream fs = new FileStream(@fileName, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
@@ -337,7 +320,33 @@ namespace surveillance_system
                     Console.WriteLine(e.ToString());
                 }
             }
+        }
 
+        public class CctvCSVWriter
+        {
+            private int N_Cctv;
+
+            public void setCctvCSVWriter(int N_Cctv)
+            {
+                this.N_Cctv= N_Cctv;
+            }
+
+            public void initialCctvsToCSV(int cctvSetIdx)
+            {
+                string fileName = "object\\cctv\\CctvSet" + cctvSetIdx + ".csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,X,Y,Z,WD,HE,H_AOV,V_AOV,imW,imH,Focal_Length,ViewAngleH,ViewAngleV,Eff_Dist_From,Eff_Dist_To,Direction,isFixed,Max_Dist");
+                    for (int j = 0; j < N_Cctv; j++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}", j, cctvs[j].X, cctvs[j].Y, cctvs[j].Z, cctvs[j].WD, cctvs[j].HE, cctvs[j].H_AOV, cctvs[j].V_AOV, cctvs[j].imW, cctvs[j].imH, cctvs[j].Focal_Length, cctvs[j].ViewAngleH, cctvs[j].ViewAngleV, cctvs[j].Eff_Dist_From, cctvs[j].Eff_Dist_To, cctvs[j].Direction, cctvs[j].isFixed, cctvs[j].Max_Dist);
+                    }
+                }
+            }
+        }
+
+        public class CctvCSVReader
+        {
             public void initialCctvsFromCSV(int cctvSetIdx)
             {
                 try
@@ -374,11 +383,6 @@ namespace surveillance_system
                     Console.WriteLine(e.ToString());
                 }
             }
-        }
-
-        public class CctvDataManager
-        {
-
         }
     }
 }
