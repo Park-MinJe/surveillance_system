@@ -41,6 +41,7 @@ namespace surveillance_system
             public int N_Surv;  //number of surveillance camera viewing this target.
 
             public int TTL;     // Time To Live
+
             public void define_TARGET(
                 double Width,
                 double Height,

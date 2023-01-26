@@ -19,7 +19,8 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
-        public static TargetDataManager tdm;
+        public static TargetCSVWriter tw = new TargetCSVWriter();
+        public static TargetCSVReader tr = new TargetCSVReader();
 
         public class Simulator
         {
@@ -450,6 +451,15 @@ namespace surveillance_system
                 {
                     cars[i] = new Car();
                 }
+                if (createCSV)
+                {
+                    //trace_idx = (int)(Sim_Time / aUnitTime);
+                    //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
+                    //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
+                    //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
+                    //header = new double[trace_idx];
+                    tw.setTargetCSVWriter(N_Ped, N_Car, N_CCTV, (int)(Sim_Time / aUnitTime));
+                }
             }
 
             public void initMap(int cctvMode)
@@ -461,6 +471,8 @@ namespace surveillance_system
                     {
                         // 도로 정보 생성, 보행자 정보 생성
                         road.roadBuilder(cctvMode, Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
+                        road.setPed(N_Ped);
+                        road.setCar(N_Car);
 
                         /*
                         // debug 220428
@@ -665,6 +677,39 @@ namespace surveillance_system
             }
 
             /* --------------------------------------
+             * init obj with csv
+            -------------------------------------- */
+            public void initPedsWithCSV(int simIdx)
+            {
+                road.setPedswithCSV(simIdx);
+            }
+
+            public void initCarsWithCSV(int simIdx)
+            {
+                road.setCarswithCSV(simIdx);
+            }
+
+            public void initCctvsWithCSV(int cctvSetIdx)
+            {
+                road.setCctvswithCSV(cctvSetIdx);
+                foreach(CCTV cctv in cctvs)
+                {
+                    cctv.detectedTargets.Clear();
+
+                    cctv.get_PixelDensity(Dist,
+                            cctv.WD,
+                            cctv.HE,
+                            cctv.Focal_Length,
+                            cctv.imW,
+                            cctv.imH);
+
+                    cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
+                    cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
+                }
+            }
+
+
+            /* --------------------------------------
              * 타이머 함수
             -------------------------------------- */
             public void initTimer()
@@ -707,7 +752,6 @@ namespace surveillance_system
                     //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
                     //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
                     //header = new double[trace_idx];
-                    tdm = new TargetDataManager(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
                     stCnt = 0;
                 }
@@ -742,7 +786,7 @@ namespace surveillance_system
                         if (createCSV)
                         {
                             //detection[i, stCnt] = res[i];
-                            tdm.addDetection(i, stCnt, res[i]);
+                            tw.addDetection(i, stCnt, res[i]);
                         }
 
                         if (res[i] == 0) outOfRange[i]++;
@@ -768,7 +812,7 @@ namespace surveillance_system
 
                     if (createCSV) {
                         //header[stCnt] = Math.Round(Now, 1);
-                        tdm.addHeader()
+                        tw.addHeader(stCnt, Math.Round(Now, 1));
                         stCnt++;
                     }
                     Now += aUnitTime;
@@ -1113,24 +1157,24 @@ namespace surveillance_system
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
-                                tdm.addTraffic_x(i, stCnt, -1);
+                                tw.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_x[i, stCnt] = Math.Round(peds[i].X, 2);
-                                tdm.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
+                                tw.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
                             }
 
                             if (peds[i].Y < road_min || peds[i].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
-                                tdm.addTraffic_y(i, stCnt, -1);
+                                tw.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_y[i, stCnt] = Math.Round(peds[i].Y, 2);
-                                tdm.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
+                                tw.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
                             }
                         }
 
@@ -1144,24 +1188,24 @@ namespace surveillance_system
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
-                                tdm.addTraffic_x(i, stCnt, -1);
+                                tw.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_x[i, stCnt] = Math.Round(cars[i - pedLen].X, 2);
-                                tdm.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
+                                tw.addTraffic_x(i, stCnt, Math.Round(cars[i - pedLen].X, 2));
                             }
 
                             if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
-                                tdm.addTraffic_y(i, stCnt, -1);
+                                tw.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_y[i, stCnt] = Math.Round(cars[i - pedLen].Y, 2);
-                                tdm.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
+                                tw.addTraffic_y(i, stCnt, Math.Round(cars[i - pedLen].Y, 2));
                             }
                         }
 
@@ -1205,19 +1249,25 @@ namespace surveillance_system
             public void initialPedsToCSV(int simIdx)
             {
                 if (createCSV)
-                    tdm.initialPedsToCSV(simIdx, N_Ped);
+                {
+                    tw.initialPedsToCSV(simIdx);
+                }
             }
 
             public void initialCarsToCSV(int simIdx)
             {
                 if (createCSV)
-                    tdm.initialCarsToCSV(simIdx, N_Car);
+                {
+                    tw.initialCarsToCSV(simIdx);
+                }
             }
 
             public void TraceLogToCSV(int cctvSetIdx, int simIdx)
             {
                 if (createCSV)
-                    tdm.TraceLogToCSV(cctvSetIdx, simIdx, trace_idx, header, traffic_x, traffic_y, detection);
+                {
+                    tw.TraceLogToCSV(cctvSetIdx, simIdx);
+                }
             }
 
             public double printResultRate()

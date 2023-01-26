@@ -20,11 +20,11 @@ namespace surveillance_system
                 InputcreateCSV = "N";
 
             List<double> successRates = new List<double>();
-            List<CCTV[]> cctvAtSim = new List<CCTV[]>();
-            List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
-            List<Car[]> carAtSim = new List<Car[]>();
+            //List<CCTV[]> cctvAtSim = new List<CCTV[]>();
+            //List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
+            //List<Car[]> carAtSim = new List<Car[]>();
 
-            List<int[,]> cctvPosAtSim = new List<int[,]>();
+            //List<int[,]> cctvPosAtSim = new List<int[,]>();
 
             while (true)
             {
@@ -137,8 +137,8 @@ namespace surveillance_system
                 sims[i].initMap(cctvMode);
                 sims[i].initialPedsToCSV(i);
                 sims[i].initialCarsToCSV(i);
-                pedestrianAtSim.Add(peds);
-                carAtSim.Add(cars);
+                //pedestrianAtSim.Add(peds);
+                //carAtSim.Add(cars);
                 // sims[i].stopTimer();
             }
 
@@ -147,8 +147,10 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    peds = pedestrianAtSim[j];
-                    cars = carAtSim[j];
+                    sims[j].initPedsWithCSV(j);
+                    road.printPedPos();
+                    sims[j].initCarsWithCSV(j);
+                    road.printCarPos();
                     sims[j].startTimer();
                     if (j == 0)
                     {
@@ -171,8 +173,9 @@ namespace surveillance_system
                                     break;
                             }
                         }
-                        cctvAtSim.Add(cctvs);
-                        cctvPosAtSim.Add(road.cctvPos);
+                        //cctvAtSim.Add(cctvs);
+                        tw.initialCctvsToCSV(i);
+                        //cctvPosAtSim.Add(road.cctvPos);
                     }
                     road.printCctvPos();
 
@@ -201,31 +204,8 @@ namespace surveillance_system
             int bestCCTVIdx = successRates.IndexOf(successRates.Max());
 
             Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-            printPos(cctvPosAtSim[bestCCTVIdx]);
-        }
-
-        // 도로 구성의 위치 출력
-        public static void printPos(int[,] pos)
-        {
-            for (int i = 0; i < road.grid_num; i++)
-            {
-                Console.Write("{0, 2}", i);
-            }
-            Console.WriteLine();
-            for (int i = 0; i < road.grid_num; i++)
-            {
-                Console.Write("{0, 2}", i);
-
-                for (int j = 0; j < road.grid_num; j++)
-                {
-                    if (pos[i, j] <= 0)
-                        Console.Write("{0, 2}", " ");
-                    else
-                        Console.Write("{0, 2}", pos[i, j]);
-
-                }
-                Console.WriteLine();
-            }
+            road.setCctvswithCSV(bestCCTVIdx);
+            road.printPos(road.cctvPos);
         }
     }
 }
