@@ -38,9 +38,10 @@ namespace surveillance_system
             public double[] Pos_V1 = new double[2];
             public double[] Pos_V2 = new double[2];
 
-            public int N_Surv; //number of surveillance camera viewing this target.
+            public int N_Surv;  //number of surveillance camera viewing this target.
 
-            public int TTL;
+            public int TTL;     // Time To Live
+
             public void define_TARGET(
                 double Width,
                 double Height,

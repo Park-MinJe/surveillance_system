@@ -111,14 +111,74 @@ namespace surveillance_system
                         break;
 
                 }*/
-                setPed(n_ped);
-                setCar(n_car);
+
+                //setPed(n_ped);
+                //setCar(n_car);
             }
 
+            /* --------------------------------------
+             * set coordinate of objects with csv
+            -------------------------------------- */
+            public void setPedswithCSV(int simIdx)
+            {
+                tr.initialPedsFromCSV(simIdx);
+
+                for (int i = 0; i < grid_num; i++)
+                {
+                    for (int j = 0; j < grid_num; j++)
+                    {
+                        pedPos[i, j] = 0;
+                    }
+                }
+
+                for(int i = 0;i < peds.Length ; i++)
+                {
+                    pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
+                }
+            }
+
+            public void setCarswithCSV(int simIdx)
+            {
+                tr.initialCarsFromCSV(simIdx);
+
+                for (int i = 0; i < grid_num; i++)
+                {
+                    for (int j = 0; j < grid_num; j++)
+                    {
+                        carPos[i, j] = 0;
+                    }
+                }
+
+                for (int i = 0; i < cars.Length; i++)
+                {
+                    carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
+                }
+            }
+
+            public void setCctvswithCSV(int cctvSetIdx)
+            {
+                cr.initialCctvsFromCSV(cctvSetIdx);
+
+                for (int i = 0; i < grid_num; i++)
+                {
+                    for (int j = 0; j < grid_num; j++)
+                    {
+                        cctvPos[i, j] = 0;
+                    }
+                }
+
+                for (int i = 0; i < cctvs.Length; i++)
+                {
+                    cctvPos[Convert.ToInt32((cctvs[i].Y) / 10000), Convert.ToInt32((cctvs[i].X / 10000))] += 1;
+                }
+            }
+
+            /* --------------------------------------
+             * set coordinate of objects
+            -------------------------------------- */
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
                 cctvPos = new int[grid_num,grid_num];
-
 
                 double range = mapSize - width;
                 int rootN = (int)Math.Sqrt((double)n_cctv);
@@ -279,6 +339,9 @@ namespace surveillance_system
                 // this.printCarPos();
             }
 
+            /* --------------------------------------
+             * get Point and index
+            -------------------------------------- */
             public double[,] getPointOfAdjacentRoad(int currAreaIdx)
             {
                 if (currAreaIdx == -1)
@@ -412,6 +475,9 @@ namespace surveillance_system
                 return newPos;
             }
 
+            /* --------------------------------------
+             * print info
+            -------------------------------------- */
             public void printRoadInfo()
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "DST");
@@ -466,6 +532,33 @@ namespace surveillance_system
                     Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
                 }
             }
+
+            /* --------------------------------------
+             * print Pos on grid
+            -------------------------------------- */
+            public void printPos(int[,] pos)
+            {
+                for (int i = 0; i < grid_num; i++)
+                {
+                    Console.Write("{0, 2}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < grid_num; i++)
+                {
+                    Console.Write("{0, 2}", i);
+
+                    for (int j = 0; j < grid_num; j++)
+                    {
+                        if (pos[i, j] <= 0)
+                            Console.Write("{0, 2}", " ");
+                        else
+                            Console.Write("{0, 2}", pos[i, j]);
+
+                    }
+                    Console.WriteLine();
+                }
+            }
+
             public void printCctvPos()
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print CCTV Position");
