@@ -230,6 +230,7 @@ namespace surveillance_system
                 public double v;
                 public double t;
             }
+            [XmlIgnore]
             public List<detectedTarget> detectedTargets;
 
             public void setZ(int z)
@@ -472,8 +473,9 @@ namespace surveillance_system
             }
 
             // public double Angle;
+            [XmlIgnore]
             public double[] SurvDist_H;
-
+            [XmlIgnore]
             public double[] SurvDist_V;
             [XmlIgnore]
             public double[] PPM_H;

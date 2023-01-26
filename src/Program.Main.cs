@@ -166,7 +166,7 @@ namespace surveillance_system
                         }
 
                         cctvAtSim.Add(cctvs);
-                        // writeInitialCctvsToXML(i);
+                        writeInitialCctvsToXML(i);
                         // writeCctvsToXML(i);
                     }
                     else
