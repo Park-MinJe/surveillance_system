@@ -176,6 +176,13 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects
             -------------------------------------- */
+
+            // set Architecture object
+            //public void setArch(int n_arch){
+            //    
+            //}
+
+
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
                 cctvPos = new int[grid_num,grid_num];
