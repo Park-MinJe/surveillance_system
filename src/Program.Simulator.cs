@@ -11,6 +11,7 @@ namespace surveillance_system
 {
     public partial class Program
     {
+        public static Architecture[] archs;
         public static CCTV[] cctvs;
         public static Pedestrian[] peds;
         public static Car[] cars;
@@ -28,12 +29,12 @@ namespace surveillance_system
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
-            //private bool getArchNumFromUser = false;
+            private bool getArchNumFromUser = false;
             private bool getCCTVNumFromUser = false;
             private bool getPedNumFromUser = false;
             private bool getCarNumFromUser = false;
 
-            //private int N_Arch = 10;
+            private int N_Arch = 10;
             private int N_CCTV = 100;
             private int N_Ped = 5;
             private int N_Car = 5;
@@ -88,7 +89,8 @@ namespace surveillance_system
             private int road_max;
 
             /* ------------------------------건물 설정------------------------------*/
-            
+            private const int Arch_Width = 9000;
+            private const int Arch_Height = 17000;
 
             /* ------------------------------PED 설정------------------------------*/
             private bool Opt_Observation = false;
@@ -202,40 +204,40 @@ namespace surveillance_system
             /* --------------------------------------
              * 입력 활성화 함수
             -------------------------------------- */
-            //public void setgetArchNumFromUser()
-            //{
-            //    while (true)
-            //    {
-            //        Console.Write("Do you want to enter Architecture Numbers(Y/N)? ");
-            //        String input = Console.ReadLine();
+            public void setgetArchNumFromUser()
+            {
+                while (true)
+                {
+                    Console.Write("Do you want to enter Architecture Numbers(Y/N)? ");
+                    String input = Console.ReadLine();
 
-            //        if (input == "Y" || input == "y")
-            //        {
-            //            getArchNumFromUser = true;
-            //            break;
-            //        }
-            //        else if (input == "N" || input == "n")
-            //        {
-            //            getArchNumFromUser = false;
-            //            break;
-            //        }
-            //        else
-            //        {
-            //            continue;
-            //        }
-            //    }
-            //}
-            //public void setgetArchNumFromUser(string input)
-            //{
-            //    if (input == "Y" || input == "y")
-            //    {
-            //        getArchNumFromUser = true;
-            //    }
-            //    else if (input == "N" || input == "n")
-            //    {
-            //        getArchNumFromUser = false;
-            //    }
-            //}
+                    if (input == "Y" || input == "y")
+                    {
+                        getArchNumFromUser = true;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        getArchNumFromUser = false;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            public void setgetArchNumFromUser(string input)
+            {
+                if (input == "Y" || input == "y")
+                {
+                    getArchNumFromUser = true;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    getArchNumFromUser = false;
+                }
+            }
 
             public void setgetCCTVNumFromUser()
             {
@@ -385,21 +387,21 @@ namespace surveillance_system
             -------------------------------------- */
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
-            //public void initNArch()
-            //{
-            //    if (getArchNumFromUser)
-            //    {
-            //        Console.Write("input number of Architecture: ");
-            //        N_CCTV = Convert.ToInt32(Console.ReadLine());
-            //    }
-            //}
-            //public void initNArch(int nArch)
-            //{
-            //    if (getArchNumFromUser)
-            //    {
-            //        N_Arch = nArch;
-            //    }
-            //}
+            public void initNArch()
+            {
+                if (getArchNumFromUser)
+                {
+                    Console.Write("input number of Architecture: ");
+                    N_CCTV = Convert.ToInt32(Console.ReadLine());
+                }
+            }
+            public void initNArch(int nArch)
+            {
+                if (getArchNumFromUser)
+                {
+                    N_Arch = nArch;
+                }
+            }
 
             public void initNCctv()
             {
@@ -498,6 +500,11 @@ namespace surveillance_system
                 }
 
                 /* ---------------------------전역 변수 할당---------------------------*/
+                archs = new Architecture[N_Arch];
+                for (int i = 0; i < N_Arch; i++)
+                {
+                    archs[i] = new Architecture();
+                }
                 cctvs = new CCTV[N_CCTV];
                 for (int i = 0; i < N_CCTV; i++)
                 {
@@ -585,10 +592,22 @@ namespace surveillance_system
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Road Setting Completed");
             }
 
-            //public void initArch()
-            //{
-
-            //}
+            public void initArch()
+            {
+                try
+                {
+                    foreach (Architecture arch in archs)
+                    {
+                        arch.define_Architecture(Arch_Width, Arch_Height);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Err while initializing Architecture\n");
+                    Console.WriteLine(ex.Message);
+                }
+                Console.WriteLine("Architecture Setting Completed\n");
+            }
 
             public void initPed()
             {
