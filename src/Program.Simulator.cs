@@ -28,10 +28,12 @@ namespace surveillance_system
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
+            //private bool getArchNumFromUser = false;
             private bool getCCTVNumFromUser = false;
             private bool getPedNumFromUser = false;
             private bool getCarNumFromUser = false;
 
+            //private int N_Arch = 10;
             private int N_CCTV = 100;
             private int N_Ped = 5;
             private int N_Car = 5;
@@ -84,6 +86,9 @@ namespace surveillance_system
 
             private int road_min = 0;
             private int road_max;
+
+            /* ------------------------------건물 설정------------------------------*/
+            
 
             /* ------------------------------PED 설정------------------------------*/
             private bool Opt_Observation = false;
@@ -197,6 +202,41 @@ namespace surveillance_system
             /* --------------------------------------
              * 입력 활성화 함수
             -------------------------------------- */
+            //public void setgetArchNumFromUser()
+            //{
+            //    while (true)
+            //    {
+            //        Console.Write("Do you want to enter Architecture Numbers(Y/N)? ");
+            //        String input = Console.ReadLine();
+
+            //        if (input == "Y" || input == "y")
+            //        {
+            //            getArchNumFromUser = true;
+            //            break;
+            //        }
+            //        else if (input == "N" || input == "n")
+            //        {
+            //            getArchNumFromUser = false;
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            continue;
+            //        }
+            //    }
+            //}
+            //public void setgetArchNumFromUser(string input)
+            //{
+            //    if (input == "Y" || input == "y")
+            //    {
+            //        getArchNumFromUser = true;
+            //    }
+            //    else if (input == "N" || input == "n")
+            //    {
+            //        getArchNumFromUser = false;
+            //    }
+            //}
+
             public void setgetCCTVNumFromUser()
             {
                 while (true)
@@ -345,6 +385,22 @@ namespace surveillance_system
             -------------------------------------- */
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
+            //public void initNArch()
+            //{
+            //    if (getArchNumFromUser)
+            //    {
+            //        Console.Write("input number of Architecture: ");
+            //        N_CCTV = Convert.ToInt32(Console.ReadLine());
+            //    }
+            //}
+            //public void initNArch(int nArch)
+            //{
+            //    if (getArchNumFromUser)
+            //    {
+            //        N_Arch = nArch;
+            //    }
+            //}
+
             public void initNCctv()
             {
                 if (getCCTVNumFromUser)
@@ -426,6 +482,9 @@ namespace surveillance_system
                     Road_N_Interval = 5;
                 }
 
+                /* ------------------------------건물 제원------------------------------*/
+
+
                 /* ------------------------------PED 설정------------------------------*/
                 if (Opt_Demo)
                 {
@@ -475,6 +534,7 @@ namespace surveillance_system
                     {
                         // 도로 정보 생성, 보행자 정보 생성
                         road.roadBuilder(cctvMode, Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
+                        //road.setArch(N_Arch);
                         road.setPed(N_Ped);
                         road.setCar(N_Car);
 
@@ -504,6 +564,9 @@ namespace surveillance_system
                         */
 
 
+                        // 건물 init
+                        //this.initArch();
+                        
                         // ped init
                         this.initPed();
 
@@ -521,6 +584,11 @@ namespace surveillance_system
                 }
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Road Setting Completed");
             }
+
+            //public void initArch()
+            //{
+
+            //}
 
             public void initPed()
             {
