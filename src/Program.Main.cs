@@ -10,11 +10,12 @@ namespace surveillance_system
     {
         static void Main(string[] args)
         {
-            int nCctv = 0, nPed = 0, nCar = 0, 
+            int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
-            string inputNCctvOption = "N",
+            string inputNArchOption = "N", 
+                inputNCctvOption = "N",
                 inputNPedOption = "N",
                 inputNCarOption = "N",
                 InputcreateCSV = "N";
@@ -56,7 +57,17 @@ namespace surveillance_system
 
             while (true)
             {
-                Console.Write("\nDo you want to enter CCTV Numbers(Y/N)? ");
+                Console.Write("\nDo you want to enter Architecture Numbers(Y/N)? ");
+                inputNArchOption = Console.ReadLine();
+
+                if (inputNArchOption == "N" || inputNArchOption == "n") { break; }
+                else if (inputNArchOption == "Y" || inputNArchOption == "y") { break; }
+                else { continue; }
+            }
+
+            while (true)
+            {
+                Console.Write("Do you want to enter CCTV Numbers(Y/N)? ");
                 inputNCctvOption = Console.ReadLine();
 
                 if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
@@ -96,6 +107,12 @@ namespace surveillance_system
 
             Console.WriteLine("");
 
+            if (inputNArchOption == "Y" || inputNArchOption == "y")
+            {
+                Console.Write("input number of Architecture: ");
+                nArch = Convert.ToInt32(Console.ReadLine());
+            }
+
             if (inputNCctvOption == "Y" || inputNCctvOption == "y")
             {
                 Console.Write("input number of CCTV: ");
@@ -121,10 +138,12 @@ namespace surveillance_system
             {
                 sims[i] = new Simulator();
                 sims[i].setcreateCSV(InputcreateCSV);
+                sims[i].setgetArchNumFromUser(inputNArchOption);
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
 
+                sims[i].initNArch(nArch);
                 sims[i].initNCctv(nCctv);
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
@@ -135,6 +154,9 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
+                // Debug Architecture Position
+                road.printArchPos();
+                sims[i].initialArchsToCSV(i);
                 sims[i].initialPedsToCSV(i);
                 sims[i].initialCarsToCSV(i);
                 //pedestrianAtSim.Add(peds);
