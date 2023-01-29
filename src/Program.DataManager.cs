@@ -10,6 +10,7 @@ namespace surveillance_system
     {
         public class TargetCSVWriter
         {
+            private int N_Arch;
             private int N_Ped;
             private int N_Car;
             private int N_Target;
@@ -29,8 +30,9 @@ namespace surveillance_system
             /* --------------------------------------
              * Set Data
             -------------------------------------- */
-            public void setTargetCSVWriter(int N_Ped, int N_Car, int trace_idx)
+            public void setTargetCSVWriter(int N_Arch, int N_Ped, int N_Car, int trace_idx)
             {
+                this.N_Arch= N_Arch;
                 this.N_Ped = N_Ped;
                 this.N_Car = N_Car;
                 this.N_Target = N_Ped + N_Car;
@@ -65,6 +67,29 @@ namespace surveillance_system
             /* --------------------------------------
              * Print CSV
             -------------------------------------- */
+
+            public void initialArchsToCSV(int simIdx)
+            {
+                string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,X,Y,Direction,W,H,D1,D2,W2");
+                    for (int j = 0; j < N_Ped; j++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].X, archs[j].Y, archs[j].Direction, archs[j].W, archs[j].H, archs[j].D1, archs[j].D2, archs[j].W2);
+                    }
+                }
+
+                fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
+                    for (int j = 0; j < N_Arch; j++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].Pos_H1[0], archs[j].Pos_H1[1], archs[j].Pos_H2[0], archs[j].Pos_H2[0], archs[j].Pos_V1[0], archs[j].Pos_V1[1], archs[j].Pos_V2[0], archs[j].Pos_V2[1]);
+                    }
+                }
+            }
 
             public void initialPedsToCSV(int simIdx)
             {

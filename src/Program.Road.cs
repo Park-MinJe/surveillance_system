@@ -32,6 +32,8 @@ namespace surveillance_system
             public int interval;
             public int width;
 
+            // 건물 위치
+            public int[,] archPos;
             // CCTV 위치
             public int[,] cctvPos;
             // Ped 위치
@@ -178,9 +180,24 @@ namespace surveillance_system
             -------------------------------------- */
 
             // set Architecture object
-            //public void setArch(int n_arch){
-            //    
-            //}
+            public void setArch(int n_arch)
+            {
+                archPos = new int[grid_num, grid_num];
+
+                for (int i = 0; i < n_arch; i++)
+                {
+                    Random rand = new Random();
+                    // int intersectidx = rand.Next(9);
+                    int intersectidx = rand.Next(lane_num * lane_num);
+
+                    // Console.WriteLine(intersectidx);
+                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
+                    archs[i].X = Math.Round(newPos[0, 0]);
+                    archs[i].Y = Math.Round(newPos[0, 1]);
+
+                    archPos[Convert.ToInt32((archs[i].Y) / 10000), Convert.ToInt32((archs[i].X / 10000))] += 1;
+                }
+            }
 
 
             public void setCCTV(int n_cctv, int wd, int n_interval)
@@ -564,6 +581,12 @@ namespace surveillance_system
                     }
                     Console.WriteLine();
                 }
+            }
+
+            public void printArchPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Architecture Position");
+                printPos(this.archPos);
             }
 
             public void printCctvPos()

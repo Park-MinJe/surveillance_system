@@ -520,15 +520,9 @@ namespace surveillance_system
                 {
                     cars[i] = new Car();
                 }
-                if (createCSV)
-                {
-                    //trace_idx = (int)(Sim_Time / aUnitTime);
-                    //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
-                    //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
-                    //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
-                    //header = new double[trace_idx];
-                    tw.setTargetCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
-                }
+                
+                tw.setTargetCSVWriter(N_Arch, N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
+
                 cw.setCctvCSVWriter(N_CCTV);
             }
 
@@ -541,7 +535,7 @@ namespace surveillance_system
                     {
                         // 도로 정보 생성, 보행자 정보 생성
                         road.roadBuilder(cctvMode, Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
-                        //road.setArch(N_Arch);
+                        road.setArch(N_Arch);
                         road.setPed(N_Ped);
                         road.setCar(N_Car);
 
@@ -572,7 +566,7 @@ namespace surveillance_system
 
 
                         // 건물 init
-                        //this.initArch();
+                        this.initArch();
                         
                         // ped init
                         this.initPed();
@@ -836,16 +830,13 @@ namespace surveillance_system
                 directionError = new int[N_Target]; // 방향 미스
                 outOfRange = new int[N_Target]; // 거리 범위 밖
 
-                if (createCSV)
-                {
-                    //trace_idx = (int)(Sim_Time / aUnitTime);
-                    //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
-                    //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
-                    //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
-                    //header = new double[trace_idx];
+                //trace_idx = (int)(Sim_Time / aUnitTime);
+                //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
+                //traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
+                //detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
+                //header = new double[trace_idx];
 
-                    stCnt = 0;
-                }
+                stCnt = 0;
 
                 road_min = 0;
                 road_max = road.mapSize;
@@ -990,10 +981,6 @@ namespace surveillance_system
                         // candidate_detected_ped_v[i, j] = 1;
                     }
                 }
-
-
-
-                // return returnArr;
 
                 // 각 CCTV의 보행자 탐지횟수 계산
                 int[] cctv_detecting_cnt = new int[N_CCTV];
@@ -1337,6 +1324,14 @@ namespace surveillance_system
             /* --------------------------------------
              * 결과 출력 함수
             -------------------------------------- */
+            public void initialArchsToCSV(int simIdx)
+            {
+                if (createCSV)
+                {
+                    tw.initialArchsToCSV(simIdx);
+                }
+            }
+
             public void initialPedsToCSV(int simIdx)
             {
                 if (createCSV)
