@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text;
 using static surveillance_system.Program;
 
@@ -8,60 +9,19 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public class TargetCSVWriter
+        /* --------------------------------------
+         * 건물 객체 CSV
+        -------------------------------------- */
+        public class ArchCSVWriter
         {
             private int N_Arch;
-            private int N_Ped;
-            private int N_Car;
-            private int N_Target;
-
-            private int trace_idx;          // csv 파일 출력 index
-            private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
-            private double[,] traffic_y;     // csv 파일 출력 위한 보행자별 y좌표
-            private int[,] detection;     // csv 파일 출력 위한 추적여부
-            private double[] header;
-
-            /* --------------------------------------
-             * 생성자
-            -------------------------------------- */
-            public TargetCSVWriter() { }
-
 
             /* --------------------------------------
              * Set Data
             -------------------------------------- */
-            public void setTargetCSVWriter(int N_Arch, int N_Ped, int N_Car, int trace_idx)
+            public void setArchCSVWriter(int N_Arch)
             {
-                this.N_Arch= N_Arch;
-                this.N_Ped = N_Ped;
-                this.N_Car = N_Car;
-                this.N_Target = N_Ped + N_Car;
-
-                this.trace_idx = trace_idx;
-                this.traffic_x = new double[N_Target, trace_idx];
-                this.traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
-                this.detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
-                this.header = new double[trace_idx];
-            }
-
-            public void addTraffic_x(int targetIdx, int timeIdx, double v)
-            {
-                this.traffic_x[targetIdx, timeIdx] = v;
-            }
-            
-            public void addTraffic_y(int targetIdx, int timeIdx, double v)
-            {
-                this.traffic_y[targetIdx, timeIdx] = v;
-            }
-
-            public void addDetection(int targetIdx, int timeIdx, int v)
-            {
-                this.detection[targetIdx, timeIdx] = v;
-            }
-
-            public void addHeader(int timeIdx, double v)
-            {
-                this.header[timeIdx] = v;
+                this.N_Arch = N_Arch;
             }
 
             /* --------------------------------------
@@ -74,13 +34,13 @@ namespace surveillance_system
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,X,Y,Direction,W,H,D1,D2,W2");
-                    for (int j = 0; j < N_Ped; j++)
+                    for (int j = 0; j < N_Arch; j++)
                     {
                         file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].X, archs[j].Y, archs[j].Direction, archs[j].W, archs[j].H, archs[j].D1, archs[j].D2, archs[j].W2);
                     }
                 }
 
-                fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
+                fileName = "object\\target\\Sim" + simIdx + ".Archs.Pos.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
@@ -90,7 +50,32 @@ namespace surveillance_system
                     }
                 }
             }
+        }
+        public class ArchCSVReader
+        {
 
+        }
+
+        /* --------------------------------------
+         * 보행자/차량 객체 CSV
+        -------------------------------------- */
+        public class TargetCSVWriter
+        {
+            private int N_Ped;
+            private int N_Car;
+
+            /* --------------------------------------
+             * Set Data
+            -------------------------------------- */
+            public void setTargetCSVWriter(int N_Ped, int N_Car)
+            {
+                this.N_Ped = N_Ped;
+                this.N_Car = N_Car;
+            }
+
+            /* --------------------------------------
+             * Print CSV
+            -------------------------------------- */
             public void initialPedsToCSV(int simIdx)
             {
                 string fileName = "object\\target\\Sim" + simIdx + ".Peds.csv";
@@ -130,25 +115,9 @@ namespace surveillance_system
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
-                    for (int j = 0; j < N_Ped; j++)
+                    for (int j = 0; j < N_Car; j++)
                     {
                         file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, cars[j].Pos_H1[0], cars[j].Pos_H1[1], cars[j].Pos_H2[0], cars[j].Pos_H2[0], cars[j].Pos_V1[0], cars[j].Pos_V1[1], cars[j].Pos_V2[0], cars[j].Pos_V2[1]);
-                    }
-                }
-            }
-
-            public void TraceLogToCSV(int cctvSetIdx, int simIdx)
-            {
-                for (int i = 0; i < N_Target; i++)
-                {
-                    string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + ".csv";
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
-                    {
-                        file.WriteLine("#header,traffic_x,traffic_y,detection");
-                        for (int j = 0; j < trace_idx; j++)
-                        {
-                            file.WriteLine("{0},{1},{2},{3}", header[j], traffic_x[i, j], traffic_y[i, j], detection[i, j]);
-                        }
                     }
                 }
             }
@@ -347,6 +316,9 @@ namespace surveillance_system
             }
         }
 
+        /* --------------------------------------
+         * CCTV 객체 CSV
+        -------------------------------------- */
         public class CctvCSVWriter
         {
             private int N_Cctv;
@@ -406,6 +378,152 @@ namespace surveillance_system
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
+                }
+            }
+        }
+
+        /* --------------------------------------
+         * Log CSV
+        -------------------------------------- */
+        public class TargetLogCSVWriter
+        {
+            private int N_Ped;
+            private int N_Car;
+            private int N_Target;
+
+            private int trace_idx;          // csv 파일 출력 index
+            private double[,] traffic_x;    // csv 파일 출력 위한 보행자별 x좌표
+            private double[,] traffic_y;    // csv 파일 출력 위한 보행자별 y좌표
+            private int[,] detection;       // csv 파일 출력 위한 추적여부
+            private double[] header;
+
+            /* --------------------------------------
+             * Set Data
+            -------------------------------------- */
+            public void setTargetLogCSVWriter(int N_Ped, int N_Car, int trace_idx)
+            {
+                this.N_Ped = N_Ped;
+                this.N_Car = N_Car;
+                this.N_Target = N_Ped + N_Car;
+
+                this.trace_idx = trace_idx;
+                this.traffic_x = new double[N_Target, trace_idx];
+                this.traffic_y = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 y좌표
+                this.detection = new int[N_Target, trace_idx]; // csv 파일 출력 위한 추적여부
+                this.header = new double[trace_idx];
+            }
+
+            public void addTraffic_x(int targetIdx, int timeIdx, double v)
+            {
+                this.traffic_x[targetIdx, timeIdx] = v;
+            }
+
+            public void addTraffic_y(int targetIdx, int timeIdx, double v)
+            {
+                this.traffic_y[targetIdx, timeIdx] = v;
+            }
+
+            public void addDetection(int targetIdx, int timeIdx, int v)
+            {
+                this.detection[targetIdx, timeIdx] = v;
+            }
+
+            public void addHeader(int timeIdx, double v)
+            {
+                this.header[timeIdx] = v;
+            }
+
+            /* --------------------------------------
+             * Print CSV
+            -------------------------------------- */
+
+            public void TraceLogToCSV(int cctvSetIdx, int simIdx)
+            {
+                for (int i = 0; i < N_Target; i++)
+                {
+                    string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + ".csv";
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                    {
+                        file.WriteLine("#header,traffic_x,traffic_y,detection");
+                        for (int j = 0; j < trace_idx; j++)
+                        {
+                            file.WriteLine("{0},{1},{2},{3}", header[j], traffic_x[i, j], traffic_y[i, j], detection[i, j]);
+                        }
+                    }
+                }
+            }
+        }
+
+        public class CctvLogCSVWriter
+        {
+            private int logSize;
+
+            private List<int> cctvIdx;
+            private List<string> targetType;
+            private List<int> targetIdx;
+            private List<double> x;
+            private List<double> y;
+            private List<double> v;
+            private List<double> t;
+
+            public void setCctvLogCSVWriter()
+            {
+                this.logSize = 0;
+
+                this.cctvIdx = new List<int>();
+                this.targetType = new List<string>();
+                this.targetIdx = new List<int>();
+                this.x = new List<double>();
+                this.y = new List<double>();
+                this.v = new List<double>();
+                this.t = new List<double>();
+            }
+
+            public void addCctvLog(int cctvIdx, string targetType, int targetIdx, double x, double y, double v, double t)
+            {
+                this.cctvIdx.Add(cctvIdx);
+                this.targetType.Add(targetType);
+                this.targetIdx.Add(targetIdx);
+                this.x.Add(x);
+                this.y.Add(y);
+                this.v.Add(v);
+                this.t.Add(t);
+
+                this.logSize++;
+            }
+
+            public int getLogSize() { return this.logSize; }
+            public int getCctvIdx(int logIdx) { return this.cctvIdx[logIdx];}
+            public string getTargetType(int logIdx) { return this.targetType[logIdx];}
+            public int getTargetIdx(int logIdx) { return this.targetIdx[logIdx];}
+            public double getX(int logIdx) { return this.x[logIdx];}
+            public double getY(int logIdx) { return this.y[logIdx];}
+            public double getV(int logIdx) { return this.v[logIdx];}
+            public double getT(int logIdx) { return this.t[logIdx];}
+
+            public void clearCctvLog()
+            {
+                this.logSize = 0;
+
+                this.cctvIdx.Clear();
+                this.targetType.Clear();
+                this.targetIdx.Clear();
+                this.x.Clear();
+                this.y.Clear();
+                this.v.Clear();
+                this.t.Clear();
+            }
+
+            public void DetectedLogToCSV(int cctvSetIdx, int simIdx)
+            {
+                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".DetectedLog.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,CCTV,TARGET,X,Y,V,Time");
+                    for (int i = 0; i < logSize; i++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6}", i, this.cctvIdx[i], this.targetIdx[i], this.x[i], this.y[i], this.v[i], this.t[i]);
+                    }
                 }
             }
         }

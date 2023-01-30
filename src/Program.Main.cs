@@ -155,7 +155,6 @@ namespace surveillance_system
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
                 // Debug Architecture Position
-                road.printArchPos();
                 sims[i].initialArchsToCSV(i);
                 sims[i].initialPedsToCSV(i);
                 sims[i].initialCarsToCSV(i);
@@ -170,9 +169,7 @@ namespace surveillance_system
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
                     sims[j].initPedsWithCSV(j);
-                    road.printPedPos();
                     sims[j].initCarsWithCSV(j);
-                    road.printCarPos();
                     sims[j].startTimer();
                     if (j == 0)
                     {
@@ -199,7 +196,7 @@ namespace surveillance_system
                         cw.initialCctvsToCSV(i);
                         //cctvPosAtSim.Add(road.cctvPos);
                     }
-                    road.printCctvPos();
+                    road.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();
@@ -208,6 +205,7 @@ namespace surveillance_system
                     double successRate = sims[j].printResultRate();
                     successRateForCCTVSet += successRate;
                     //sims[j].printDetectedResults();
+                    sims[j].DetectedResultsToCSV(i, j);
 
                     sims[j].resetTimer();
                 }

@@ -20,11 +20,18 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
+        // Data Handler
+        public static ArchCSVWriter aw = new ArchCSVWriter();
+        public static ArchCSVReader ar = new ArchCSVReader();
+
         public static TargetCSVWriter tw = new TargetCSVWriter();
         public static TargetCSVReader tr = new TargetCSVReader();
 
         public static CctvCSVWriter cw = new CctvCSVWriter();
         public static CctvCSVReader cr = new CctvCSVReader();
+
+        public static TargetLogCSVWriter tlog = new TargetLogCSVWriter();
+        public static CctvLogCSVWriter clog = new CctvLogCSVWriter();
 
         public class Simulator
         {
@@ -520,10 +527,16 @@ namespace surveillance_system
                 {
                     cars[i] = new Car();
                 }
-                
-                tw.setTargetCSVWriter(N_Arch, N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
+
+                aw.setArchCSVWriter(N_Arch);
+
+                tw.setTargetCSVWriter(N_Ped, N_Car);
 
                 cw.setCctvCSVWriter(N_CCTV);
+
+                tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
+
+                clog.setCctvLogCSVWriter();
             }
 
             public void initMap(int cctvMode)
@@ -733,7 +746,7 @@ namespace surveillance_system
                                                            // cctvs[i].Max_Dist = 500 * 100 * 100; // 500m (milimeter)
 
                         // record detected Target Info
-                        cctvs[i].detectedTargets = new List<CCTV.detectedTarget>();
+                        //cctvs[i].detectedTargets = new List<CCTV.detectedTarget>();
 
                         // Line 118~146
                         /*  여기부턴 Road_Builder 관련 정보가 없으면 의미가 없을거같아서 주석처리했어용..
@@ -779,7 +792,7 @@ namespace surveillance_system
                 road.setCctvswithCSV(cctvSetIdx);
                 foreach(CCTV cctv in cctvs)
                 {
-                    cctv.detectedTargets.Clear();
+                    clog.clearCctvLog();
 
                     cctv.get_PixelDensity(Dist,
                             cctv.WD,
@@ -868,7 +881,7 @@ namespace surveillance_system
                         if (createCSV)
                         {
                             //detection[i, stCnt] = res[i];
-                            tw.addDetection(i, stCnt, res[i]);
+                            tlog.addDetection(i, stCnt, res[i]);
                         }
 
                         if (res[i] == 0) outOfRange[i]++;
@@ -894,7 +907,7 @@ namespace surveillance_system
 
                     if (createCSV) {
                         //header[stCnt] = Math.Round(Now, 1);
-                        tw.addHeader(stCnt, Math.Round(Now, 1));
+                        tlog.addHeader(stCnt, Math.Round(Now, 1));
                         stCnt++;
                     }
                     Now += aUnitTime;
@@ -913,59 +926,189 @@ namespace surveillance_system
             {
 
                 int N_Target = N_Ped + N_Car;
-                int[] returnArr = new int[N_Target]; // 반환할 탐지 결과 (1: 탐지  0: 거리상 미탐지  -1: 방향 미스)
+                int[] returnArr = new int[N_Target]; // 반환할 탐지 결과 (1: 탐지  0: 거리상 미탐지  -1: 방향 미스  -2: 건물에 가림)
 
-                // 거리 검사
+                // 건물 대상 거리 검사 결과
+                    // 건물과 cctv 간 거리
+                double[,] arch_dist_h1 = new double[N_CCTV, N_Arch];
+                double[,] arch_dist_h2 = new double[N_CCTV, N_Arch];
+                double[,] arch_dist_v1 = new double[N_CCTV, N_Arch];
+                double[,] arch_dist_v2 = new double[N_CCTV, N_Arch];
+
+                    // cctv 탐지 거리 안의 건물
+                int[,] candidate_detected_arch_h = new int[N_CCTV, N_Arch];
+                int[,] candidate_detected_arch_v = new int[N_CCTV, N_Arch];
+
+                    // cctv에 잡힌 건물의 cos 좌표
+                double[,] cosine_Arch_h1 = new double[N_CCTV, N_Arch];
+                double[,] cosine_Arch_h2 = new double[N_CCTV, N_Arch];
+                double[,] cosine_Arch_v1 = new double[N_CCTV, N_Arch];
+                double[,] cosine_Arch_v2 = new double[N_CCTV, N_Arch];
+
+                    // cctv 감시 범위 안의 건물
+                double[,] arch_in_range_h = new double[N_CCTV, N_Arch];
+                double[,] arch_in_range_v = new double[N_CCTV, N_Arch];
+
+                // 감시 대상 거리 검사 결과
+                    // 감시 대상과 cctv 간 거리
+                double[,] target_dist_h1 = new double[N_CCTV, N_Target];
+                double[,] target_dist_h2 = new double[N_CCTV, N_Target];
+                double[,] target_dist_v1 = new double[N_CCTV, N_Target];
+                double[,] target_dist_v2 = new double[N_CCTV, N_Target];
+                
+                    // cctv 탐지 거리 안의 감시 대상
                 int[,] candidate_detected_target_h = new int[N_CCTV, N_Target];
                 int[,] candidate_detected_target_v = new int[N_CCTV, N_Target];
 
                 for (int i = 0; i < N_CCTV; i++)
                 {
+                    // 건물과 cctv 간 거리 검사
+                    for (int j = 0; j < N_Arch; j++)
+                    {
+                        arch_in_range_h[i, j] = -1;
+                        arch_in_range_v[i, j] = -1;
+
+                        arch_dist_h1[i, j] = Math
+                                .Sqrt(Math.Pow(cctvs[i].X - archs[j].Pos_H1[0], 2) +
+                                Math.Pow(cctvs[i].Y - archs[j].Pos_H1[1], 2));
+                        arch_dist_h2[i, j] = Math
+                                .Sqrt(Math.Pow(cctvs[i].X - archs[j].Pos_H2[0], 2) +
+                                Math.Pow(cctvs[i].Y - archs[j].Pos_H2[1], 2));
+                        arch_dist_v1[i, j] = Math
+                                .Sqrt(Math.Pow(cctvs[i].X - archs[j].Pos_V1[0], 2) +
+                                Math.Pow(cctvs[i].Z - archs[j].Pos_V1[1], 2));
+                        arch_dist_v2[i, j] = Math
+                                .Sqrt(Math.Pow(cctvs[i].X - archs[j].Pos_V2[0], 2) +
+                                Math.Pow(cctvs[i].Z - archs[j].Pos_V2[1], 2));
+
+                        foreach (double survdist_h in cctvs[i].SurvDist_H)
+                        {
+                            if (arch_dist_h1[i, j] <= survdist_h * 100 * 10 && arch_dist_h2[i, j] <= survdist_h * 100 * 10)
+                            {
+                                candidate_detected_arch_h[i, j] = 1;
+                            }
+                        }
+                        foreach (double survdist_v in cctvs[i].SurvDist_V)
+                        {
+                            if (arch_dist_v1[i, j] <= survdist_v * 100 * 10 && arch_dist_v2[i, j] <= survdist_v * 100 * 10)
+                            {
+                                candidate_detected_arch_v[i, j] = 1;
+                            }
+                        }
+
+                        // 건물이 차지하는 각도 검사
+                        double cosine_H_AOV = Math.Cos(cctvs[i].H_AOV / 2);
+                        double cosine_V_AOV = Math.Cos(cctvs[i].V_AOV / 2);
+
+                        // 거리상 미탐지면 넘어감 
+                        if (candidate_detected_arch_h[i, j] != 1 || candidate_detected_arch_v[i, j] != 1)
+                        {
+                            continue;
+                        }
+
+                        // 거리가 범위 내이면
+                        if (candidate_detected_arch_h[i, j] == 1)
+                        {
+                            // len equals Dist
+                            int len = cctvs[i].H_FOV.X0.GetLength(0);
+                            double[] A = { cctvs[i].H_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].H_FOV.Y0[len - 1] - cctvs[i].Y };
+                            double[] B = new double[2];
+                            
+                            B[0] = archs[j].Pos_H1[0] - cctvs[i].X;
+                            B[1] = archs[j].Pos_H1[1] - cctvs[i].Y;
+
+                            cosine_Arch_h1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                            
+                            B[0] = archs[j].Pos_H2[0] - cctvs[i].X;
+                            B[1] = archs[j].Pos_H2[1] - cctvs[i].Y;
+
+                            cosine_Arch_h2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+
+                            // horizontal 각도 검사 
+                            if (cosine_Arch_h1[i, j] >= cosine_H_AOV && cosine_Arch_h2[i, j] >= cosine_H_AOV)
+                            {
+                                //감지 됨
+                                arch_in_range_h[i, j] = 1;
+                            }
+                            else
+                            {
+                                arch_in_range_h[i, j] = 0;
+                            }
+                        }
+
+                        // vertical  각도 검사 
+                        if (candidate_detected_arch_v[i, j] == 1)
+                        {
+                            int len = cctvs[i].V_FOV.X0.GetLength(0);
+                            double[] A = { cctvs[i].V_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].V_FOV.Z0[len - 1] - cctvs[i].Z };
+                            double[] B = new double[2];
+                             
+                            B[0] = archs[j].Pos_V1[0] - cctvs[i].X;
+                            B[1] = archs[j].Pos_V1[1] - cctvs[i].Z;
+
+                            cosine_Arch_v1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+
+                            B[0] = archs[j].Pos_V2[0] - cctvs[i].X;
+                            B[1] = archs[j].Pos_V2[1] - cctvs[i].Z;
+
+                            cosine_Arch_v2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+
+                            if (cosine_Arch_v1[i, j] >= cosine_V_AOV && cosine_Arch_v2[i, j] >= cosine_V_AOV)
+                            {
+                                //감지 됨
+                                arch_in_range_v[i, j] = 1;
+                            }
+                            else
+                            {
+                                arch_in_range_v[i, j] = 0;
+                            }
+                        }
+                    }
+
+                    // 감시 대상과 cctv 간 거리 검사
                     for (int j = 0; j < N_Target; j++)
                     {
-                        double dist_h1, dist_h2,
-                            dist_v1, dist_v2;
                         if (j < N_Ped)
                         {
-                            dist_h1 = Math
+                            target_dist_h1[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_H1[0], 2) +
                                     Math.Pow(cctvs[i].Y - peds[j].Pos_H1[1], 2));
-                            dist_h2 = Math
+                            target_dist_h2[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_H2[0], 2) +
                                     Math.Pow(cctvs[i].Y - peds[j].Pos_H2[1], 2));
-                            dist_v1 = Math
+                            target_dist_v1[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_V1[0], 2) +
                                     Math.Pow(cctvs[i].Z - peds[j].Pos_V1[1], 2));
-                            dist_v2 = Math
+                            target_dist_v2[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_V2[0], 2) +
                                     Math.Pow(cctvs[i].Z - peds[j].Pos_V2[1], 2));
                         }
                         else
                         {
-                            dist_h1 = Math
+                            target_dist_h1[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_H1[0], 2) +
                                     Math.Pow(cctvs[i].Y - cars[j - N_Ped].Pos_H1[1], 2));
-                            dist_h2 = Math
+                            target_dist_h2[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_H2[0], 2) +
                                     Math.Pow(cctvs[i].Y - cars[j - N_Ped].Pos_H2[1], 2));
-                            dist_v1 = Math
+                            target_dist_v1[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_V1[0], 2) +
                                     Math.Pow(cctvs[i].Z - cars[j - N_Ped].Pos_V1[1], 2));
-                            dist_v2 = Math
+                            target_dist_v2[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_V2[0], 2) +
                                     Math.Pow(cctvs[i].Z - cars[j - N_Ped].Pos_V2[1], 2));
                         }
 
                         foreach (double survdist_h in cctvs[i].SurvDist_H)
                         {
-                            if (dist_h1 <= survdist_h * 100 * 10 && dist_h2 <= survdist_h * 100 * 10)
+                            if (target_dist_h1[i, j] <= survdist_h * 100 * 10 && target_dist_h2[i, j] <= survdist_h * 100 * 10)
                             {
                                 candidate_detected_target_h[i, j] = 1;
                             }
                         }
                         foreach (double survdist_v in cctvs[i].SurvDist_V)
                         {
-                            if (dist_v1 <= survdist_v * 100 * 10 && dist_v2 <= survdist_v * 100 * 10)
+                            if (target_dist_v1[i, j] <= survdist_v * 100 * 10 && target_dist_v2[i, j] <= survdist_v * 100 * 10)
                             {
                                 candidate_detected_target_v[i, j] = 1;
                             }
@@ -981,7 +1124,7 @@ namespace surveillance_system
                     }
                 }
 
-                // 각 CCTV의 보행자 탐지횟수 계산
+                // 각 CCTV의 감시대상 탐지횟수 계산
                 int[] cctv_detecting_cnt = new int[N_CCTV];
                 int[] cctv_missing_cnt = new int[N_CCTV];
 
@@ -1039,14 +1182,33 @@ namespace surveillance_system
                             double cosine_TARGET_h2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
                             // horizontal 각도 검사 
-                            if (cosine_TARGET_h1 >= cosine_H_AOV && cosine_TARGET_h2 >= cosine_H_AOV)
+                            // 건물이 차지하는 영역 대비
+                            for (int k = 0; k < N_Arch; k++)
                             {
-                                //감지 됨
-                                h_detected = 1;
+                                if (arch_in_range_h[i, k] == 1)
+                                {
+                                    if (cosine_TARGET_h1 >= cosine_Arch_h1[i, k] && cosine_TARGET_h2 >= cosine_Arch_h2[i, k])
+                                    {
+                                        if (target_dist_h1[i, j] >= arch_dist_h1[i, k] && target_dist_h2[i,j] >= arch_dist_h2[i, k])
+                                        {
+                                            h_detected = -2;
+                                        }
+                                    }
+                                }
                             }
-                            else
+
+                            // cctv aov 대비
+                            if (h_detected != -2)
                             {
-                                h_detected = 0;
+                                if (cosine_TARGET_h1 >= cosine_H_AOV && cosine_TARGET_h2 >= cosine_H_AOV)
+                                {
+                                    //감지 됨
+                                    h_detected = 1;
+                                }
+                                else
+                                {
+                                    h_detected = 0;
+                                }
                             }
                         }
 
@@ -1086,14 +1248,34 @@ namespace surveillance_system
                             }
                             double cosine_TARGET_v2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
-                            if (cosine_TARGET_v1 >= cosine_V_AOV && cosine_TARGET_v2 >= cosine_V_AOV)
+                            // 건물이 차지하는 영역 대비
+                            for (int k = 0; k < N_Arch; k++)
                             {
-                                //감지 됨
-                                v_detected = 1;
+                                if (arch_in_range_v[i, k] == 1)
+                                {
+                                    if (cosine_TARGET_v1 >= cosine_Arch_v1[i, k] && cosine_TARGET_v2 >= cosine_Arch_v2[i, k])
+                                    {
+                                        if (target_dist_v1[i, j] >= arch_dist_v1[i, k] && target_dist_v2[i, j] >= arch_dist_v2[i, k])
+                                        {
+                                            v_detected = -2;
+                                        }
+                                    }
+                                }
                             }
-                            else
+
+                            // cctv aov 대비
+                            if (v_detected != -2)
                             {
-                                v_detected = 0;
+
+                                if (cosine_TARGET_v1 >= cosine_V_AOV && cosine_TARGET_v2 >= cosine_V_AOV)
+                                {
+                                    //감지 됨
+                                    v_detected = 1;
+                                }
+                                else
+                                {
+                                    v_detected = 0;
+                                }
                             }
                         }
 
@@ -1107,17 +1289,18 @@ namespace surveillance_system
                             returnArr[j] = 1;
 
                             // record detected Target & increase velocity when detected
-                            CCTV.detectedTarget detectedTargetInfo = new CCTV.detectedTarget();
-                            detectedTargetInfo.setIdx(j);
-                            detectedTargetInfo.setT(nowTime);
+                            //CCTV.detectedTarget detectedTargetInfo = new CCTV.detectedTarget();
+                            //detectedTargetInfo.setIdx(j);
+                            //detectedTargetInfo.setT(nowTime);
 
                             if (j < N_Ped)
                             {
                                 // Record Detected Target
-                                detectedTargetInfo.setX(peds[j].X);
-                                detectedTargetInfo.setY(peds[j].Y);
-                                detectedTargetInfo.setV(peds[j].Velocity);
-                                cctvs[i].detectedTargets.Add(detectedTargetInfo);
+                                //detectedTargetInfo.setX(peds[j].X);
+                                //detectedTargetInfo.setY(peds[j].Y);
+                                //detectedTargetInfo.setV(peds[j].Velocity);
+                                //cctvs[i].detectedTargets.Add(detectedTargetInfo);
+                                clog.addCctvLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                 // Increase Velocity
                                 peds[j].upVelocity();
@@ -1125,14 +1308,21 @@ namespace surveillance_system
                             else
                             {
                                 // Record Detected Target
-                                detectedTargetInfo.setX(cars[j - N_Ped].X);
-                                detectedTargetInfo.setY(cars[j - N_Ped].Y);
-                                detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
-                                cctvs[i].detectedTargets.Add(detectedTargetInfo);
+                                //detectedTargetInfo.setX(cars[j - N_Ped].X);
+                                //detectedTargetInfo.setY(cars[j - N_Ped].Y);
+                                //detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
+                                //cctvs[i].detectedTargets.Add(detectedTargetInfo);
+                                int carIdx = j - N_Ped;
+                                clog.addCctvLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                 // Increase Velocity
                                 cars[j - N_Ped].upVelocity();
                             }
+                        }
+                        // 건물에 가림
+                        else if(h_detected == -2 || v_detected == -2)
+                        {
+                            returnArr[j] = -2;
                         }
                         // 방향 미스 (h or v 중 하나라도 방향이 맞지 않는 경우)
                         else // cctv[i]가 보행자[j]를 h or v 탐지 실패 여부 추가
@@ -1174,9 +1364,9 @@ namespace surveillance_system
                         cctv_missing_count_h[i] += missed_map_h[i, j];
                         cctv_missing_count_v[i] += missed_map_v[i, j];
                     }
-                // 보행자를 탐지한 cctv 수
+                // target을 탐지한 cctv 수
                 int[] detecting_cctv_cnt = new int[N_Target];
-                // 보행자를 탐지하지 못한 cctv 수
+                // target을 탐지하지 못한 cctv 수
                 int[] missing_cctv_cnt = new int[N_Target];
 
                 // detection 결과 출력 
@@ -1234,24 +1424,24 @@ namespace surveillance_system
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
-                                tw.addTraffic_x(i, stCnt, -1);
+                                tlog.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_x[i, stCnt] = Math.Round(peds[i].X, 2);
-                                tw.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
+                                tlog.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
                             }
 
                             if (peds[i].Y < road_min || peds[i].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
-                                tw.addTraffic_y(i, stCnt, -1);
+                                tlog.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_y[i, stCnt] = Math.Round(peds[i].Y, 2);
-                                tw.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
+                                tlog.addTraffic_y(i, stCnt, Math.Round(peds[i].Y, 2));
                             }
                         }
 
@@ -1265,24 +1455,24 @@ namespace surveillance_system
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
-                                tw.addTraffic_x(i, stCnt, -1);
+                                tlog.addTraffic_x(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_x[i, stCnt] = Math.Round(cars[i - pedLen].X, 2);
-                                tw.addTraffic_x(i, stCnt, Math.Round(cars[i - pedLen].X, 2));
+                                tlog.addTraffic_x(i, stCnt, Math.Round(cars[i - pedLen].X, 2));
                             }
 
                             if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
-                                tw.addTraffic_y(i, stCnt, -1);
+                                tlog.addTraffic_y(i, stCnt, -1);
                             }
                             else
                             {
                                 //traffic_y[i, stCnt] = Math.Round(cars[i - pedLen].Y, 2);
-                                tw.addTraffic_y(i, stCnt, Math.Round(cars[i - pedLen].Y, 2));
+                                tlog.addTraffic_y(i, stCnt, Math.Round(cars[i - pedLen].Y, 2));
                             }
                         }
 
@@ -1325,33 +1515,32 @@ namespace surveillance_system
             -------------------------------------- */
             public void initialArchsToCSV(int simIdx)
             {
-                if (createCSV)
-                {
-                    tw.initialArchsToCSV(simIdx);
-                }
+                aw.initialArchsToCSV(simIdx);
             }
 
             public void initialPedsToCSV(int simIdx)
             {
-                if (createCSV)
-                {
-                    tw.initialPedsToCSV(simIdx);
-                }
+                tw.initialPedsToCSV(simIdx);
             }
 
             public void initialCarsToCSV(int simIdx)
             {
-                if (createCSV)
-                {
-                    tw.initialCarsToCSV(simIdx);
-                }
+                tw.initialCarsToCSV(simIdx);
             }
 
             public void TraceLogToCSV(int cctvSetIdx, int simIdx)
             {
                 if (createCSV)
                 {
-                    tw.TraceLogToCSV(cctvSetIdx, simIdx);
+                    tlog.TraceLogToCSV(cctvSetIdx, simIdx);
+                }
+            }
+
+            public void DetectedResultsToCSV(int cctvSetIdx, int simIdx)
+            {
+                if (createCSV)
+                {
+                    clog.DetectedLogToCSV(cctvSetIdx, simIdx);
                 }
             }
 
@@ -1387,21 +1576,11 @@ namespace surveillance_system
                     {
                         Console.WriteLine("\n====== Surveillance Target Result ======");
                         Console.WriteLine("print index of CCTV and detected Target\n");
-                        Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", "CNT", "CCTV", "TARGET", "X", "Y", "V", "Time");
+                        Console.WriteLine("{0, 8}\t{1, 4}\t{2, 11}\t{3, 5}\t{4, 18}\t{5, 18}\t{6, 18}\t{7}", "CNT", "CCTV", "TYPE", "TARGET", "X", "Y", "V", "Time");
                         int cnt = 1;
-                        for (int i = 0; i < N_CCTV; i++)
+                        for (int i = 0; i < clog.getLogSize(); i++)
                         {
-                            foreach (CCTV.detectedTarget dt in cctvs[i].detectedTargets)
-                            {
-                                if (dt.getIdx() < N_Ped)
-                                {
-                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.getIdx(), dt.getX(), dt.getY(), dt.getV(), dt.getT());
-                                }
-                                else
-                                {
-                                    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 5}\t{3, 18}\t{4, 18}\t{5, 18}\t{6}", cnt++, i, dt.getIdx(), dt.getX(), dt.getY(), dt.getV(), dt.getT());
-                                }
-                            }
+                            Console.WriteLine("{0, 8}\t{1, 4}\t{2, 11}\t{3, 5}\t{4, 18}\t{5, 18}\t{6, 18}\t{7}", i, clog.getCctvIdx(i), clog.getTargetType(i), clog.getTargetIdx(i), clog.getX(i), clog.getY(i), clog.getV(i), clog.getT(i));
                         }
                         break;
                     }
