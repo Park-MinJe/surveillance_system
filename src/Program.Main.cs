@@ -15,7 +15,8 @@ namespace surveillance_system
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
             string inputNArchOption = "N", 
-                inputNCctvOption = "N",
+                inputNCctvOption = "N", 
+                inputCctvRotate = "N", 
                 inputNPedOption = "N",
                 inputNCarOption = "N",
                 InputcreateCSV = "N";
@@ -52,6 +53,16 @@ namespace surveillance_system
                 cctvMode = Convert.ToInt32(Console.ReadLine());
 
                 if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2) { break; }
+                else { continue; }
+            }
+
+            while (true)
+            {
+                Console.Write("\nDo you want to rotate cctv(Y/N)? ");
+                inputCctvRotate = Console.ReadLine();
+
+                if (inputCctvRotate == "N" || inputCctvRotate == "n") { break; }
+                else if (inputCctvRotate == "Y" || inputCctvRotate == "y") { break; }
                 else { continue; }
             }
 
@@ -138,6 +149,7 @@ namespace surveillance_system
             {
                 sims[i] = new Simulator();
                 sims[i].setcreateCSV(InputcreateCSV);
+                sims[i].setCctvFixMode(inputCctvRotate);
                 sims[i].setgetArchNumFromUser(inputNArchOption);
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
