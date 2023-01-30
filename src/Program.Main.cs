@@ -206,6 +206,7 @@ namespace surveillance_system
                     successRateForCCTVSet += successRate;
                     //sims[j].printDetectedResults();
                     sims[j].DetectedResultsToCSV(i, j);
+                    sims[j].ShadowedLogToCSV(i, j);
 
                     sims[j].resetTimer();
                 }

@@ -40,7 +40,7 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\target\\Sim" + simIdx + ".Archs.Pos.csv";
+                fileName = "object\\architecture\\Sim" + simIdx + ".Archs.Pos.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
@@ -456,62 +456,118 @@ namespace surveillance_system
 
         public class CctvLogCSVWriter
         {
-            private int logSize;
+            // Detected Log
+            private int detectedLogSize;
 
-            private List<int> cctvIdx;
-            private List<string> targetType;
-            private List<int> targetIdx;
-            private List<double> x;
-            private List<double> y;
-            private List<double> v;
-            private List<double> t;
+            private List<int> detectedCctvIdx;
+            private List<string> detectedTargetType;
+            private List<int> detectedTargetIdx;
+            private List<double> detectedX;
+            private List<double> detectedY;
+            private List<double> detectedV;
+            private List<double> detectedT;
 
-            public void setCctvLogCSVWriter()
+            public void setDetectedLogCSVWriter()
             {
-                this.logSize = 0;
+                this.detectedLogSize = 0;
 
-                this.cctvIdx = new List<int>();
-                this.targetType = new List<string>();
-                this.targetIdx = new List<int>();
-                this.x = new List<double>();
-                this.y = new List<double>();
-                this.v = new List<double>();
-                this.t = new List<double>();
+                this.detectedCctvIdx = new List<int>();
+                this.detectedTargetType = new List<string>();
+                this.detectedTargetIdx = new List<int>();
+                this.detectedX = new List<double>();
+                this.detectedY = new List<double>();
+                this.detectedV = new List<double>();
+                this.detectedT = new List<double>();
             }
 
-            public void addCctvLog(int cctvIdx, string targetType, int targetIdx, double x, double y, double v, double t)
+            public void addDetectedLog(int cctvIdx, string targetType, int targetIdx, double x, double y, double v, double t)
             {
-                this.cctvIdx.Add(cctvIdx);
-                this.targetType.Add(targetType);
-                this.targetIdx.Add(targetIdx);
-                this.x.Add(x);
-                this.y.Add(y);
-                this.v.Add(v);
-                this.t.Add(t);
+                this.detectedCctvIdx.Add(cctvIdx);
+                this.detectedTargetType.Add(targetType);
+                this.detectedTargetIdx.Add(targetIdx);
+                this.detectedX.Add(x);
+                this.detectedY.Add(y);
+                this.detectedV.Add(v);
+                this.detectedT.Add(t);
 
-                this.logSize++;
+                this.detectedLogSize++;
             }
 
-            public int getLogSize() { return this.logSize; }
-            public int getCctvIdx(int logIdx) { return this.cctvIdx[logIdx];}
-            public string getTargetType(int logIdx) { return this.targetType[logIdx];}
-            public int getTargetIdx(int logIdx) { return this.targetIdx[logIdx];}
-            public double getX(int logIdx) { return this.x[logIdx];}
-            public double getY(int logIdx) { return this.y[logIdx];}
-            public double getV(int logIdx) { return this.v[logIdx];}
-            public double getT(int logIdx) { return this.t[logIdx];}
+            public int getLogSize() { return this.detectedLogSize; }
+            public int getCctvIdx(int logIdx) { return this.detectedCctvIdx[logIdx];}
+            public string getTargetType(int logIdx) { return this.detectedTargetType[logIdx];}
+            public int getTargetIdx(int logIdx) { return this.detectedTargetIdx[logIdx];}
+            public double getX(int logIdx) { return this.detectedX[logIdx];}
+            public double getY(int logIdx) { return this.detectedY[logIdx];}
+            public double getV(int logIdx) { return this.detectedV[logIdx];}
+            public double getT(int logIdx) { return this.detectedT[logIdx];}
+
+            // Shadowed by Architecture Log
+            private int shadowedLogSize;
+
+            private List<int> shadowedCctvIdx;
+            private List<int> shadowedArchIdx;
+            private List<char> shadowedType;
+            private List<string> shadowedTargetType;
+            private List<int> shadowedTargetIdx;
+            private List<double> shadowedX;
+            private List<double> shadowedY;
+            private List<double> shadowedV;
+            private List<double> shadowedT;
+
+            public void setShadowedLogCSVWriter()
+            {
+                this.shadowedLogSize = 0;
+
+                this.shadowedCctvIdx = new List<int>();
+                this.shadowedArchIdx = new List<int>();
+                this.shadowedType = new List<char>();
+                this.shadowedTargetType = new List<string>();
+                this.shadowedTargetIdx = new List<int>();
+                this.shadowedX = new List<double>();
+                this.shadowedY = new List<double>();
+                this.shadowedV = new List<double>();
+                this.shadowedT = new List<double>();
+            }
+
+            public void addShadowedLog(int cctvIdx, int archIdx, char shadowType, string targetType, int targetIdx, double x, double y, double v, double t)
+            {
+                this.shadowedCctvIdx.Add(cctvIdx);
+                this.shadowedArchIdx.Add(archIdx);
+                this.shadowedType.Add(shadowType);
+                this.shadowedTargetType.Add(targetType);
+                this.shadowedTargetIdx.Add(targetIdx);
+                this.shadowedX.Add(x);
+                this.shadowedY.Add(y);
+                this.shadowedV.Add(v);
+                this.shadowedT.Add(t);
+
+                this.shadowedLogSize++;
+            }
 
             public void clearCctvLog()
             {
-                this.logSize = 0;
+                this.detectedLogSize = 0;
 
-                this.cctvIdx.Clear();
-                this.targetType.Clear();
-                this.targetIdx.Clear();
-                this.x.Clear();
-                this.y.Clear();
-                this.v.Clear();
-                this.t.Clear();
+                this.detectedCctvIdx.Clear();
+                this.detectedTargetType.Clear();
+                this.detectedTargetIdx.Clear();
+                this.detectedX.Clear();
+                this.detectedY.Clear();
+                this.detectedV.Clear();
+                this.detectedT.Clear();
+
+                this.shadowedLogSize = 0;
+
+                this.shadowedCctvIdx.Clear();
+                this.shadowedArchIdx.Clear();
+                this.shadowedType.Clear();
+                this.shadowedTargetType.Clear();
+                this.shadowedTargetIdx.Clear();
+                this.shadowedX.Clear();
+                this.shadowedY.Clear();
+                this.shadowedV.Clear();
+                this.shadowedT.Clear();
             }
 
             public void DetectedLogToCSV(int cctvSetIdx, int simIdx)
@@ -519,10 +575,23 @@ namespace surveillance_system
                 string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".DetectedLog.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
-                    file.WriteLine("#idx,CCTV,TARGET,X,Y,V,Time");
-                    for (int i = 0; i < logSize; i++)
+                    file.WriteLine("#idx,CCTV,TYPE,TARGET,X,Y,V,Time");
+                    for (int i = 0; i < this.detectedLogSize; i++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6}", i, this.cctvIdx[i], this.targetIdx[i], this.x[i], this.y[i], this.v[i], this.t[i]);
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7}", i, this.detectedCctvIdx[i], this.detectedTargetType[i], this.detectedTargetIdx[i], this.detectedX[i], this.detectedY[i], this.detectedV[i], this.detectedT[i]);
+                    }
+                }
+            }
+
+            public void ShadowedByArchLogToCSV(int cctvSetIdx, int simIdx)
+            {
+                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".ShadowedByArchLog.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,CCTV,ARCHITECTURE,SHADOW_TYPE,TARGET_TYPE,TARGET,X,Y,V,Time");
+                    for (int i = 0; i < this.shadowedLogSize; i++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", i, this.shadowedCctvIdx[i], this.shadowedArchIdx[i], this.shadowedType[i], this.shadowedTargetType[i], this.shadowedTargetIdx[i], this.shadowedX[i], this.shadowedY[i], this.shadowedV[i], this.shadowedT[i]);
                     }
                 }
             }
