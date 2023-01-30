@@ -73,6 +73,7 @@ namespace surveillance_system
             private const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
             private const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
+            private bool fixMode = true;
             private double rotateTerm = 30.0; // sec
 
             // calculate vertical/horizontal AOV
@@ -212,6 +213,41 @@ namespace surveillance_system
             /* --------------------------------------
              * 입력 활성화 함수
             -------------------------------------- */
+            public void setCctvFixMode()
+            {
+                while (true)
+                {
+                    Console.Write("Do you want to rotate cctv(Y/N)? ");
+                    String input = Console.ReadLine();
+
+                    if (input == "Y" || input == "y")
+                    {
+                        fixMode = false;
+                        break;
+                    }
+                    else if (input == "N" || input == "n")
+                    {
+                        fixMode = true;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            public void setCctvFixMode(string input)
+            {
+                if (input == "Y" || input == "y")
+                {
+                    fixMode = false;
+                }
+                else if (input == "N" || input == "n")
+                {
+                    fixMode = true;
+                }
+            }
+
             public void setgetArchNumFromUser()
             {
                 while (true)
@@ -738,7 +774,7 @@ namespace surveillance_system
                         cctvs[i].setViewAngleV(-45.0);
 
 
-                        cctvs[i].setFixMode(true); // default (rotate)
+                        cctvs[i].setFixMode(fixMode); // default (rotate)
 
                         cctvs[i].H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));
                         cctvs[i].V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));
@@ -1341,7 +1377,7 @@ namespace surveillance_system
                         // 건물에 가림
                         else if(h_detected == -2 || v_detected == -2)
                         {
-                            Console.WriteLine("가림");
+                            //Console.WriteLine("가림");
                             returnArr[j] = -2;
                         }
                         // 방향 미스 (h or v 중 하나라도 방향이 맞지 않는 경우)
