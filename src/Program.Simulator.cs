@@ -854,7 +854,7 @@ namespace surveillance_system
                 {
                     Console.Write(".");
                     // 추적 검사
-                    int[] res = this.checkDetection(Now, N_CCTV, N_Ped, N_Car);
+                    int[] res = this.checkDetection(Now, N_Arch, N_CCTV, N_Ped, N_Car);
                     // debug
                     // Console.WriteLine("Checking Detection Completed\n");
                     // threading.. error
@@ -909,7 +909,7 @@ namespace surveillance_system
             /* --------------------------------------
              * 추적 여부 검사 함수
             -------------------------------------- */
-            public int[] checkDetection(double nowTime, int N_CCTV, int N_Ped, int N_Car)
+            public int[] checkDetection(double nowTime, int N_Arch, int N_CCTV, int N_Ped, int N_Car)
             {
 
                 int N_Target = N_Ped + N_Car;
@@ -921,7 +921,6 @@ namespace surveillance_system
 
                 for (int i = 0; i < N_CCTV; i++)
                 {
-
                     for (int j = 0; j < N_Target; j++)
                     {
                         double dist_h1, dist_h2,
