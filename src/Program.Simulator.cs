@@ -125,6 +125,7 @@ namespace surveillance_system
             private int[] R_Surv_Time;      // 탐지 
             private int[] directionError;   // 방향 미스
             private int[] outOfRange;       // 거리 범위 밖
+            private int[] shadowedByArch;   // 건물에 가림
 
             //private int trace_idx;          // csv 파일 출력 index
             //private double[,] traffic_x;     // csv 파일 출력 위한 보행자별 x좌표
@@ -536,7 +537,8 @@ namespace surveillance_system
 
                 tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
-                clog.setCctvLogCSVWriter();
+                clog.setDetectedLogCSVWriter();
+                clog.setShadowedLogCSVWriter();
             }
 
             public void initMap(int cctvMode)
@@ -842,6 +844,7 @@ namespace surveillance_system
                 R_Surv_Time = new int[N_Target]; // 탐지 
                 directionError = new int[N_Target]; // 방향 미스
                 outOfRange = new int[N_Target]; // 거리 범위 밖
+                shadowedByArch = new int[N_Target]; // 건물에 가림
 
                 //trace_idx = (int)(Sim_Time / aUnitTime);
                 //traffic_x = new double[N_Target, trace_idx]; // csv 파일 출력 위한 보행자별 x좌표
@@ -887,6 +890,7 @@ namespace surveillance_system
                         if (res[i] == 0) outOfRange[i]++;
                         else if (res[i] == -1) directionError[i]++;
                         else if (res[i] == 1) R_Surv_Time[i]++;
+                        else if (res[i] == -2) shadowedByArch[i]++;
                     }
                     // debug
                     // Console.WriteLine("while simulation 1");
@@ -1141,7 +1145,6 @@ namespace surveillance_system
 
                     for (int j = 0; j < N_Target; j++)
                     {
-
                         // 거리상 미탐지면 넘어감 
                         if (candidate_detected_target_h[i, j] != 1 || candidate_detected_target_v[i, j] != 1)
                         {
@@ -1192,6 +1195,14 @@ namespace surveillance_system
                                         if (target_dist_h1[i, j] >= arch_dist_h1[i, k] && target_dist_h2[i,j] >= arch_dist_h2[i, k])
                                         {
                                             h_detected = -2;
+                                            if (j < N_Ped)
+                                            {
+                                                clog.addShadowedLog(i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                            }
+                                            else
+                                            {
+                                                clog.addShadowedLog(i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                            }
                                         }
                                     }
                                 }
@@ -1258,6 +1269,14 @@ namespace surveillance_system
                                         if (target_dist_v1[i, j] >= arch_dist_v1[i, k] && target_dist_v2[i, j] >= arch_dist_v2[i, k])
                                         {
                                             v_detected = -2;
+                                            if (j < N_Ped)
+                                            {
+                                                clog.addShadowedLog(i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                            }
+                                            else
+                                            {
+                                                clog.addShadowedLog(i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                            }
                                         }
                                     }
                                 }
@@ -1300,7 +1319,7 @@ namespace surveillance_system
                                 //detectedTargetInfo.setY(peds[j].Y);
                                 //detectedTargetInfo.setV(peds[j].Velocity);
                                 //cctvs[i].detectedTargets.Add(detectedTargetInfo);
-                                clog.addCctvLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                 // Increase Velocity
                                 peds[j].upVelocity();
@@ -1313,7 +1332,7 @@ namespace surveillance_system
                                 //detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
                                 //cctvs[i].detectedTargets.Add(detectedTargetInfo);
                                 int carIdx = j - N_Ped;
-                                clog.addCctvLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
+                                clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                 // Increase Velocity
                                 cars[j - N_Ped].upVelocity();
@@ -1322,6 +1341,7 @@ namespace surveillance_system
                         // 건물에 가림
                         else if(h_detected == -2 || v_detected == -2)
                         {
+                            Console.WriteLine("가림");
                             returnArr[j] = -2;
                         }
                         // 방향 미스 (h or v 중 하나라도 방향이 맞지 않는 경우)
@@ -1544,11 +1564,21 @@ namespace surveillance_system
                 }
             }
 
+            public void ShadowedLogToCSV(int cctvSetIdx, int simIdx)
+            {
+                if (createCSV)
+                {
+                    clog.ShadowedByArchLogToCSV(cctvSetIdx, simIdx);
+                }
+            }
+
             public double printResultRate()
             {
                 double totalSimCount = Sim_Time / aUnitTime * N_Target;
                 double outOfRangeRate = 100 * outOfRange.Sum() / totalSimCount;
                 double directionErrorRate = 100 * directionError.Sum() / totalSimCount;
+                double shadowedRate = 100 * shadowedByArch.Sum() / totalSimCount;
+
                 double successRate = 100 * R_Surv_Time.Sum() / totalSimCount;
 
                 // 결과(탐지율)
@@ -1559,6 +1589,7 @@ namespace surveillance_system
                 Console.WriteLine("[Fail]");
                 Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
                 Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
+                Console.WriteLine("  - Shadowed by Arch: {0:F2}% ({1}/{2})", shadowedRate, shadowedByArch.Sum(), totalSimCount);
                 Console.WriteLine("[Success]");
                 Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
 
