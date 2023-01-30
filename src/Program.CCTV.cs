@@ -215,7 +215,7 @@ namespace surveillance_system
             public FOV V_FOV;
 
             // record detected Target Info
-            public class detectedTarget
+            /*public class detectedTarget
             {
                 private int idx;
                 private double x;
@@ -235,7 +235,7 @@ namespace surveillance_system
                 public double getV() { return v; }
                 public double getT() { return t; }
             }
-            public List<detectedTarget> detectedTargets;
+            public List<detectedTarget> detectedTargets;*/
 
             public void setZ(int z)
             {
@@ -309,22 +309,11 @@ namespace surveillance_system
                 double Y
             )
             {
-                // 211126_2
+                // 230130
+                // Angle3D를 사용하여 FOV 연산
                 Angle3D H_FOV_temp = new Angle3D(Dist.Length);
                 Angle3D H_X_temp = new Angle3D(Dist.Length);
                 Angle3D H_Y_temp = new Angle3D(Dist.Length);
-
-                /*double[] H_FOV_0 = new double[Dist.Length];
-                double[] H_FOV_1 = new double[Dist.Length];
-                double[] H_FOV_2 = new double[Dist.Length];
-
-                double[] H_X0 = new double[Dist.Length];
-                double[] H_X1 = new double[Dist.Length];
-                double[] H_X2 = new double[Dist.Length];
-
-                double[] H_Y0 = new double[Dist.Length];
-                double[] H_Y1 = new double[Dist.Length];
-                double[] H_Y2 = new double[Dist.Length];*/
 
                 for (int i = 0; i < Dist.Length; i++)
                 {
@@ -332,25 +321,11 @@ namespace surveillance_system
                     double Dist_Cos_ViewAngle = Dist[i] * Math.Cos(ViewAngle);
                     double Dist_Sin_ViewAngle = Dist[i] * Math.Sin(ViewAngle);
 
-                    /*H_FOV_0[i] = 0; // 해당 점이 CCTV에서 Horizontal(X)만큼 얼마나 떨어졌는지 크기
                     // 220407
                     // https://github.com/0BoOKim/Surveillance-System/blob/main/get_H_FOV.m
                     // line 9, 10
-                    // H_FOV_1[i] = (1 / 2) * Dist[i] * HE / Focal_Length;
-                    // H_FOV_2[i] = (-1 / 2) * Dist[i] * HE / Focal_Length;
-                    H_FOV_1[i] = (1 / 2) * Dist[i] * WD / Focal_Length;
-                    H_FOV_2[i] = (-1 / 2) * Dist[i] * WD / Focal_Length;*/
                     H_FOV_temp.Set_Angle012(0, Dist_WD_FL, (-1) * Dist_WD_FL, i);
 
-                    /*H_X0[i] =
-                        Dist[i] * Math.Cos(ViewAngle) -
-                        H_FOV_0[i] * Math.Sin(ViewAngle);
-                    H_X1[i] =
-                        Dist[i] * Math.Cos(ViewAngle) -
-                        H_FOV_1[i] * Math.Sin(ViewAngle);
-                    H_X2[i] =
-                        Dist[i] * Math.Cos(ViewAngle) -
-                        H_FOV_2[i] * Math.Sin(ViewAngle);*/
                     H_X_temp
                         .Set_Angle012(
                         Dist_Cos_ViewAngle - H_FOV_temp.Angle_0[i] * Math.Sin(ViewAngle),
@@ -358,15 +333,6 @@ namespace surveillance_system
                         Dist_Cos_ViewAngle - H_FOV_temp.Angle_2[i] * Math.Sin(ViewAngle),
                         i);
 
-                    /*H_Y0[i] =
-                        Dist[i] * Math.Sin(ViewAngle) +
-                        H_FOV_0[i] * Math.Cos(ViewAngle);
-                    H_Y1[i] =
-                        Dist[i] * Math.Sin(ViewAngle) +
-                        H_FOV_1[i] * Math.Cos(ViewAngle);
-                    H_Y2[i] =
-                        Dist[i] * Math.Sin(ViewAngle) +
-                        H_FOV_2[i] * Math.Cos(ViewAngle);*/
                     H_Y_temp
                         .Set_Angle012(
                         Dist_Sin_ViewAngle + H_FOV_temp.Angle_0[i] * Math.Cos(ViewAngle),
@@ -374,19 +340,11 @@ namespace surveillance_system
                         Dist_Sin_ViewAngle + H_FOV_temp.Angle_2[i] * Math.Cos(ViewAngle),
                         i);
                 }
-                /*double[,] H_FOV_X = new double[3, Dist.Length];
-                double[,] H_FOV_Y = new double[3, Dist.Length];*/
                 Angle3D H_FOV_X_temp = new Angle3D(Dist.Length);
                 Angle3D H_FOV_Y_temp = new Angle3D(Dist.Length);
 
                 for (int i = 0; i < Dist.Length; i++)
                 {
-                    /*H_FOV_X[0, i] = H_X0[i] + X;
-                    H_FOV_X[1, i] = H_X1[i] + X;
-                    H_FOV_X[2, i] = H_X2[i] + X;
-                    H_FOV_Y[0, i] = H_Y0[i] + Y;
-                    H_FOV_Y[1, i] = H_Y1[i] + Y;
-                    H_FOV_Y[2, i] = H_Y2[i] + Y;*/
                     H_FOV_X_temp.Set_Angle012(
                         H_X_temp.Angle_0[i] + X,
                         H_X_temp.Angle_1[i] + X,
