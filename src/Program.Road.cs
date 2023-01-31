@@ -32,6 +32,8 @@ namespace surveillance_system
             public int interval;
             public int width;
 
+            // 건물 위치
+            public int[,] archPos;
             // CCTV 위치
             public int[,] cctvPos;
             // Ped 위치
@@ -176,6 +178,28 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects
             -------------------------------------- */
+
+            // set Architecture object
+            public void setArch(int n_arch)
+            {
+                archPos = new int[grid_num, grid_num];
+
+                for (int i = 0; i < n_arch; i++)
+                {
+                    Random rand = new Random();
+                    // int intersectidx = rand.Next(9);
+                    int intersectidx = rand.Next(lane_num * lane_num);
+
+                    // Console.WriteLine(intersectidx);
+                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
+                    archs[i].X = Math.Round(newPos[0, 0]);
+                    archs[i].Y = Math.Round(newPos[0, 1]);
+
+                    archPos[Convert.ToInt32((archs[i].Y) / 10000), Convert.ToInt32((archs[i].X / 10000))] += 1;
+                }
+            }
+
+
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
                 cctvPos = new int[grid_num,grid_num];
@@ -538,7 +562,8 @@ namespace surveillance_system
             -------------------------------------- */
             public void printPos(int[,] pos)
             {
-                for (int i = 0; i < grid_num; i++)
+                Console.Write("{0, 4}", 0);
+                for (int i = 1; i < grid_num; i++)
                 {
                     Console.Write("{0, 2}", i);
                 }
@@ -559,6 +584,12 @@ namespace surveillance_system
                 }
             }
 
+            public void printArchPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Architecture Position");
+                printPos(this.archPos);
+            }
+
             public void printCctvPos()
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print CCTV Position");
@@ -575,6 +606,36 @@ namespace surveillance_system
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Car Position");
                 printPos(this.carPos);
+            }
+
+            public void printAllPos()
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print All Position");
+                Console.Write("{0, 10}", 0);
+                for (int i = 1; i < grid_num; i++)
+                {
+                    Console.Write("{0, 8}", i);
+                }
+                Console.WriteLine();
+                for (int i = 0; i < grid_num; i++)
+                {
+                    Console.Write("{0, 2}", i);
+
+                    for (int j = 0; j < grid_num; j++)
+                    {
+                        string tmp = "";
+                        if (this.cctvPos[i, j] > 0) tmp += "&" + cctvPos[i, j];
+
+                        if (this.archPos[i, j] > 0) tmp += "A" + archPos[i, j];
+
+                        if (this.pedPos[i, j] > 0) tmp += "P" + pedPos[i, j];
+
+                        if (this.carPos[i, j] > 0) tmp += "C" + carPos[i, j];
+
+                        Console.Write("{0, 8}", tmp);
+                    }
+                    Console.WriteLine();
+                }
             }
         }
     }
