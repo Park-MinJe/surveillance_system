@@ -33,6 +33,18 @@ namespace surveillance_system
         {
             return (Math.PI / 180) * angle;
         }
+
+        static public double getDistanceBetweenPoints(double minlat, double minlon, double maxlat, double maxlon)
+        {
+            double theta = maxlon - minlon;
+            // kilometers
+            double distance = Math.Round(
+                60 * 1.1515 * (180 / Math.PI) * Math.Acos(
+                    Math.Sin(minlat * (Math.PI / 180)) * Math.Sin(maxlat * (Math.PI / 180)) +
+                    Math.Cos(minlat * (Math.PI / 180)) * Math.Cos(maxlat * (Math.PI / 180)) * Math.Cos(theta * (Math.PI / 180))) * 1.609344
+                , 2);
+            return distance;
+        }
     }
 
 }
