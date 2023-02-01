@@ -20,19 +20,6 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
-        // Data Handler
-        public static ArchCSVWriter aw = new ArchCSVWriter();
-        public static ArchCSVReader ar = new ArchCSVReader();
-
-        public static TargetCSVWriter tw = new TargetCSVWriter();
-        public static TargetCSVReader tr = new TargetCSVReader();
-
-        public static CctvCSVWriter cw = new CctvCSVWriter();
-        public static CctvCSVReader cr = new CctvCSVReader();
-
-        public static TargetLogCSVWriter tlog = new TargetLogCSVWriter();
-        public static CctvLogCSVWriter clog = new CctvLogCSVWriter();
-
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
