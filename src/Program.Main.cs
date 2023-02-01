@@ -8,9 +8,38 @@ namespace surveillance_system
 {
     public partial class Program
     {
+        // Data Handler
+        public static ArchCSVWriter aw = new ArchCSVWriter();
+        public static ArchCSVReader ar = new ArchCSVReader();
+
+        public static TargetCSVWriter tw = new TargetCSVWriter();
+        public static TargetCSVReader tr = new TargetCSVReader();
+
+        public static CctvCSVWriter cw = new CctvCSVWriter();
+        public static CctvCSVReader cr = new CctvCSVReader();
+
+        public static TargetLogCSVWriter tlog = new TargetLogCSVWriter();
+        public static CctvLogCSVWriter clog = new CctvLogCSVWriter();
+
+        public static GisBuildingService gbs = new GisBuildingService();
+
         static void Main(string[] args)
         {
-            int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
+            demo_DotSpatial();
+            Console.WriteLine();
+
+            string methodName = Console.ReadLine();
+            string serviceKey = Console.ReadLine();
+            string typeName = Console.ReadLine();
+            string bbox = Console.ReadLine();
+            string pnu = Console.ReadLine();
+            string maxFeature = Console.ReadLine();
+            string resultType = Console.ReadLine();
+            string srsName = Console.ReadLine();
+
+            gbs.testGisBuildingService(methodName, serviceKey, bbox, typeName, maxFeature, resultType, srsName);
+
+            /*int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
@@ -239,6 +268,8 @@ namespace surveillance_system
             Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
             road.setCctvswithCSV(bestCCTVIdx);
             road.printPos(road.cctvPos);
+
+            demo_DotSpatial();*/
         }
     }
 }
