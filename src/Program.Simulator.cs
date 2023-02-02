@@ -770,9 +770,6 @@ namespace surveillance_system
                         cctvs[i].Max_Dist = 50 * 100 * 10; // 50m (milimeter)
                                                            // cctvs[i].Max_Dist = 500 * 100 * 100; // 500m (milimeter)
 
-                        // record detected Target Info
-                        //cctvs[i].detectedTargets = new List<CCTV.detectedTarget>();
-
                         // Line 118~146
                         /*  여기부턴 Road_Builder 관련 정보가 없으면 의미가 없을거같아서 주석처리했어용..
                             그리고 get_Sectoral_Coverage 이런함수도 지금은 구현해야할지 애매해서..?

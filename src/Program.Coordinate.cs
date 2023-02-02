@@ -111,8 +111,13 @@ namespace surveillance_system
             DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
         }
 
-        public static double getDistanceBetweenPoints(double minlat, double minlon, double maxlat, double maxlon)
+        public static double getDistanceBetweenPoints(double lat0, double lon0, double lat1, double lon1)
         {
+            double minlat = Math.Min(lat0, lat1);
+            double maxlat = Math.Max(lat0, lat1);
+            double minlon = Math.Min(lon0, lon1);
+            double maxlon = Math.Max(lon0, lon1);
+
             double theta = maxlon - minlon;
             // kilometers
             double distance = 

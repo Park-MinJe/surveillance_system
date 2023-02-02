@@ -21,10 +21,15 @@ namespace surveillance_system
         public static TargetLogCSVWriter tlog = new TargetLogCSVWriter();
         public static CctvLogCSVWriter clog = new CctvLogCSVWriter();
 
+        public static OsmReader or = new OsmReader();
         public static GisBuildingService gbs = new GisBuildingService();
 
         static void Main(string[] args)
         {
+            // 도로 정보
+
+
+            // 건물 정보
             demo_DotSpatial();
             Console.WriteLine();
 
@@ -38,6 +43,11 @@ namespace surveillance_system
             string srsName = Console.ReadLine();
 
             gbs.testGisBuildingService(methodName, serviceKey, bbox, typeName, maxFeature, resultType, srsName);
+            foreach(Architecture arch in archs)
+            {
+                Console.WriteLine();
+                arch.printArchInfo();
+            }
 
             /*int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
@@ -267,9 +277,7 @@ namespace surveillance_system
 
             Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
             road.setCctvswithCSV(bestCCTVIdx);
-            road.printPos(road.cctvPos);
-
-            demo_DotSpatial();*/
+            road.printPos(road.cctvPos);*/
         }
     }
 }

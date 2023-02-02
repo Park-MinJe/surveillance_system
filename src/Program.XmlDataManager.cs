@@ -19,7 +19,7 @@ namespace surveillance_system
             XmlNodeList ways;
             XmlNodeList relations;
 
-            public OsmReader(string fileName)
+            public void setOsmReader(string fileName)
             {
                 this.fileName = fileName;
                 xdoc = new XmlDocument();
@@ -143,13 +143,18 @@ namespace surveillance_system
                 XmlNodeList gml_upperCorner = xml.GetElementsByTagName("gml:upperCorner");
                 double[,] upperCorner = new double[gml_upperCorner.Count, 2];
 
+                double[,] transformedCorners = new double[2, 2];
+
+                string phrase;
+                string[] words;
+
                 for (int i = 0; i < gml_lowerCorner.Count; i++)
                 {
                     Console.WriteLine("\n");
                     Console.WriteLine("Raw Lower Conrer");
-                    string phrase = gml_lowerCorner[i].InnerText;
+                    phrase = gml_lowerCorner[i].InnerText;
                     Console.WriteLine("{0}", phrase);
-                    string[] words = phrase.Split(' ');
+                    words = phrase.Split(' ');
                     lowerCorner[i, 0] = Convert.ToDouble(words[0]);
                     lowerCorner[i, 1] = Convert.ToDouble(words[1]);
 
@@ -160,42 +165,76 @@ namespace surveillance_system
                     upperCorner[i, 0] = Convert.ToDouble(words[0]);
                     upperCorner[i, 1] = Convert.ToDouble(words[1]);
 
-                    double[,] transformedCorners = TransformCoordinate(lowerCorner[i, 0], lowerCorner[i, 1], upperCorner[i, 0], upperCorner[i, 1]);
+                    transformedCorners = TransformCoordinate(lowerCorner[i, 0], lowerCorner[i, 1], upperCorner[i, 0], upperCorner[i, 1]);
                     Console.WriteLine("Transformed Lower Corner");
                     Console.WriteLine("x: {0}\ty:{1}", transformedCorners[0, 0], transformedCorners[0, 1]);
                     Console.WriteLine("Transformed Upper Corner");
                     Console.WriteLine("x: {0}\ty:{1}", transformedCorners[1, 0], transformedCorners[1, 1]);
+                    Console.WriteLine("가로 길이: {0}", getDistanceBetweenPoints(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[1, 0], transformedCorners[0, 1]));
+                    Console.WriteLine("세로 길이: {0}", getDistanceBetweenPoints(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[0, 0], transformedCorners[1, 1]));
                 }
 
                 XmlNodeList gml_featureMembers = xml.GetElementsByTagName("gml:featureMember");
                 XmlNodeList gml_posLists = xml.GetElementsByTagName("gml:posList");
                 XmlNodeList NSDI_BULD_HGs = xml.GetElementsByTagName("NSDI:BULD_HG");
 
-                for(int i = 0; i<gml_featureMembers.Count; i++)
+                List<double[]> pls = new List<double[]>();
+                List<double> hs = new List<double>();
+
+                for (int i = 0; i<gml_featureMembers.Count; i++)
                 {
-                    if (Convert.ToDouble(NSDI_BULD_HGs[i].InnerText) > 0)
+                    double h = Convert.ToDouble(NSDI_BULD_HGs[i].InnerText);
+                    if (h > 0)
                     {
+                        hs.Add(h);
+
                         Console.WriteLine("\n");
                         Console.WriteLine("posList:");
-                        string phrase = gml_posLists[i].InnerText;
+                        phrase = gml_posLists[i].InnerText;
                         Console.WriteLine("{0}\n", phrase);
-                        string[] words = phrase.Split(" ");
+                        words = phrase.Split(" ");
                         double[] pl = new double[words.Length];
                         for(int j = 0;j < words.Length; j++)
                         {
                             pl[j] = Convert.ToDouble(words[j]);
-                            Console.Write("{0} ", pl[j]);
+                            if (j % 2 == 1)
+                                Console.WriteLine("x: {0}\ty: {1}", pl[j - 1], pl[j]);
                         }
                         Console.WriteLine();
                         TransformCoordinate(pl);
+
+                        // 프로그램상의 좌표계로 변환
+                        // 지도 범위의 왼쪽 위를 기준으로 한다.
+                        for (int j = 0; j < pl.Length / 2; j++)
+                        {
+                            double x = pl[j * 2];
+                            double y = pl[j * 2 + 1];
+
+                            pl[j * 2] = getDistanceBetweenPoints(transformedCorners[0, 0], y, x, y);
+                            pl[j * 2 + 1] = getDistanceBetweenPoints(x, transformedCorners[1, 1], x, y);
+                        }
+
+                        pls.Add(pl);
+
+                        double x_sum = 0, y_sum = 0;
                         for(int j = 0; j < pl.Length / 2; j++)
                         {
-                            Console.WriteLine("x: {0}, y: {1}", pl[j * 2], pl[j * 2 + 1]);
+                            Console.WriteLine("{1}, {0}", pl[j * 2], pl[j * 2 + 1]);
+                            x_sum += pl[j * 2];
+                            y_sum += pl[j * 2 + 1];
                         }
+                        Console.WriteLine("Center of Building: {0}, {1}", y_sum / pl.Length * 2, x_sum / pl.Length * 2);
 
                         Console.WriteLine("\nBuilding height: ");
                         Console.WriteLine("{0}", NSDI_BULD_HGs[i].InnerText);
                     }
+                }
+
+                archs = new Architecture[pls.Count];
+                for(int i = 0; i<pls.Count; i++)
+                {
+                    archs[i] = new Architecture();
+                    archs[i].define_Architecture(pls[i], hs[i]);
                 }
             }
         }
