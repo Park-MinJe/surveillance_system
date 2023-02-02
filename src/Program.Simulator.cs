@@ -55,8 +55,8 @@ namespace surveillance_system
             private const double imW = 1920; // (pixels) image width
             private const double imH = 1080; // (pixels) image height
 
-            private const double cctv_rotate_degree = 90; // 30초에 한바퀴
-                                                    // Installation [line_23]
+            private const double cctv_rotate_degree = -1; //90; --> 30초에 한바퀴?, -1: angle이 회전하는 옵션 disable (note 23-01-16)
+                                                  // Installation [line_23]
             private const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
             private const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
@@ -64,8 +64,8 @@ namespace surveillance_system
             private double rotateTerm = 30.0; // sec
 
             // calculate vertical/horizontal AOV
-            private double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
-            private double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
+            double H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
+            double V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
 
             private double[] Dist = new double[25000];
             private int dist_len = 100000;
@@ -755,10 +755,10 @@ namespace surveillance_system
                         // cctvs[i].ViewAngleH = rand.NextDouble() * 360;
                         // cctvs[i].ViewAngleV = -35 - 20 * rand.NextDouble();
 
-                        cctvs[i].setViewAngleH(rand.NextDouble() * 360);
+                        cctvs[i].setViewAngleH(rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
                         // cctvs[i].setViewAngleH(rand.Next(4) * 90);
                         // cctvs[i].setViewAngleV(-35 - 20 * rand.NextDouble());
-                        cctvs[i].setViewAngleV(-45.0);
+                        cctvs[i].setViewAngleV(-45.0 * Math.PI / 180);   // (23-02-02) modified by 0BoO, deg -> rad
 
 
                         cctvs[i].setFixMode(fixMode); // default (rotate)
@@ -789,6 +789,9 @@ namespace surveillance_system
                         cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
                         cctvs[i].get_V_FOV(Dist, cctvs[i].HE, cctvs[i].Focal_Length, cctvs[i].ViewAngleV, cctvs[i].X, cctvs[i].Z);
                         // cctvs[i].printCCTVInfo();
+
+                        cctvs[i].calcBlindToPed();          // (23-02-01) added by 0BoO
+                        cctvs[i].calcEffDistToPed(3000);     // (23-02-01) added by 0BoO, input value is 3000mm(3meter)
                     }
                 }
                 catch(Exception ex)
@@ -1533,22 +1536,24 @@ namespace surveillance_system
             public void rotateCCTVs()
             {
                 // 220317 cctv rotation
-                for (int i = 0; i < N_CCTV; i++)
+                if (cctv_rotate_degree > 0)
                 {
-                    // 220331 rotate 후 fov 재계산
-                    // 30초마다 한바퀴 돌도록 -> 7.5초마다 90도
-                    // Now는 현재 simulation 수행 경과 시간
-                    // 360/cctv_rotate_degree = 4
-                    // 30/4 = 7.5
-                    if (Math.Round(Now, 2) % Math.Round(rotateTerm / (360.0 / cctv_rotate_degree), 2) == 0)
+                    for (int i = 0; i < N_CCTV; i++)
                     {
-                        // cctv.setFixMode(false)로 설정해줘야함!
-                        // debug
-                        // Console.WriteLine("[Rotate] Now: {0}, Degree: {1}", Math.Round(Now, 2), cctvs[i].ViewAngleH);
-                        cctvs[i].rotateHorizon(cctv_rotate_degree); // 90
-                                                                    // 회전후 수평 FOV update (지금은 전부 Update -> 시간 오래걸림 -> 일부만(일부FOV구성좌표만)해야할듯)
-                        if (!cctvs[i].isFixed)
-                            cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
+                        // 220331 rotate 후 fov 재계산
+                        // 30초마다 한바퀴 돌도록 -> 7.5초마다 90도
+                        // Now는 현재 simulation 수행 경과 시간
+                        // 360/cctv_rotate_degree = 4
+                        // 30/4 = 7.5
+                        if (Math.Round(Now, 2) % Math.Round(rotateTerm / (360.0 / cctv_rotate_degree), 2) == 0)
+                        {
+                            // cctv.setFixMode(false)로 설정해줘야함!
+                            // Console.WriteLine("[Rotate] Now: {0}, Degree: {1}", Math.Round(Now, 2), cctvs[i].ViewAngleH);
+                            cctvs[i].rotateHorizon(cctv_rotate_degree); // 90
+                                                                        // 회전후 수평 FOV update (지금은 전부 Update -> 시간 오래걸림 -> 일부만(일부FOV구성좌표만)해야할듯)
+                            if (!cctvs[i].isFixed)
+                                cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
+                        }
                     }
                 }
             }
