@@ -219,7 +219,7 @@ namespace surveillance_system
                         double x_sum = 0, y_sum = 0;
                         for(int j = 0; j < pl.Length / 2; j++)
                         {
-                            Console.WriteLine("{1}, {0}", pl[j * 2], pl[j * 2 + 1]);
+                            Console.WriteLine("{0}, {1}", pl[j * 2], pl[j * 2 + 1]);
                             x_sum += pl[j * 2];
                             y_sum += pl[j * 2 + 1];
                         }
