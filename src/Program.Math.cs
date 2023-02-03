@@ -73,12 +73,34 @@ namespace surveillance_system
         }
 
         // 선분의 중점
-        public static Point calcMidpointOfLine(Line l)
+        public static Point calcMidpointOfLine(Segment l)
         {
             Point rt = new Point();
 
             rt.setX((l.getP1().getX() + l.getP2().getX()) / 2);
             rt.setY((l.getP1().getY() + l.getP2().getY()) / 2);
+
+            return rt;
+        }
+
+        // 꼭짓점 평균 위치
+        public static Point calcMidpointOfPolygon(Polygon p)
+        {
+            Point rt = new Point();
+            double xSum = 0, 
+                ySum = 0, 
+                zSum = 0;
+
+            foreach(Segment s in p.getSegments())
+            {
+                xSum += s.getP1().getX();
+                ySum += s.getP1().getY();
+                zSum += s.getP1().getZ();
+            }
+            int segNum = p.getSegmentCnt();
+            rt.setX(xSum / segNum);
+            rt.setY(ySum / segNum);
+            rt.setZ(zSum / segNum);
 
             return rt;
         }

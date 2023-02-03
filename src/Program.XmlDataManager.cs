@@ -109,6 +109,7 @@ namespace surveillance_system
                 this.srsName += srsName; 
             }
 
+            // debug
             public void testGisBuildingService(string methodName, string serviceKey, string bbox, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
                 this.setServiceKey(serviceKey);
@@ -165,13 +166,13 @@ namespace surveillance_system
                     upperCorner[i, 0] = Convert.ToDouble(words[0]);
                     upperCorner[i, 1] = Convert.ToDouble(words[1]);
 
-                    transformedCorners = TransformCoordinate(lowerCorner[i, 0], lowerCorner[i, 1], upperCorner[i, 0], upperCorner[i, 1]);
+                    transformedCorners = TransformCoordinate(lowerCorner[i, 0], lowerCorner[i, 1], upperCorner[i, 0], upperCorner[i, 1], 5174, 4326);
                     Console.WriteLine("Transformed Lower Corner");
                     Console.WriteLine("x: {0}\ty:{1}", transformedCorners[0, 0], transformedCorners[0, 1]);
                     Console.WriteLine("Transformed Upper Corner");
                     Console.WriteLine("x: {0}\ty:{1}", transformedCorners[1, 0], transformedCorners[1, 1]);
-                    Console.WriteLine("가로 길이: {0}", getDistanceBetweenPoints(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[1, 0], transformedCorners[0, 1]));
-                    Console.WriteLine("세로 길이: {0}", getDistanceBetweenPoints(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[0, 0], transformedCorners[1, 1]));
+                    Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[1, 0], transformedCorners[0, 1]));
+                    Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[0, 0], transformedCorners[1, 1]));
                 }
 
                 XmlNodeList gml_featureMembers = xml.GetElementsByTagName("gml:featureMember");
@@ -210,8 +211,8 @@ namespace surveillance_system
                             double x = pl[j * 2];
                             double y = pl[j * 2 + 1];
 
-                            pl[j * 2] = getDistanceBetweenPoints(transformedCorners[0, 0], y, x, y);
-                            pl[j * 2 + 1] = getDistanceBetweenPoints(x, transformedCorners[1, 1], x, y);
+                            pl[j * 2] = getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], y, x, y);
+                            pl[j * 2 + 1] = getDistanceBetweenPointsOfepsg4326(x, transformedCorners[1, 1], x, y);
                         }
 
                         pls.Add(pl);

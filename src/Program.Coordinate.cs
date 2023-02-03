@@ -7,8 +7,13 @@ namespace surveillance_system
     public partial class Program
     {
         // 좌표계 proj4 string
-        public static string proj4_epsg5174 = "+proj=tmerc +lat_0=38 +lon_0=127.0028902777778 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs +towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43";
+        // 구글맵
+        // 거리 계산 안됨
+        public static string proj4_epsg3857 = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs";
+        // LOCALDATA CCTV정보
         public static string proj4_epsg4326 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+        // 국토교통부_건물융합정보
+        public static string proj4_epsg5174 = "+proj=tmerc +lat_0=38 +lon_0=127.0028902777778 +k=1 +x_0=200000 +y_0=500000 +ellps=bessel +units=m +no_defs +towgs84=-115.80,474.99,674.11,1.16,-2.31,-1.63,6.43";
 
         // DotSpatial을 사용한 좌표계 변환
         public static void demo_DotSpatial()
@@ -29,17 +34,6 @@ namespace surveillance_system
                 z[i] = 0;
             }
 
-            //rewrite xy array for input into Proj4
-            //double[] xy = new double[2 * x.Length];
-            /*int ixy = 0;
-            for (int i = 0; i <= z.Length - 1; i++)
-            {
-                xy[ixy] = x[i];
-                xy[ixy + 1] = y[i];
-                z[i] = 0;
-                ixy += 2;
-            }*/
-
             DotSpatial.Projections.ProjectionInfo src =
                 DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
             DotSpatial.Projections.ProjectionInfo trg =
@@ -50,7 +44,7 @@ namespace surveillance_system
             for (int i = 0; i <= z.Length - 1; i++)
             {
                 Console.WriteLine("output EPSG:4326 p{0} = {1} {2}", i + 1, xy[i * 2], xy[i * 2 + 1]);
-                distance[i] = getDistanceBetweenPoints(realxy[i * 2], realxy[i * 2 + 1], xy[i * 2], xy[i * 2 + 1]);
+                distance[i] = getDistanceBetweenPointsOfepsg4326(realxy[i * 2], realxy[i * 2 + 1], xy[i * 2], xy[i * 2 + 1]);
                 Console.WriteLine("distance between real Coordinate = {0}", distance[i]);
             }
 
@@ -62,14 +56,10 @@ namespace surveillance_system
             }
 
             Console.WriteLine("{0}", mean_distance / distance.Length);
-
-            //Console.Write("Press any key to continue . . . ");
-            //Console.ReadKey(true);
         }
 
         // 좌표계 변환 함수
-        // 추후 확장 가능하도록 매개변수로 기존 좌표계, 변환할 좌표계 받을 계획
-        public static double[,] TransformCoordinate(double x1, double y1, double x2, double y2)
+        public static double[,] TransformCoordinate(double x1, double y1, double x2, double y2, int src_epsgN, int trg_epsgN)
         {
             double[,] rt = new double[2, 2];
 
@@ -81,11 +71,37 @@ namespace surveillance_system
 
             double[] z = new double[xy.Length / 2];
 
-            DotSpatial.Projections.ProjectionInfo src =
-                DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
-            DotSpatial.Projections.ProjectionInfo trg =
-                DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+            // 원본 좌표계
+            DotSpatial.Projections.ProjectionInfo src = new DotSpatial.Projections.ProjectionInfo();
+            switch (src_epsgN)
+            {
+                case 3857: 
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg3857);
+                    break;
+                case 4326:
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+                    break;
+                case 5174:
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
+                    break;
+            }
 
+            // 변환할 좌표계
+            DotSpatial.Projections.ProjectionInfo trg = new DotSpatial.Projections.ProjectionInfo();
+            switch (trg_epsgN)
+            {
+                case 3857:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg3857);
+                    break;
+                case 4326:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+                    break;
+                case 5174:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
+                    break;
+            }
+
+            // 좌표계 변환
             DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
 
             for(int i = 0; i < 2; i++)
@@ -111,7 +127,7 @@ namespace surveillance_system
             DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
         }
 
-        public static double getDistanceBetweenPoints(double lat0, double lon0, double lat1, double lon1)
+        public static double getDistanceBetweenPointsOfepsg4326(double lat0, double lon0, double lat1, double lon1)
         {
             double minlat = Math.Min(lat0, lat1);
             double maxlat = Math.Max(lat0, lat1);
