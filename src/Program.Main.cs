@@ -29,10 +29,6 @@ namespace surveillance_system
             // 도로 정보
 
 
-            // 건물 정보
-            demo_DotSpatial();
-            Console.WriteLine();
-
             string methodName = Console.ReadLine();
             string serviceKey = Console.ReadLine();
             string typeName = Console.ReadLine();
@@ -42,14 +38,14 @@ namespace surveillance_system
             string resultType = Console.ReadLine();
             string srsName = Console.ReadLine();
 
-            gbs.testGisBuildingService(methodName, serviceKey, bbox, typeName, maxFeature, resultType, srsName);
+            gbs.testGisBuildingService(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
             foreach(Architecture arch in archs)
             {
                 Console.WriteLine();
                 arch.printArchInfo();
             }
 
-            /*int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
+            int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
@@ -277,7 +273,7 @@ namespace surveillance_system
 
             Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
             road.setCctvswithCSV(bestCCTVIdx);
-            road.printPos(road.cctvPos);*/
+            road.printPos(road.cctvPos);
         }
     }
 }

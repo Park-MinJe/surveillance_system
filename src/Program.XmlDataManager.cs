@@ -56,6 +56,8 @@ namespace surveillance_system
         public class GisBuildingService
         {
             private HttpClient client = new HttpClient();
+
+            private string url;
             private string apiEndPoint = "http://apis.data.go.kr/1611000/nsdi/GisBuildingService";
             private string serviceKey = "?ServiceKey=";     // 필수
             private string typeName = "&typename=";
@@ -73,6 +75,18 @@ namespace surveillance_system
             private bool IsSetResultTypeCalled = false;
             private bool IsSetSrsNameCalled = false;
 
+            // 데이터 저장 메모리
+            // 데이터 베이스 또는 문서로 확장할까?
+            XmlDocument xml;
+            XmlNodeList gml_lowerCorner;
+            XmlNodeList gml_upperCorner;
+            XmlNodeList gml_featureMembers;
+            XmlNodeList gml_posLists;
+            XmlNodeList NSDI_BULD_HGs;
+
+            /* --------------------------------------
+             * setter
+            -------------------------------------- */
             public void setServiceKey(string serviceKey)
             {
                 this.IsSetServiceKeyCalled = true;
@@ -109,21 +123,41 @@ namespace surveillance_system
                 this.srsName += srsName; 
             }
 
-            // debug
-            public void testGisBuildingService(string methodName, string serviceKey, string bbox, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
+            public void setEndPointUrl(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
-                this.setServiceKey(serviceKey);
-                this.setBBox(bbox);
-                //this.setPnu(pnu);
-                this.setTypeName(typeName);
-                this.setMaxFeature(maxFeature);
-                this.setResultType(resultType);
-                this.setSrsName(srsName);
+                if (serviceKey != "")
+                    this.setServiceKey(serviceKey);
+                if (bbox != "")
+                    this.setBBox(bbox);
+                if (pnu != "")
+                    this.setPnu(pnu);
+                if (typeName != "")
+                    this.setTypeName(typeName);
+                if (maxFeature != "")
+                    this.setMaxFeature(maxFeature);
+                if (resultType != "")
+                    this.setResultType(resultType);
+                if (srsName != "")
+                    this.setSrsName(srsName);
 
-                string url = this.apiEndPoint + methodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
+                this.url = this.apiEndPoint + methodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
+                if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
+                if (this.IsSetTypeNameCalled) this.url += this.typeName;
+                if (this.IsSetBBoxCalled) this.url += this.bbox;
+                if (this.IsSetPnuCalled) this.url += this.pnu;
+                if (this.IsSetMaxFeatureCalled) this.url += this.maxFeature;
+                if (this.IsSetResultTypeCalled) this.url += this.resultType;
+                if (this.IsSetSrsNameCalled) this.url += this.srsName;
+
                 // debug;
                 Console.WriteLine(url);
+            }
 
+            /* --------------------------------------
+             * load data as xml
+            -------------------------------------- */
+            public void loadArchDataFromApiAsXml()
+            {
                 var request = (HttpWebRequest)WebRequest.Create(url);
                 request.Method = "GET";
 
@@ -137,97 +171,136 @@ namespace surveillance_system
 
                 Console.WriteLine(results);
 
-                XmlDocument xml = new XmlDocument();
+                this.xml = new XmlDocument();
                 xml.LoadXml(results);
-                XmlNodeList gml_lowerCorner = xml.GetElementsByTagName("gml:lowerCorner");
-                double[,] lowerCorner = new double[gml_lowerCorner.Count, 2];
-                XmlNodeList gml_upperCorner = xml.GetElementsByTagName("gml:upperCorner");
-                double[,] upperCorner = new double[gml_upperCorner.Count, 2];
+            }
 
-                double[,] transformedCorners = new double[2, 2];
+            /* --------------------------------------
+             * read from xml
+            -------------------------------------- */
+            public void readLowerCorner()
+            {
+                gml_lowerCorner = xml.GetElementsByTagName("gml:lowerCorner");
+            }
 
-                string phrase;
-                string[] words;
+            public void readUpperCorner()
+            {
+                gml_upperCorner = xml.GetElementsByTagName("gml:upperCorner");
+            }
 
-                for (int i = 0; i < gml_lowerCorner.Count; i++)
+            public void readFeatureMembers()
+            {
+                gml_featureMembers = xml.GetElementsByTagName("gml:featureMember");
+            }
+
+            public void readPosLists()
+            {
+                gml_posLists = xml.GetElementsByTagName("gml:posList");
+            }
+
+            public void readArchHs()
+            {
+                NSDI_BULD_HGs = xml.GetElementsByTagName("NSDI:BULD_HG");
+            }
+
+            /* --------------------------------------
+             * get data from xml as local class
+            -------------------------------------- */
+            public Point getMapLowerCorner()
+            {
+                this.readLowerCorner();
+                string lowerCorner = gml_lowerCorner[0].InnerText;
+                string[] lowerCornerCoordinate = lowerCorner.Split(' ');
+                Point rt = new Point(Convert.ToDouble(lowerCornerCoordinate[0]), Convert.ToDouble(lowerCornerCoordinate[1]), 0d);
+
+                //Debug
+                Console.WriteLine("Raw Lower Corner");
+                rt.printString();
+
+                return rt;
+            }
+
+            public Point getMapUpperCorner()
+            {
+                this.readUpperCorner();
+                string upperCorner = gml_upperCorner[0].InnerText;
+                string[] upperCornerCoordinate = upperCorner.Split(' ');
+                Point rt = new Point(Convert.ToDouble(upperCornerCoordinate[0]), Convert.ToDouble(upperCornerCoordinate[1]), 0d);
+
+                //Debug
+                Console.WriteLine("Raw Lower Corner");
+                rt.printString();
+
+                return rt;
+            }
+
+            public int getFeatureMembersCnt()
+            {
+                return this.gml_featureMembers.Count;
+            }
+
+            public double getArchH(int idx)
+            {
+                return Convert.ToDouble(NSDI_BULD_HGs[idx].InnerText);
+            }
+
+            public Point[] getPosList(int idx)
+            {
+                string phrase = gml_posLists[idx].InnerText;
+                string[] words = phrase.Split(" ");
+                Point[] rt = new Point[words.Length / 2];
+                for (int j = 0; j < words.Length / 2; j++)
                 {
-                    Console.WriteLine("\n");
-                    Console.WriteLine("Raw Lower Conrer");
-                    phrase = gml_lowerCorner[i].InnerText;
-                    Console.WriteLine("{0}", phrase);
-                    words = phrase.Split(' ');
-                    lowerCorner[i, 0] = Convert.ToDouble(words[0]);
-                    lowerCorner[i, 1] = Convert.ToDouble(words[1]);
-
-                    Console.WriteLine("Raw Upper Conrer");
-                    phrase = gml_upperCorner[i].InnerText;
-                    Console.WriteLine("{0}", phrase);
-                    words = phrase.Split(" ");
-                    upperCorner[i, 0] = Convert.ToDouble(words[0]);
-                    upperCorner[i, 1] = Convert.ToDouble(words[1]);
-
-                    transformedCorners = TransformCoordinate(lowerCorner[i, 0], lowerCorner[i, 1], upperCorner[i, 0], upperCorner[i, 1], 5174, 4326);
-                    Console.WriteLine("Transformed Lower Corner");
-                    Console.WriteLine("x: {0}\ty:{1}", transformedCorners[0, 0], transformedCorners[0, 1]);
-                    Console.WriteLine("Transformed Upper Corner");
-                    Console.WriteLine("x: {0}\ty:{1}", transformedCorners[1, 0], transformedCorners[1, 1]);
-                    Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[1, 0], transformedCorners[0, 1]));
-                    Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], transformedCorners[0, 1], transformedCorners[0, 0], transformedCorners[1, 1]));
+                    rt[j] = new Point(Convert.ToDouble(words[j * 2]), Convert.ToDouble(words[j * 2 + 1]), 0d);
                 }
 
-                XmlNodeList gml_featureMembers = xml.GetElementsByTagName("gml:featureMember");
-                XmlNodeList gml_posLists = xml.GetElementsByTagName("gml:posList");
-                XmlNodeList NSDI_BULD_HGs = xml.GetElementsByTagName("NSDI:BULD_HG");
+                return rt;
+            }
 
-                List<double[]> pls = new List<double[]>();
+            // debug
+            public void testGisBuildingService(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
+            {
+                this.setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
+
+                this.loadArchDataFromApiAsXml();
+
+                Point lowerCorner = this.getMapLowerCorner();
+
+                Point upperCorner = this.getMapUpperCorner();
+
+                Point transformedLowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
+                Console.WriteLine("Transformed Lower Corner");
+                transformedLowerCorner.printString();
+
+                Point transformedUpperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+                Console.WriteLine("Transformed Upper Corner");
+                transformedUpperCorner.printString();
+
+                Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedUpperCorner.getX(), transformedLowerCorner.getY()));
+                Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedLowerCorner.getX(), transformedUpperCorner.getY()));
+
+                this.readFeatureMembers();
+                this.readPosLists();
+                this.readArchHs();
+
+                List<Point[]> pls = new List<Point[]>();
                 List<double> hs = new List<double>();
 
-                for (int i = 0; i<gml_featureMembers.Count; i++)
+                for (int i = 0; i<this.getFeatureMembersCnt(); i++)
                 {
                     double h = Convert.ToDouble(NSDI_BULD_HGs[i].InnerText);
                     if (h > 0)
                     {
                         hs.Add(h);
 
-                        Console.WriteLine("\n");
-                        Console.WriteLine("posList:");
-                        phrase = gml_posLists[i].InnerText;
-                        Console.WriteLine("{0}\n", phrase);
-                        words = phrase.Split(" ");
-                        double[] pl = new double[words.Length];
-                        for(int j = 0;j < words.Length; j++)
-                        {
-                            pl[j] = Convert.ToDouble(words[j]);
-                            if (j % 2 == 1)
-                                Console.WriteLine("x: {0}\ty: {1}", pl[j - 1], pl[j]);
-                        }
-                        Console.WriteLine();
-                        TransformCoordinate(pl);
+                        Point[] pl = this.getPosList(i);
+                        Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
 
                         // 프로그램상의 좌표계로 변환
                         // 지도 범위의 왼쪽 위를 기준으로 한다.
-                        for (int j = 0; j < pl.Length / 2; j++)
-                        {
-                            double x = pl[j * 2];
-                            double y = pl[j * 2 + 1];
+                        Point[] plOnSystem = calcIndexOnProg(transformedPl, transformedLowerCorner.getX(), transformedUpperCorner.getY());
 
-                            pl[j * 2] = getDistanceBetweenPointsOfepsg4326(transformedCorners[0, 0], y, x, y);
-                            pl[j * 2 + 1] = getDistanceBetweenPointsOfepsg4326(x, transformedCorners[1, 1], x, y);
-                        }
-
-                        pls.Add(pl);
-
-                        double x_sum = 0, y_sum = 0;
-                        for(int j = 0; j < pl.Length / 2; j++)
-                        {
-                            Console.WriteLine("{0}, {1}", pl[j * 2], pl[j * 2 + 1]);
-                            x_sum += pl[j * 2];
-                            y_sum += pl[j * 2 + 1];
-                        }
-                        Console.WriteLine("Center of Building: {0}, {1}", y_sum / pl.Length * 2, x_sum / pl.Length * 2);
-
-                        Console.WriteLine("\nBuilding height: ");
-                        Console.WriteLine("{0}", NSDI_BULD_HGs[i].InnerText);
+                        pls.Add(plOnSystem);
                     }
                 }
 

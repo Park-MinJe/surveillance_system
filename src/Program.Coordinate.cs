@@ -59,17 +59,17 @@ namespace surveillance_system
         }
 
         // 좌표계 변환 함수
-        public static double[,] TransformCoordinate(double x1, double y1, double x2, double y2, int src_epsgN, int trg_epsgN)
+        // 1개의 점
+        public static Point TransformCoordinate(Point p, int src_epsgN, int trg_epsgN)
         {
-            double[,] rt = new double[2, 2];
+            Point rt = new Point();
 
-            double[] xy = new double[4];
-            xy[0] = x1;
-            xy[1] = y1;
-            xy[2] = x2;
-            xy[3] = y2;
+            double[] xy = new double[2];
+            xy[0] = p.getX();
+            xy[1] = p.getY();
 
             double[] z = new double[xy.Length / 2];
+            z[0] = p.getZ();
 
             // 원본 좌표계
             DotSpatial.Projections.ProjectionInfo src = new DotSpatial.Projections.ProjectionInfo();
@@ -104,27 +104,79 @@ namespace surveillance_system
             // 좌표계 변환
             DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
 
-            for(int i = 0; i < 2; i++)
+            rt = new Point(xy[0], xy[1], 0d);
+
+            return rt;
+        }
+        // 여러개의 점
+        public static Point[] TransformCoordinate(Point[] ps, int src_epsgN, int trg_epsgN)
+        {
+            Point[] rt = new Point[ps.Length];
+
+            double[] xy = new double[2 * ps.Length];
+            double[] z = new double[ps.Length];
+            for (int i = 0; i < ps.Length; i++)
             {
-                for(int j = 0; j<2;j++)
-                {
-                    rt[i, j] = xy[i * 2 + j];
-                }
+                xy[i * 2] = ps[i].getX();
+                xy[i * 2 + 1] = ps[i].getY();
+                z[i] = ps[i].getZ();
+            }
+
+            // 원본 좌표계
+            DotSpatial.Projections.ProjectionInfo src = new DotSpatial.Projections.ProjectionInfo();
+            switch (src_epsgN)
+            {
+                case 3857:
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg3857);
+                    break;
+                case 4326:
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+                    break;
+                case 5174:
+                    src = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
+                    break;
+            }
+
+            // 변환할 좌표계
+            DotSpatial.Projections.ProjectionInfo trg = new DotSpatial.Projections.ProjectionInfo();
+            switch (trg_epsgN)
+            {
+                case 3857:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg3857);
+                    break;
+                case 4326:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+                    break;
+                case 5174:
+                    trg = DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
+                    break;
+            }
+
+            // 좌표계 변환
+            DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
+
+            for (int i = 0; i < ps.Length; i++)
+            {
+                rt[i] = new Point(xy[i * 2], xy[i * 2 + 1], z[i]);
             }
 
             return rt;
         }
-
-        public static void TransformCoordinate(double[] xy)
+        // proj4_epsg4326 to system 좌표계
+        public static Point[] calcIndexOnProg(Point[] ps, double lowerCornerX, double upperCornerY)
         {
-            double[] z = new double[xy.Length / 2];
+            Point[] rt = new Point[ps.Length];
+            for(int i = 0; i<ps.Length; i++)
+            {
+                double x = ps[i].getX();
+                double y = ps[i].getY();
 
-            DotSpatial.Projections.ProjectionInfo src =
-                DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg5174);
-            DotSpatial.Projections.ProjectionInfo trg =
-                DotSpatial.Projections.ProjectionInfo.FromProj4String(proj4_epsg4326);
+                rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCornerX, y, x, y),
+                                    getDistanceBetweenPointsOfepsg4326(x, upperCornerY, x, y),
+                                    0d);
+            }
 
-            DotSpatial.Projections.Reproject.ReprojectPoints(xy, z, src, trg, 0, z.Length);
+            return rt;
         }
 
         public static double getDistanceBetweenPointsOfepsg4326(double lat0, double lon0, double lat1, double lon1)

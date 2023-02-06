@@ -28,7 +28,8 @@ namespace surveillance_system
              * Print CSV
             -------------------------------------- */
 
-            public void initialArchsToCSV(int simIdx)
+            // 임의 좌표 사용시
+            /*public void initialArchsToCSV(int simIdx)
             {
                 string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
@@ -47,6 +48,18 @@ namespace surveillance_system
                     for (int j = 0; j < N_Arch; j++)
                     {
                         file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].Pos_H1[0], archs[j].Pos_H1[1], archs[j].Pos_H2[0], archs[j].Pos_H2[0], archs[j].Pos_V1[0], archs[j].Pos_V1[1], archs[j].Pos_V2[0], archs[j].Pos_V2[1]);
+                    }
+                }
+            }*/
+            public void initialArchsToCSV(int simIdx)
+            {
+                string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                {
+                    file.WriteLine("#idx,X,Y,Z,Direction,H");
+                    for (int j = 0; j < N_Arch; j++)
+                    {
+                        file.WriteLine("{0},{1},{2},{3},{4},{5}", j, archs[j].X, archs[j].Y, archs[j].Z, archs[j].Direction, archs[j].H);
                     }
                 }
             }

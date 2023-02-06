@@ -10,6 +10,10 @@ namespace surveillance_system
     {
         public class Road
         {
+            // Map의 실제 범위
+            public Point lowerCorner;
+            public Point upperCorner;
+
             public double[] laneVector;
 
             // 가로 도로 좌표
@@ -26,10 +30,13 @@ namespace surveillance_system
 
             public double[,] DST; // 도로 교차점
             public double[,] intersectionArea; // 도로 교차구간
-            public int mapSize;
-            public int grid_num;
+            public double X_mapSize;
+            public double Y_mapSize;
+            public int X_grid_num;
+            public int Y_grid_num;
             public int lane_num;
-            public int interval;
+            public double X_interval;
+            public double Y_interval;
             public int width;
 
             // 건물 위치
@@ -41,24 +48,44 @@ namespace surveillance_system
             // Car 위치
             public int[,] carPos;
 
-            public void roadBuilder(int cctvMode, int wd, int intvl, int n_interval, int n_cctv, int n_ped, int n_car)
+            public void roadBuilder(int wd, int intvl, int n_interval)
             {
                 this.lane_num = n_interval + 1;
                 DST = new double[lane_num * lane_num, 2];
                 intersectionArea = new double[lane_num * lane_num, 4];
-                this.interval = intvl;
+                //this.interval = intvl;
                 this.width = wd;
 
-                this.mapSize = n_interval * intvl + wd * lane_num;
-                this.grid_num = this.mapSize / 10000 + 2;
+                //this.mapSize = n_interval * intvl + wd * lane_num;
+                //this.grid_num = this.mapSize / 10000 + 2;
+                // 실제 데이터로부터의 mapSize
+                lowerCorner = gbs.getMapLowerCorner();
+                upperCorner = gbs.getMapUpperCorner();
+
+                lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
+                upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+
+                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY()) * 1000;
+                Console.WriteLine("x map size: {0}", this.X_mapSize);
+                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY()) * 1000;
+                Console.WriteLine("y map size: {0}", this.Y_mapSize);
+
+                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
+                Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
+                Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+
+                this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
+                this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
+
                 // 교차점, 교차구간 설정
                 int idx = 0;
                 for (int i = 0; i < lane_num; i++)
                 {
                     for (int j = 0; j < lane_num; j++)
                     {
-                        DST[idx, 0] = (intvl + wd) * i + (wd / 2);
-                        DST[idx, 1] = (intvl + wd) * j + (wd / 2);
+                        DST[idx, 0] = (this.X_interval + wd) * i + (wd / 2);
+                        DST[idx, 1] = (this.Y_interval + wd) * j + (wd / 2);
 
                         intersectionArea[idx, 0] = DST[idx, 0] - (wd / 2); // x_min
                         intersectionArea[idx, 1] = DST[idx, 0] + (wd / 2); // x_max
@@ -68,8 +95,9 @@ namespace surveillance_system
                     }
                 }
 
+                // 230206 쓰이지 않고 있음 _Minje
                 // 도로 벡터 초기화
-                double incr = 100;
+                /*double incr = 100;
                 int laneVectorSize = (int)((intvl + wd) * (n_interval) / incr);
                 //Console.WriteLine("laneSize = {0}", laneSize);
                 laneVector = new double[laneVectorSize];
@@ -77,7 +105,7 @@ namespace surveillance_system
                 for (int i = 0; i < laneVectorSize; i++)
                 {
                     laneVector[i] = i * incr;
-                }
+                }*/
 
                 // 가로 도로 좌표 설정
                 lane_h = new double[lane_num, 1];
@@ -125,9 +153,9 @@ namespace surveillance_system
             {
                 tr.initialPedsFromCSV(simIdx);
 
-                for (int i = 0; i < grid_num; i++)
+                for (int i = 0; i < this.Y_grid_num; i++)
                 {
-                    for (int j = 0; j < grid_num; j++)
+                    for (int j = 0; j < this.X_grid_num; j++)
                     {
                         pedPos[i, j] = 0;
                     }
@@ -143,9 +171,9 @@ namespace surveillance_system
             {
                 tr.initialCarsFromCSV(simIdx);
 
-                for (int i = 0; i < grid_num; i++)
+                for (int i = 0; i < this.Y_grid_num; i++)
                 {
-                    for (int j = 0; j < grid_num; j++)
+                    for (int j = 0; j < this.X_grid_num; j++)
                     {
                         carPos[i, j] = 0;
                     }
@@ -161,9 +189,9 @@ namespace surveillance_system
             {
                 cr.initialCctvsFromCSV(cctvSetIdx);
 
-                for (int i = 0; i < grid_num; i++)
+                for (int i = 0; i < this.Y_grid_num; i++)
                 {
-                    for (int j = 0; j < grid_num; j++)
+                    for (int j = 0; j < this.X_grid_num; j++)
                     {
                         cctvPos[i, j] = 0;
                     }
@@ -182,7 +210,7 @@ namespace surveillance_system
             // set Architecture object
             public void setArch(int n_arch)
             {
-                archPos = new int[grid_num, grid_num];
+                archPos = new int[this.Y_grid_num, this.X_grid_num];
 
                 for (int i = 0; i < n_arch; i++)
                 {
@@ -202,14 +230,14 @@ namespace surveillance_system
 
             public void setCCTV(int n_cctv, int wd, int n_interval)
             {
-                cctvPos = new int[grid_num,grid_num];
+                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
-                double range = mapSize - width;
+                double range = X_mapSize - width;
                 int rootN = (int)Math.Sqrt((double)n_cctv);
 
                 // x좌표가 int 형식이라 캐스팅해서 완벽한 그리드는 아닐 수 있음
                 int intvl = (int)range / (rootN-1); 
-                Console.WriteLine("mapsize range rootN intvl {0} {1} {2} {3} ", mapSize, range, rootN, intvl);
+                Console.WriteLine("x_mapsize range rootN intvl {0} {1} {2} {3} ", X_mapSize, range, rootN, intvl);
                 double startX = DST[0, 0];
                 double startY = DST[0, 1];
 
@@ -245,9 +273,9 @@ namespace surveillance_system
             // 교차로 중 설치 위치는 랜덤
             public void setCCTVbyRandomInDST(int n_cctv)
             {
-                cctvPos = new int[grid_num, grid_num];
+                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
-                Console.WriteLine("mapsize {0} ", mapSize);
+                Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
                 for (int i = 0; i < n_cctv; i++)
@@ -269,16 +297,16 @@ namespace surveillance_system
 
             public void setCCTVbyRandomInInt(int n_cctv)
             {
-                cctvPos = new int[grid_num, grid_num];
+                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
-                Console.WriteLine("mapsize {0} ", mapSize);
+                Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random");
                 for (int i = 0; i < n_cctv; i++)
                 {
                     Random rand = new Random();
-                    cctvs[i].X = rand.Next(this.mapSize);
-                    cctvs[i].Y = rand.Next(this.mapSize);
+                    cctvs[i].X = rand.Next(Convert.ToInt32(Math.Truncate(this.X_mapSize)));
+                    cctvs[i].Y = rand.Next(Convert.ToInt32(Math.Truncate(this.Y_mapSize)));
 
                     // Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
                     // Console.WriteLine();
@@ -293,7 +321,7 @@ namespace surveillance_system
             // 보행자 위치 처음 설정
             public void setPed(int n_ped)
             {
-                pedPos = new int[grid_num, grid_num];
+                pedPos = new int[this.Y_grid_num, this.X_grid_num];
                 for (int i = 0; i < n_ped; i++)
                 {
                     Random rand = new Random();
@@ -327,7 +355,7 @@ namespace surveillance_system
             // set Car object
             public void setCar(int n_car)
             {
-                carPos = new int[grid_num, grid_num];
+                carPos = new int[this.Y_grid_num, this.X_grid_num];
                 for (int i = 0; i < n_car; i++)
                 {
                     Random rand = new Random();
@@ -450,14 +478,14 @@ namespace surveillance_system
                         }
                         else if (opt == 1) //left
                         { 
-                            curX -= (interval + width/2);
+                            curX -= (this.X_interval + width/2);
                             i -= 1;
                         }
                     }
                     else if ( x >= midX && y >= midY ){ // 1 up left
                         if (opt == 0) // up
                         {   
-                            curY += (interval + width/2);
+                            curY += (this.Y_interval + width/2);
                             j += 1; 
                         }
                         else if (opt == 1) // left
@@ -472,14 +500,14 @@ namespace surveillance_system
                         }
                         else if (opt == 1) // right
                         {
-                            curX += (interval + width/2);
+                            curX += (this.X_interval + width/2);
                             i += 1;
                         }                        
                     }
                     else if( x < midX && y < midY ){ // 3 down right
                         if (opt == 0) // down
                         {
-                            curY -= (interval + width/2);
+                            curY -= (this.Y_interval + width/2);
                             j -= 1;
                         }
                         else if (opt == 1) // right
@@ -563,16 +591,16 @@ namespace surveillance_system
             public void printPos(int[,] pos)
             {
                 Console.Write("{0, 4}", 0);
-                for (int i = 1; i < grid_num; i++)
+                for (int i = 1; i < this.X_grid_num; i++)
                 {
                     Console.Write("{0, 2}", i);
                 }
                 Console.WriteLine();
-                for (int i = 0; i < grid_num; i++)
+                for (int i = 0; i < this.Y_grid_num; i++)
                 {
                     Console.Write("{0, 2}", i);
 
-                    for (int j = 0; j < grid_num; j++)
+                    for (int j = 0; j < this.X_grid_num; j++)
                     {
                         if (pos[i, j] <= 0)
                             Console.Write("{0, 2}", " ");
@@ -612,16 +640,16 @@ namespace surveillance_system
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print All Position");
                 Console.Write("{0, 10}", 0);
-                for (int i = 1; i < grid_num; i++)
+                for (int i = 1; i < this.X_grid_num; i++)
                 {
                     Console.Write("{0, 8}", i);
                 }
                 Console.WriteLine();
-                for (int i = 0; i < grid_num; i++)
+                for (int i = 0; i < this.Y_grid_num; i++)
                 {
                     Console.Write("{0, 2}", i);
 
-                    for (int j = 0; j < grid_num; j++)
+                    for (int j = 0; j < this.X_grid_num; j++)
                     {
                         string tmp = "";
                         if (this.cctvPos[i, j] > 0) tmp += "&" + cctvPos[i, j];

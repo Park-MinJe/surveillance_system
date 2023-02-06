@@ -251,11 +251,18 @@ namespace surveillance_system
               }
             }
             
-            public double calcDistToPed(Pedestrian ped)
+            public double calcDistToTarget(SurveillanceTarget trg)
             {
               // 이차원 상 거리
-              return Math.Sqrt(Math.Pow(Math.Abs(X - ped.X),2) 
-                              + Math.Pow(Math.Abs(Y - ped.Y),2));
+              return Math.Sqrt(Math.Pow(Math.Abs(X - trg.X),2) 
+                              + Math.Pow(Math.Abs(Y - trg.Y),2));
+            }
+            public double calcDistToArchFace(Polygon face)
+            {
+                Point p = calcMidpointOfPolygon(face);
+                // 이차원 상 거리
+                return Math.Sqrt(Math.Pow(Math.Abs(X - p.getX()), 2)
+                                + Math.Pow(Math.Abs(Y - p.getY()), 2));
             }
             public void calcEffDistToPed(double height)  // 22-02-01, modified by 0BoO
             {

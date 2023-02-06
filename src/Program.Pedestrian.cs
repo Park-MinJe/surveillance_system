@@ -122,7 +122,7 @@ namespace surveillance_system
 
             public Boolean outOfRange()
             {
-                if (X < 0 || X > road.mapSize || Y < 0 || Y > road.mapSize)
+                if (X < 0 || X > road.X_mapSize || Y < 0 || Y > road.Y_mapSize)
                 {
                     return true;
                 }

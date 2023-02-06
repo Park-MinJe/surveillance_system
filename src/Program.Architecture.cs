@@ -9,23 +9,25 @@ namespace surveillance_system
     {
         public class Architecture
         {
+            // 실제 데이터 미사용 시에만 사용
+            /*public double W;
+            public double D1;
+            public double D2;
+            public double W2;
+
+            public double[] Pos_H1 = new double[2];
+            public double[] Pos_H2 = new double[2];
+            public double[] Pos_V1 = new double[2];
+            public double[] Pos_V2 = new double[2];*/
+            /*************************************/
+
             public double X;
             public double Y;
             public double Z;
 
             public double Direction = 0;
 
-            //public double W;
             public double H;
-            /*public double D1;
-            public double D2;
-            public double W2;
-
-            public double[] midPoint = new double[2];
-            public double[] Pos_H1 = new double[2];
-            public double[] Pos_H2 = new double[2];
-            public double[] Pos_V1 = new double[2];
-            public double[] Pos_V2 = new double[2];*/
 
             // Polygon
             public Point[] pointsOfBottom;
@@ -72,17 +74,17 @@ namespace surveillance_system
             }*/
 
             // 실제 data를 이용해 건물 객체 생성
-            public void define_Architecture(double[] xy, double h)
+            public void define_Architecture(Point[] p, double h)
             {
-                int dotCnt = xy.Length / 2;
+                int dotCnt = p.Length;
                 this.H = h;
 
                 this.pointsOfBottom = new Point[dotCnt];
                 this.pointsOfTop = new Point[dotCnt];
                 for (int i = 0; i < dotCnt; i++)
                 {
-                    this.pointsOfBottom[i] = new Point(xy[i * 2], xy[i * 2 + 1], 0);
-                    this.pointsOfTop[i] = new Point(xy[i * 2], xy[i * 2 + 1], this.H);
+                    this.pointsOfBottom[i] = new Point(p[i].getX(), p[i].getY(), 0);
+                    this.pointsOfTop[i] = new Point(p[i].getX(), p[i].getY(), this.H);
                 }
 
                 this.facesOfArch = new Polygon[dotCnt + 1];

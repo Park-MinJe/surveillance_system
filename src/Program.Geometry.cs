@@ -63,6 +63,11 @@ namespace surveillance_system
             public double getX() { return this.x; }
             public double getY() { return this.y; }
             public double getZ() { return this.z; }
+
+            public void printString()
+            {
+                Console.WriteLine("x: {0}\ty: {1}\tz: {2}", this.x, this.y, this.z);
+            }
         }
 
         public class Segment
