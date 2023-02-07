@@ -29,7 +29,7 @@ namespace surveillance_system
             private bool getPedNumFromUser = false;
             private bool getCarNumFromUser = false;
 
-            private int N_Arch = 10;
+            private int N_Arch;         // 실제 데이터에서 받아와 initArch method에서 초기화
             private int N_CCTV = 100;
             private int N_Ped = 5;
             private int N_Car = 5;
@@ -532,11 +532,11 @@ namespace surveillance_system
                 }
 
                 /* ---------------------------전역 변수 할당---------------------------*/
-                archs = new Architecture[N_Arch];
+                /*archs = new Architecture[N_Arch];
                 for (int i = 0; i < N_Arch; i++)
                 {
                     archs[i] = new Architecture();
-                }
+                }*/
                 cctvs = new CCTV[N_CCTV];
                 for (int i = 0; i < N_CCTV; i++)
                 {
@@ -553,7 +553,7 @@ namespace surveillance_system
                     cars[i] = new Car();
                 }
 
-                aw.setArchCSVWriter(N_Arch);
+                //aw.setArchCSVWriter(N_Arch);
 
                 tw.setTargetCSVWriter(N_Ped, N_Car);
 
@@ -629,40 +629,42 @@ namespace surveillance_system
             {
                 try
                 {
-                    foreach (Architecture arch in archs)
+                    gbs.readFeatureMembers();
+                    gbs.readPosLists();
+                    gbs.readArchHs();
+
+                    List<Point[]> pls = new List<Point[]>();
+                    List<double> hs = new List<double>();
+
+                    for (int i = 0; i < gbs.getFeatureMembersCnt(); i++)
                     {
-                        gbs.readFeatureMembers();
-                        gbs.readPosLists();
-                        gbs.readArchHs();
-
-                        List<Point[]> pls = new List<Point[]>();
-                        List<double> hs = new List<double>();
-
-                        for (int i = 0; i < gbs.getFeatureMembersCnt(); i++)
+                        double h = gbs.getArchH(i);
+                        if (h > 0)
                         {
-                            double h = gbs.getArchH(i);
-                            if (h > 0)
-                            {
-                                hs.Add(h);
+                            hs.Add(h);
 
-                                Point[] pl = gbs.getPosList(i);
-                                Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
+                            Point[] pl = gbs.getPosList(i);
+                            Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
 
-                                // 프로그램상의 좌표계로 변환
-                                // 지도 범위의 왼쪽 위를 기준으로 한다.
-                                Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner.getX(), road.upperCorner.getY());
+                            // 프로그램상의 좌표계로 변환
+                            // 지도 범위의 왼쪽 위를 기준으로 한다.
+                            Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner.getX(), road.upperCorner.getY());
 
-                                pls.Add(plOnSystem);
-                            }
-                        }
-
-                        archs = new Architecture[pls.Count];
-                        for (int i = 0; i < pls.Count; i++)
-                        {
-                            archs[i] = new Architecture();
-                            archs[i].define_Architecture(pls[i], hs[i]);
+                            pls.Add(plOnSystem);
                         }
                     }
+
+                    this.N_Arch = pls.Count;
+                    archs = new Architecture[this.N_Arch];
+                    aw.setArchCSVWriter(this.N_Arch);
+                    for (int i = 0; i < this.N_Arch; i++)
+                    {
+                        archs[i] = new Architecture();
+                        archs[i].define_Architecture(pls[i], hs[i]);
+                        //Debug
+                        //archs[i].printArchInfo();
+                    }
+                    road.setArch(this.N_Arch);
                 }
                 catch (Exception ex)
                 {
@@ -990,6 +992,10 @@ namespace surveillance_system
                     // 건물과 cctv 간 거리
                 double[,] arch_dist = new double[N_CCTV, N_Arch];
 
+                    // cctv 탐지 거리 안의 건물
+                int[,] candidate_detected_arch_h = new int[N_CCTV, N_Arch];
+                int[,] candidate_detected_arch_v = new int[N_CCTV, N_Arch];
+
                     // cctv에 잡힌 건물의 cos 좌표
                 double[,] cosine_Arch_h1 = new double[N_CCTV, N_Arch];
                 double[,] cosine_Arch_h2 = new double[N_CCTV, N_Arch];
@@ -1022,8 +1028,8 @@ namespace surveillance_system
 
                             if (arch_dist[i, j] < cctvs[i].Max_Dist)
                             {
-                                arch_in_range_h[i, j] = 1;
-                                arch_in_range_v[i, j] = 1;
+                                candidate_detected_arch_h[i, j] = 1;
+                                candidate_detected_arch_v[i, j] = 1;
                             }
                         }
 
@@ -1060,40 +1066,37 @@ namespace surveillance_system
                         double cosine_V_AOV = Math.Cos(cctvs[i].V_AOV / 2);
 
                         // 거리상 미탐지면 넘어감 
-                        if (arch_in_range_h[i, j] != 1 || arch_in_range_v[i, j] != 1)
+                        if (candidate_detected_arch_h[i, j] != 1 || candidate_detected_arch_v[i, j] != 1)
                         {
                             continue;
                         }
 
                         // 거리가 범위 내이면
-                        if (arch_in_range_h[i, j] == 1)
+                        if (candidate_detected_arch_h[i, j] == 1)
                         {
                             // len equals Dist
                             int len = cctvs[i].H_FOV.X0.GetLength(0);
                             double[] A = { cctvs[i].H_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].H_FOV.Y0[len - 1] - cctvs[i].Y };
                             double[] B = new double[2];
 
-                            // 일단 아랫면, 윗면에 의한 사각지대 제외
-                            for (int k = 0, faceIdx = 2; k < archs[j].H_Segment.Length; k++, faceIdx++)
+                            // 밑면의 점 중 H1과 H2를 구한다.
+                            // x 단위 벡터와의 각도를 기준으로 가장 작은 점이 H1, 가장 큰 점이 H2가 된다.
+                            // 각도는 라디안
+                            cosine_Arch_h1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
+                            cosine_Arch_h2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
+
+                            foreach(Point pointOfBottom in archs[j].pointsOfBottom)
                             {
-                                Point p1 = archs[j].H_Segment[k].getP1();
-                                B[0] = p1.getX() - cctvs[i].X;
-                                B[1] = p1.getY() - cctvs[i].Y;
+                                B[0] = pointOfBottom.getX() - cctvs[i].X;
+                                B[1] = pointOfBottom.getY() - cctvs[i].Y;
 
-                                
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_h1[i, j] = (cosine_Arch_h1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_h1[i, j];
+                                cosine_Arch_h2[i, j] = (cosine_Arch_h2[i, j] > tmp_cosine) ? cosine_Arch_h2[i, j] : tmp_cosine;
                             }
-                            B[0] = archs[j].Pos_H1[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_H1[1] - cctvs[i].Y;
-
-                            cosine_Arch_h1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
-                            
-                            B[0] = archs[j].Pos_H2[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_H2[1] - cctvs[i].Y;
-
-                            cosine_Arch_h2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
                             // horizontal 각도 검사 
-                            if (cosine_Arch_h1[i, j] >= cosine_H_AOV && cosine_Arch_h2[i, j] >= cosine_H_AOV)
+                            if (cosine_Arch_h1[i, j] >= cosine_H_AOV || cosine_Arch_h2[i, j] >= cosine_H_AOV)
                             {
                                 //감지 됨
                                 arch_in_range_h[i, j] = 1;
@@ -1105,23 +1108,39 @@ namespace surveillance_system
                         }
 
                         // vertical  각도 검사 
-                        if (arch_in_range_v[i, j] == 1)
+                        if (candidate_detected_arch_v[i, j] == 1)
                         {
                             int len = cctvs[i].V_FOV.X0.GetLength(0);
                             double[] A = { cctvs[i].V_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].V_FOV.Z0[len - 1] - cctvs[i].Z };
                             double[] B = new double[2];
-                             
-                            B[0] = archs[j].Pos_V1[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_V1[1] - cctvs[i].Z;
 
-                            cosine_Arch_v1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                            // 수평 각도 검사와 동일
+                            cosine_Arch_v1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
+                            cosine_Arch_v2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
 
-                            B[0] = archs[j].Pos_V2[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_V2[1] - cctvs[i].Z;
+                            // 230207 카메라와 건물의 상대적 위치에 따라 연산 후보군에 해당하는 점이 바뀌므로 추가적 업데이트 필요
+                            // 밑면의 점들
+                            foreach (Point pointOfBottom in archs[j].pointsOfBottom)
+                            {
+                                B[0] = pointOfBottom.getX() - cctvs[i].X;
+                                B[1] = pointOfBottom.getZ() - cctvs[i].Z;
 
-                            cosine_Arch_v2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_v1[i, j] = (cosine_Arch_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_v1[i, j];
+                                cosine_Arch_v2[i, j] = (cosine_Arch_v2[i, j] > tmp_cosine) ? cosine_Arch_v2[i, j] : tmp_cosine;
+                            }
+                            // 윗면의 점들
+                            foreach (Point pointOfTop in archs[j].pointsOfTop)
+                            {
+                                B[0] = pointOfTop.getX() - cctvs[i].X;
+                                B[1] = pointOfTop.getZ() - cctvs[i].Z;
 
-                            if (cosine_Arch_v1[i, j] >= cosine_V_AOV && cosine_Arch_v2[i, j] >= cosine_V_AOV)
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_v1[i, j] = (cosine_Arch_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_v1[i, j];
+                                cosine_Arch_v2[i, j] = (cosine_Arch_v2[i, j] > tmp_cosine) ? cosine_Arch_v2[i, j] : tmp_cosine;
+                            }
+
+                            if (cosine_Arch_v1[i, j] >= cosine_V_AOV || cosine_Arch_v2[i, j] >= cosine_V_AOV)
                             {
                                 //감지 됨
                                 arch_in_range_v[i, j] = 1;
@@ -1229,8 +1248,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_H1[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_H1[1] - cctvs[i].Y;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_H1[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_H1[1] - cctvs[i].Y;
                             }
                             double cosine_TARGET_h1 = InnerProduct(A, B) / (Norm(A) * Norm(B));
                             if (j < N_Ped)
@@ -1240,8 +1260,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_H2[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_H2[1] - cctvs[i].Y;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_H2[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_H2[1] - cctvs[i].Y;
                             }
                             double cosine_TARGET_h2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1253,7 +1274,7 @@ namespace surveillance_system
                                 {
                                     if (cosine_TARGET_h1 >= cosine_Arch_h1[i, k] && cosine_TARGET_h2 >= cosine_Arch_h2[i, k])
                                     {
-                                        if (target_dist_h1[i, j] >= arch_dist_h1[i, k] && target_dist_h2[i,j] >= arch_dist_h2[i, k])
+                                        if (target_dist[i, j] >= arch_dist[i, k])
                                         {
                                             h_detected = -2;
                                             if (j < N_Ped)
@@ -1303,8 +1324,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_V1[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_V1[1] - cctvs[i].Z;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_V1[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_V1[1] - cctvs[i].Z;
                             }
                             double cosine_TARGET_v1 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1315,8 +1337,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_V2[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_V2[1] - cctvs[i].Z;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_V2[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_V2[1] - cctvs[i].Z;
                             }
                             double cosine_TARGET_v2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1327,7 +1350,7 @@ namespace surveillance_system
                                 {
                                     if (cosine_TARGET_v1 >= cosine_Arch_v1[i, k] && cosine_TARGET_v2 >= cosine_Arch_v2[i, k])
                                     {
-                                        if (target_dist_v1[i, j] >= arch_dist_v1[i, k] && target_dist_v2[i, j] >= arch_dist_v2[i, k])
+                                        if (target_dist[i, j] >= arch_dist[i, k])
                                         {
                                             v_detected = -2;
                                             if (j < N_Ped)

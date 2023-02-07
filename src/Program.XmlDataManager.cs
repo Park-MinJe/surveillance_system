@@ -150,7 +150,7 @@ namespace surveillance_system
                 if (this.IsSetSrsNameCalled) this.url += this.srsName;
 
                 // debug;
-                Console.WriteLine(url);
+                //Console.WriteLine(url);
             }
 
             /* --------------------------------------
@@ -169,7 +169,8 @@ namespace surveillance_system
                     results = reader.ReadToEnd();
                 }
 
-                Console.WriteLine(results);
+                //Debug
+                //Console.WriteLine(results);
 
                 this.xml = new XmlDocument();
                 xml.LoadXml(results);
@@ -214,8 +215,8 @@ namespace surveillance_system
                 Point rt = new Point(Convert.ToDouble(lowerCornerCoordinate[0]), Convert.ToDouble(lowerCornerCoordinate[1]), 0d);
 
                 //Debug
-                Console.WriteLine("Raw Lower Corner");
-                rt.printString();
+                //Console.WriteLine("Raw Lower Corner");
+                //rt.printString();
 
                 return rt;
             }
@@ -228,8 +229,8 @@ namespace surveillance_system
                 Point rt = new Point(Convert.ToDouble(upperCornerCoordinate[0]), Convert.ToDouble(upperCornerCoordinate[1]), 0d);
 
                 //Debug
-                Console.WriteLine("Raw Lower Corner");
-                rt.printString();
+                //Console.WriteLine("Raw Lower Corner");
+                //rt.printString();
 
                 return rt;
             }

@@ -65,15 +65,15 @@ namespace surveillance_system
                 lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
                 upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
 
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY()) * 1000;
-                Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY()) * 1000;
-                Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
+                //Console.WriteLine("x map size: {0}", this.X_mapSize);
+                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
+                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
                 this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
-                Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
                 this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
-                Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
                 this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
                 this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
@@ -214,15 +214,6 @@ namespace surveillance_system
 
                 for (int i = 0; i < n_arch; i++)
                 {
-                    Random rand = new Random();
-                    // int intersectidx = rand.Next(9);
-                    int intersectidx = rand.Next(lane_num * lane_num);
-
-                    // Console.WriteLine(intersectidx);
-                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
-                    archs[i].X = Math.Round(newPos[0, 0]);
-                    archs[i].Y = Math.Round(newPos[0, 1]);
-
                     archPos[Convert.ToInt32((archs[i].Y) / 10000), Convert.ToInt32((archs[i].X / 10000))] += 1;
                 }
             }
@@ -232,12 +223,15 @@ namespace surveillance_system
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
-                double range = X_mapSize - width;
+                double x_range = X_mapSize - width;
+                double y_range = Y_mapSize - width;
                 int rootN = (int)Math.Sqrt((double)n_cctv);
 
                 // x좌표가 int 형식이라 캐스팅해서 완벽한 그리드는 아닐 수 있음
-                int intvl = (int)range / (rootN-1); 
-                Console.WriteLine("x_mapsize range rootN intvl {0} {1} {2} {3} ", X_mapSize, range, rootN, intvl);
+                int x_intvl = (int)x_range / (rootN-1);
+                int y_intvl = (int)y_range / (rootN - 1);
+                Console.WriteLine("x_mapsize y_mapsize x_range y_range rootN x_intvl y_intvl {0} {1} {2} {3} ", 
+                                    this.X_mapSize, this.Y_mapSize, x_range, y_range, rootN, x_intvl, y_intvl);
                 double startX = DST[0, 0];
                 double startY = DST[0, 1];
 
@@ -253,7 +247,7 @@ namespace surveillance_system
                         // Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i * rootN + j, cctvs[cctvIdx].X , cctvs[cctvIdx].Y);
                         // Console.WriteLine("pos arr {0} {1} ", cctvs[i].Y / 10000, cctvs[i].X / 10000);   // 사용 안함
                         // Console.WriteLine();
-                        startX += intvl;
+                        startX += x_intvl;
 
                         //debug
 			            cctvPos[(cctvs[cctvIdx].Y)/10000, (cctvs[cctvIdx].X)/10000] += 1;
@@ -262,7 +256,7 @@ namespace surveillance_system
 
                     }
 
-                    startY += intvl;
+                    startY += y_intvl;
                 			// 여기는 cctv 값 넣는 for문 안쪽
                 }
                 // for문 끝나고

@@ -28,22 +28,35 @@ namespace surveillance_system
         {
             // 도로 정보
 
-
+            // 230207 pmj
+            // Open Api를 이용해 건물 정보 받아오기 test
+            // MSTest v2 test project로 분기 예정
+            Console.Write("사용 함수: ");
             string methodName = Console.ReadLine();
+            Console.Write("서비스 키: ");
             string serviceKey = Console.ReadLine();
+            Console.Write("Type Name: ");
             string typeName = Console.ReadLine();
+            Console.Write("bbox: ");
             string bbox = Console.ReadLine();
+            Console.Write("Pnu: ");
             string pnu = Console.ReadLine();
+            Console.Write("검색 범위: ");
             string maxFeature = Console.ReadLine();
+            Console.Write("Result Type: ");
             string resultType = Console.ReadLine();
+            Console.Write("Srs Name: ");
             string srsName = Console.ReadLine();
 
-            gbs.testGisBuildingService(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
+            /*gbs.testGisBuildingService(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
             foreach(Architecture arch in archs)
             {
                 Console.WriteLine();
                 arch.printArchInfo();
-            }
+            }*/
+
+            gbs.setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
+            gbs.loadArchDataFromApiAsXml();
 
             int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
@@ -65,7 +78,7 @@ namespace surveillance_system
 
             while (true)
             {
-                Console.Write("input Number of CCTV set( 1~ ): ");
+                Console.Write("\ninput Number of CCTV set( 1~ ): ");
                 numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
 
                 if (numberOfCCTVSet < 1) { continue; }
@@ -201,7 +214,6 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
-                // Debug Architecture Position
                 sims[i].initialArchsToCSV(i);
                 sims[i].initialPedsToCSV(i);
                 sims[i].initialCarsToCSV(i);

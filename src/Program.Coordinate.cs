@@ -191,7 +191,7 @@ namespace surveillance_system
             double distance = 
                 60 * 1.1515 * (180 / Math.PI) * Math.Acos(
                     Math.Sin(minlat * (Math.PI / 180)) * Math.Sin(maxlat * (Math.PI / 180)) +
-                    Math.Cos(minlat * (Math.PI / 180)) * Math.Cos(maxlat * (Math.PI / 180)) * Math.Cos(theta * (Math.PI / 180))) * 1.609344 * 1000;
+                    Math.Cos(minlat * (Math.PI / 180)) * Math.Cos(maxlat * (Math.PI / 180)) * Math.Cos(theta * (Math.PI / 180))) * 1.609344 * 1000 * 1000;
             return Math.Round(distance, 10);
         }
     }

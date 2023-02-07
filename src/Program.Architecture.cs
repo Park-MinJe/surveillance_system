@@ -18,14 +18,14 @@ namespace surveillance_system
             public double[] Pos_H1 = new double[2];
             public double[] Pos_H2 = new double[2];
             public double[] Pos_V1 = new double[2];
-            public double[] Pos_V2 = new double[2];*/
+            public double[] Pos_V2 = new double[2];
+
+            public double Direction = 0;*/
             /*************************************/
 
             public double X;
             public double Y;
             public double Z;
-
-            public double Direction = 0;
 
             public double H;
 
@@ -139,7 +139,7 @@ namespace surveillance_system
                 rt = Math.Round(Math.Acos(InnerProduct(verticalVector, XunitVector) / (Norm(verticalVector) * Norm(XunitVector))), 8);
                 if (verticalVector.getComponetY() < 0)
                 {
-                    rt = Math.Round(2 * Math.PI - Direction, 8);
+                    rt = Math.Round(2 * Math.PI - rt, 8);
                 }
 
                 return rt;

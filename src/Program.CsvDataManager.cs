@@ -56,10 +56,11 @@ namespace surveillance_system
                 string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
-                    file.WriteLine("#idx,X,Y,Z,Direction,H");
+                    //Console.WriteLine("{0}", archs.Length);
+                    file.WriteLine("#idx,X,Y,Z,H");
                     for (int j = 0; j < N_Arch; j++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5}", j, archs[j].X, archs[j].Y, archs[j].Z, archs[j].Direction, archs[j].H);
+                        file.WriteLine("{0},{1},{2},{3},{4}", j, archs[j].X, archs[j].Y, archs[j].Z, archs[j].H);
                     }
                 }
             }
@@ -313,7 +314,7 @@ namespace surveillance_system
                                 cars[idx].Pos_H2[0] = Convert.ToDouble(values[3]);
                                 cars[idx].Pos_H2[1] = Convert.ToDouble(values[4]);
 
-                                cars[idx].Pos_V1[0] = Convert.ToInt32(values[5]);
+                                cars[idx].Pos_V1[0] = Convert.ToDouble(values[5]);
                                 cars[idx].Pos_V1[1] = Convert.ToDouble(values[6]);
 
                                 cars[idx].Pos_V2[0] = Convert.ToDouble(values[7]);
