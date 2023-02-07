@@ -54,8 +54,8 @@ namespace surveillance_system
 
                 this.W = Width;
                 this.H = Height;
-                this.D1 = 90;
-                this.D2 = 180 + 90 * rand.NextDouble();
+                this.D1 = 90 * Math.PI / 180;   // modified by 0BoO, deg -> rad
+                this.D2 = (180 + 90 * rand.NextDouble()) * Math.PI / 180; // modified by 0BoO, deg -> rad
                 this.W2 = this.W / 2;
 
                 this.Pos_H1[0] =
@@ -122,7 +122,7 @@ namespace surveillance_system
 
             public Boolean outOfRange()
             {
-                if (X < 0 || X > road.mapSize || Y < 0 || Y > road.mapSize)
+                if (X < 0 || X > road.X_mapSize || Y < 0 || Y > road.Y_mapSize)
                 {
                     return true;
                 }

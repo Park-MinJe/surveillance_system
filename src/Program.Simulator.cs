@@ -6,6 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
+using System.Runtime.Intrinsics.X86;
 
 namespace surveillance_system
 {
@@ -20,19 +21,6 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
-        // Data Handler
-        public static ArchCSVWriter aw = new ArchCSVWriter();
-        public static ArchCSVReader ar = new ArchCSVReader();
-
-        public static TargetCSVWriter tw = new TargetCSVWriter();
-        public static TargetCSVReader tr = new TargetCSVReader();
-
-        public static CctvCSVWriter cw = new CctvCSVWriter();
-        public static CctvCSVReader cr = new CctvCSVReader();
-
-        public static TargetLogCSVWriter tlog = new TargetLogCSVWriter();
-        public static CctvLogCSVWriter clog = new CctvLogCSVWriter();
-
         public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
@@ -41,7 +29,7 @@ namespace surveillance_system
             private bool getPedNumFromUser = false;
             private bool getCarNumFromUser = false;
 
-            private int N_Arch = 10;
+            private int N_Arch;         // 실제 데이터에서 받아와 initArch method에서 초기화
             private int N_CCTV = 100;
             private int N_Ped = 5;
             private int N_Car = 5;
@@ -68,8 +56,8 @@ namespace surveillance_system
             private const double imW = 1920; // (pixels) image width
             private const double imH = 1080; // (pixels) image height
 
-            private const double cctv_rotate_degree = 90; // 30초에 한바퀴
-                                                    // Installation [line_23]
+            private const double cctv_rotate_degree = -1; //90; --> 30초에 한바퀴?, -1: angle이 회전하는 옵션 disable (note 23-01-16)
+                                                  // Installation [line_23]
             private const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
             private const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
@@ -77,8 +65,8 @@ namespace surveillance_system
             private double rotateTerm = 30.0; // sec
 
             // calculate vertical/horizontal AOV
-            private double H_AOV = RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
-            private double V_AOV = RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
+            double H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
+            double V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
 
             private double[] Dist = new double[25000];
             private int dist_len = 100000;
@@ -544,11 +532,11 @@ namespace surveillance_system
                 }
 
                 /* ---------------------------전역 변수 할당---------------------------*/
-                archs = new Architecture[N_Arch];
+                /*archs = new Architecture[N_Arch];
                 for (int i = 0; i < N_Arch; i++)
                 {
                     archs[i] = new Architecture();
-                }
+                }*/
                 cctvs = new CCTV[N_CCTV];
                 for (int i = 0; i < N_CCTV; i++)
                 {
@@ -565,7 +553,7 @@ namespace surveillance_system
                     cars[i] = new Car();
                 }
 
-                aw.setArchCSVWriter(N_Arch);
+                //aw.setArchCSVWriter(N_Arch);
 
                 tw.setTargetCSVWriter(N_Ped, N_Car);
 
@@ -585,8 +573,8 @@ namespace surveillance_system
                     if (On_Road_Builder)
                     {
                         // 도로 정보 생성, 보행자 정보 생성
-                        road.roadBuilder(cctvMode, Road_Width, Road_Interval, Road_N_Interval, N_CCTV, N_Ped, N_Car);
-                        road.setArch(N_Arch);
+                        road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval);
+                        //road.setArch(N_Arch);
                         road.setPed(N_Ped);
                         road.setCar(N_Car);
 
@@ -641,10 +629,42 @@ namespace surveillance_system
             {
                 try
                 {
-                    foreach (Architecture arch in archs)
+                    gbs.readFeatureMembers();
+                    gbs.readPosLists();
+                    gbs.readArchHs();
+
+                    List<Point[]> pls = new List<Point[]>();
+                    List<double> hs = new List<double>();
+
+                    for (int i = 0; i < gbs.getFeatureMembersCnt(); i++)
                     {
-                        arch.define_Architecture(Arch_Width, Arch_Height);
+                        double h = gbs.getArchH(i);
+                        if (h > 0)
+                        {
+                            hs.Add(h);
+
+                            Point[] pl = gbs.getPosList(i);
+                            Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
+
+                            // 프로그램상의 좌표계로 변환
+                            // 지도 범위의 왼쪽 위를 기준으로 한다.
+                            Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner.getX(), road.upperCorner.getY());
+
+                            pls.Add(plOnSystem);
+                        }
                     }
+
+                    this.N_Arch = pls.Count;
+                    archs = new Architecture[this.N_Arch];
+                    aw.setArchCSVWriter(this.N_Arch);
+                    for (int i = 0; i < this.N_Arch; i++)
+                    {
+                        archs[i] = new Architecture();
+                        archs[i].define_Architecture(pls[i], hs[i]);
+                        //Debug
+                        //archs[i].printArchInfo();
+                    }
+                    road.setArch(this.N_Arch);
                 }
                 catch (Exception ex)
                 {
@@ -768,10 +788,10 @@ namespace surveillance_system
                         // cctvs[i].ViewAngleH = rand.NextDouble() * 360;
                         // cctvs[i].ViewAngleV = -35 - 20 * rand.NextDouble();
 
-                        cctvs[i].setViewAngleH(rand.NextDouble() * 360);
+                        cctvs[i].setViewAngleH(rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
                         // cctvs[i].setViewAngleH(rand.Next(4) * 90);
                         // cctvs[i].setViewAngleV(-35 - 20 * rand.NextDouble());
-                        cctvs[i].setViewAngleV(-45.0);
+                        cctvs[i].setViewAngleV(-45.0 * Math.PI / 180);   // (23-02-02) modified by 0BoO, deg -> rad
 
 
                         cctvs[i].setFixMode(fixMode); // default (rotate)
@@ -782,9 +802,6 @@ namespace surveillance_system
                         // 기기 성능상의 최대 감시거리 (임시값)
                         cctvs[i].Max_Dist = 50 * 100 * 10; // 50m (milimeter)
                                                            // cctvs[i].Max_Dist = 500 * 100 * 100; // 500m (milimeter)
-
-                        // record detected Target Info
-                        //cctvs[i].detectedTargets = new List<CCTV.detectedTarget>();
 
                         // Line 118~146
                         /*  여기부턴 Road_Builder 관련 정보가 없으면 의미가 없을거같아서 주석처리했어용..
@@ -802,6 +819,9 @@ namespace surveillance_system
                         cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
                         cctvs[i].get_V_FOV(Dist, cctvs[i].HE, cctvs[i].Focal_Length, cctvs[i].ViewAngleV, cctvs[i].X, cctvs[i].Z);
                         // cctvs[i].printCCTVInfo();
+
+                        cctvs[i].calcBlindToPed();          // (23-02-01) added by 0BoO
+                        cctvs[i].calcEffDistToPed(3000);     // (23-02-01) added by 0BoO, input value is 3000mm(3meter)
                     }
                 }
                 catch(Exception ex)
@@ -890,8 +910,8 @@ namespace surveillance_system
 
                 stCnt = 0;
 
-                road_min = 0;
-                road_max = road.mapSize;
+                //road_min = 0;
+                //road_max = road.mapSize;
 
                 Now = 0;
 
@@ -970,10 +990,7 @@ namespace surveillance_system
 
                 // 건물 대상 거리 검사 결과
                     // 건물과 cctv 간 거리
-                double[,] arch_dist_h1 = new double[N_CCTV, N_Arch];
-                double[,] arch_dist_h2 = new double[N_CCTV, N_Arch];
-                double[,] arch_dist_v1 = new double[N_CCTV, N_Arch];
-                double[,] arch_dist_v2 = new double[N_CCTV, N_Arch];
+                double[,] arch_dist = new double[N_CCTV, N_Arch];
 
                     // cctv 탐지 거리 안의 건물
                 int[,] candidate_detected_arch_h = new int[N_CCTV, N_Arch];
@@ -991,10 +1008,7 @@ namespace surveillance_system
 
                 // 감시 대상 거리 검사 결과
                     // 감시 대상과 cctv 간 거리
-                double[,] target_dist_h1 = new double[N_CCTV, N_Target];
-                double[,] target_dist_h2 = new double[N_CCTV, N_Target];
-                double[,] target_dist_v1 = new double[N_CCTV, N_Target];
-                double[,] target_dist_v2 = new double[N_CCTV, N_Target];
+                double[,] target_dist = new double[N_CCTV, N_Target];
                 
                     // cctv 탐지 거리 안의 감시 대상
                 int[,] candidate_detected_target_h = new int[N_CCTV, N_Target];
@@ -1008,7 +1022,18 @@ namespace surveillance_system
                         arch_in_range_h[i, j] = -1;
                         arch_in_range_v[i, j] = -1;
 
-                        arch_dist_h1[i, j] = Math
+                        foreach(Polygon poly in archs[j].facesOfArch)
+                        {
+                            arch_dist[i, j] = cctvs[i].calcDistToArchFace(poly);
+
+                            if (arch_dist[i, j] < cctvs[i].Max_Dist)
+                            {
+                                candidate_detected_arch_h[i, j] = 1;
+                                candidate_detected_arch_v[i, j] = 1;
+                            }
+                        }
+
+                        /*arch_dist_h1[i, j] = Math
                                 .Sqrt(Math.Pow(cctvs[i].X - archs[j].Pos_H1[0], 2) +
                                 Math.Pow(cctvs[i].Y - archs[j].Pos_H1[1], 2));
                         arch_dist_h2[i, j] = Math
@@ -1034,7 +1059,7 @@ namespace surveillance_system
                             {
                                 candidate_detected_arch_v[i, j] = 1;
                             }
-                        }
+                        }*/
 
                         // 건물이 차지하는 각도 검사
                         double cosine_H_AOV = Math.Cos(cctvs[i].H_AOV / 2);
@@ -1053,19 +1078,25 @@ namespace surveillance_system
                             int len = cctvs[i].H_FOV.X0.GetLength(0);
                             double[] A = { cctvs[i].H_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].H_FOV.Y0[len - 1] - cctvs[i].Y };
                             double[] B = new double[2];
-                            
-                            B[0] = archs[j].Pos_H1[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_H1[1] - cctvs[i].Y;
 
-                            cosine_Arch_h1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
-                            
-                            B[0] = archs[j].Pos_H2[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_H2[1] - cctvs[i].Y;
+                            // 밑면의 점 중 H1과 H2를 구한다.
+                            // x 단위 벡터와의 각도를 기준으로 가장 작은 점이 H1, 가장 큰 점이 H2가 된다.
+                            // 각도는 라디안
+                            cosine_Arch_h1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
+                            cosine_Arch_h2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
 
-                            cosine_Arch_h2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                            foreach(Point pointOfBottom in archs[j].pointsOfBottom)
+                            {
+                                B[0] = pointOfBottom.getX() - cctvs[i].X;
+                                B[1] = pointOfBottom.getY() - cctvs[i].Y;
+
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_h1[i, j] = (cosine_Arch_h1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_h1[i, j];
+                                cosine_Arch_h2[i, j] = (cosine_Arch_h2[i, j] > tmp_cosine) ? cosine_Arch_h2[i, j] : tmp_cosine;
+                            }
 
                             // horizontal 각도 검사 
-                            if (cosine_Arch_h1[i, j] >= cosine_H_AOV && cosine_Arch_h2[i, j] >= cosine_H_AOV)
+                            if (cosine_Arch_h1[i, j] >= cosine_H_AOV || cosine_Arch_h2[i, j] >= cosine_H_AOV)
                             {
                                 //감지 됨
                                 arch_in_range_h[i, j] = 1;
@@ -1082,18 +1113,34 @@ namespace surveillance_system
                             int len = cctvs[i].V_FOV.X0.GetLength(0);
                             double[] A = { cctvs[i].V_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].V_FOV.Z0[len - 1] - cctvs[i].Z };
                             double[] B = new double[2];
-                             
-                            B[0] = archs[j].Pos_V1[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_V1[1] - cctvs[i].Z;
 
-                            cosine_Arch_v1[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                            // 수평 각도 검사와 동일
+                            cosine_Arch_v1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
+                            cosine_Arch_v2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
 
-                            B[0] = archs[j].Pos_V2[0] - cctvs[i].X;
-                            B[1] = archs[j].Pos_V2[1] - cctvs[i].Z;
+                            // 230207 카메라와 건물의 상대적 위치에 따라 연산 후보군에 해당하는 점이 바뀌므로 추가적 업데이트 필요
+                            // 밑면의 점들
+                            foreach (Point pointOfBottom in archs[j].pointsOfBottom)
+                            {
+                                B[0] = pointOfBottom.getX() - cctvs[i].X;
+                                B[1] = pointOfBottom.getZ() - cctvs[i].Z;
 
-                            cosine_Arch_v2[i, j] = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_v1[i, j] = (cosine_Arch_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_v1[i, j];
+                                cosine_Arch_v2[i, j] = (cosine_Arch_v2[i, j] > tmp_cosine) ? cosine_Arch_v2[i, j] : tmp_cosine;
+                            }
+                            // 윗면의 점들
+                            foreach (Point pointOfTop in archs[j].pointsOfTop)
+                            {
+                                B[0] = pointOfTop.getX() - cctvs[i].X;
+                                B[1] = pointOfTop.getZ() - cctvs[i].Z;
 
-                            if (cosine_Arch_v1[i, j] >= cosine_V_AOV && cosine_Arch_v2[i, j] >= cosine_V_AOV)
+                                double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                cosine_Arch_v1[i, j] = (cosine_Arch_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Arch_v1[i, j];
+                                cosine_Arch_v2[i, j] = (cosine_Arch_v2[i, j] > tmp_cosine) ? cosine_Arch_v2[i, j] : tmp_cosine;
+                            }
+
+                            if (cosine_Arch_v1[i, j] >= cosine_V_AOV || cosine_Arch_v2[i, j] >= cosine_V_AOV)
                             {
                                 //감지 됨
                                 arch_in_range_v[i, j] = 1;
@@ -1110,22 +1157,12 @@ namespace surveillance_system
                     {
                         if (j < N_Ped)
                         {
-                            target_dist_h1[i, j] = Math
-                                    .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_H1[0], 2) +
-                                    Math.Pow(cctvs[i].Y - peds[j].Pos_H1[1], 2));
-                            target_dist_h2[i, j] = Math
-                                    .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_H2[0], 2) +
-                                    Math.Pow(cctvs[i].Y - peds[j].Pos_H2[1], 2));
-                            target_dist_v1[i, j] = Math
-                                    .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_V1[0], 2) +
-                                    Math.Pow(cctvs[i].Z - peds[j].Pos_V1[1], 2));
-                            target_dist_v2[i, j] = Math
-                                    .Sqrt(Math.Pow(cctvs[i].X - peds[j].Pos_V2[0], 2) +
-                                    Math.Pow(cctvs[i].Z - peds[j].Pos_V2[1], 2));
+                            target_dist[i, j] = cctvs[i].calcDistToTarget(peds[j]);
                         }
                         else
                         {
-                            target_dist_h1[i, j] = Math
+                            target_dist[i, j] = cctvs[i].calcDistToTarget(cars[j - N_Ped]);
+                            /*target_dist_h1[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_H1[0], 2) +
                                     Math.Pow(cctvs[i].Y - cars[j - N_Ped].Pos_H1[1], 2));
                             target_dist_h2[i, j] = Math
@@ -1136,10 +1173,17 @@ namespace surveillance_system
                                     Math.Pow(cctvs[i].Z - cars[j - N_Ped].Pos_V1[1], 2));
                             target_dist_v2[i, j] = Math
                                     .Sqrt(Math.Pow(cctvs[i].X - cars[j - N_Ped].Pos_V2[0], 2) +
-                                    Math.Pow(cctvs[i].Z - cars[j - N_Ped].Pos_V2[1], 2));
+                                    Math.Pow(cctvs[i].Z - cars[j - N_Ped].Pos_V2[1], 2));*/
                         }
 
-                        foreach (double survdist_h in cctvs[i].SurvDist_H)
+                        if (target_dist[i, j] >= cctvs[i].Eff_Dist_From &&
+                            target_dist[i, j] <= cctvs[i].Eff_Dist_To)
+                        {
+                            candidate_detected_target_h[i, j] = 1;
+                            candidate_detected_target_v[i, j] = 1;
+                        }
+
+                        /*foreach (double survdist_h in cctvs[i].SurvDist_H)
                         {
                             if (target_dist_h1[i, j] <= survdist_h * 100 * 10 && target_dist_h2[i, j] <= survdist_h * 100 * 10)
                             {
@@ -1152,7 +1196,7 @@ namespace surveillance_system
                             {
                                 candidate_detected_target_v[i, j] = 1;
                             }
-                        }
+                        }*/
 
                         // if (cctvs[i].isPedInEffDist(peds[j])) {
                         //   candidate_detected_ped_h[i, j] = 1;
@@ -1204,8 +1248,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_H1[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_H1[1] - cctvs[i].Y;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_H1[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_H1[1] - cctvs[i].Y;
                             }
                             double cosine_TARGET_h1 = InnerProduct(A, B) / (Norm(A) * Norm(B));
                             if (j < N_Ped)
@@ -1215,8 +1260,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_H2[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_H2[1] - cctvs[i].Y;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_H2[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_H2[1] - cctvs[i].Y;
                             }
                             double cosine_TARGET_h2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1228,7 +1274,7 @@ namespace surveillance_system
                                 {
                                     if (cosine_TARGET_h1 >= cosine_Arch_h1[i, k] && cosine_TARGET_h2 >= cosine_Arch_h2[i, k])
                                     {
-                                        if (target_dist_h1[i, j] >= arch_dist_h1[i, k] && target_dist_h2[i,j] >= arch_dist_h2[i, k])
+                                        if (target_dist[i, j] >= arch_dist[i, k])
                                         {
                                             h_detected = -2;
                                             if (j < N_Ped)
@@ -1278,8 +1324,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_V1[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_V1[1] - cctvs[i].Z;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_V1[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_V1[1] - cctvs[i].Z;
                             }
                             double cosine_TARGET_v1 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1290,8 +1337,9 @@ namespace surveillance_system
                             }
                             else
                             {
-                                B[0] = cars[j - N_Ped].Pos_V2[0] - cctvs[i].X;
-                                B[1] = cars[j - N_Ped].Pos_V2[1] - cctvs[i].Z;
+                                int carIdx = j - N_Ped;
+                                B[0] = cars[carIdx].Pos_V2[0] - cctvs[i].X;
+                                B[1] = cars[carIdx].Pos_V2[1] - cctvs[i].Z;
                             }
                             double cosine_TARGET_v2 = InnerProduct(A, B) / (Norm(A) * Norm(B));
 
@@ -1302,7 +1350,7 @@ namespace surveillance_system
                                 {
                                     if (cosine_TARGET_v1 >= cosine_Arch_v1[i, k] && cosine_TARGET_v2 >= cosine_Arch_v2[i, k])
                                     {
-                                        if (target_dist_v1[i, j] >= arch_dist_v1[i, k] && target_dist_v2[i, j] >= arch_dist_v2[i, k])
+                                        if (target_dist[i, j] >= arch_dist[i, k])
                                         {
                                             v_detected = -2;
                                             if (j < N_Ped)
@@ -1546,22 +1594,24 @@ namespace surveillance_system
             public void rotateCCTVs()
             {
                 // 220317 cctv rotation
-                for (int i = 0; i < N_CCTV; i++)
+                if (cctv_rotate_degree > 0)
                 {
-                    // 220331 rotate 후 fov 재계산
-                    // 30초마다 한바퀴 돌도록 -> 7.5초마다 90도
-                    // Now는 현재 simulation 수행 경과 시간
-                    // 360/cctv_rotate_degree = 4
-                    // 30/4 = 7.5
-                    if (Math.Round(Now, 2) % Math.Round(rotateTerm / (360.0 / cctv_rotate_degree), 2) == 0)
+                    for (int i = 0; i < N_CCTV; i++)
                     {
-                        // cctv.setFixMode(false)로 설정해줘야함!
-                        // debug
-                        // Console.WriteLine("[Rotate] Now: {0}, Degree: {1}", Math.Round(Now, 2), cctvs[i].ViewAngleH);
-                        cctvs[i].rotateHorizon(cctv_rotate_degree); // 90
-                                                                    // 회전후 수평 FOV update (지금은 전부 Update -> 시간 오래걸림 -> 일부만(일부FOV구성좌표만)해야할듯)
-                        if (!cctvs[i].isFixed)
-                            cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
+                        // 220331 rotate 후 fov 재계산
+                        // 30초마다 한바퀴 돌도록 -> 7.5초마다 90도
+                        // Now는 현재 simulation 수행 경과 시간
+                        // 360/cctv_rotate_degree = 4
+                        // 30/4 = 7.5
+                        if (Math.Round(Now, 2) % Math.Round(rotateTerm / (360.0 / cctv_rotate_degree), 2) == 0)
+                        {
+                            // cctv.setFixMode(false)로 설정해줘야함!
+                            // Console.WriteLine("[Rotate] Now: {0}, Degree: {1}", Math.Round(Now, 2), cctvs[i].ViewAngleH);
+                            cctvs[i].rotateHorizon(cctv_rotate_degree); // 90
+                                                                        // 회전후 수평 FOV update (지금은 전부 Update -> 시간 오래걸림 -> 일부만(일부FOV구성좌표만)해야할듯)
+                            if (!cctvs[i].isFixed)
+                                cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
+                        }
                     }
                 }
             }
