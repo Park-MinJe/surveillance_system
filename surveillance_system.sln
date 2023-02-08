@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "surveillance_system", "surveillance_system.csproj", "{66B422D9-36EA-4477-8297-F194D236B633}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "surveillance_system_Form", "surveillance_system_Form\surveillance_system_Form.csproj", "{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{66B422D9-36EA-4477-8297-F194D236B633}.Release|x64.Build.0 = Release|Any CPU
 		{66B422D9-36EA-4477-8297-F194D236B633}.Release|x86.ActiveCfg = Release|Any CPU
 		{66B422D9-36EA-4477-8297-F194D236B633}.Release|x86.Build.0 = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|x64.Build.0 = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Debug|x86.Build.0 = Debug|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|x64.ActiveCfg = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|x64.Build.0 = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|x86.ActiveCfg = Release|Any CPU
+		{0C22066B-3FB9-41AA-9F95-E853F1F2CD31}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
