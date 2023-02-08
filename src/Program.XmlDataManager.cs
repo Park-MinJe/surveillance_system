@@ -177,6 +177,20 @@ namespace surveillance_system
                 // debug;
                 //Console.WriteLine(url);
             }
+            public void setEndPointUrl()
+            {
+                this.url = this.apiEndPoint + this.gisMethodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
+                if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
+                if (this.IsSetTypeNameCalled) this.url += this.typeName;
+                if (this.IsSetBBoxCalled) this.url += this.bbox;
+                if (this.IsSetPnuCalled) this.url += this.pnu;
+                if (this.IsSetMaxFeatureCalled) this.url += this.maxFeature;
+                if (this.IsSetResultTypeCalled) this.url += this.resultType;
+                if (this.IsSetSrsNameCalled) this.url += this.srsName;
+
+                // debug;
+                Console.WriteLine(url);
+            }
 
             /* --------------------------------------
              * load data as xml
@@ -332,6 +346,56 @@ namespace surveillance_system
 
                 archs = new Architecture[pls.Count];
                 for(int i = 0; i<pls.Count; i++)
+                {
+                    archs[i] = new Architecture();
+                    archs[i].define_Architecture(pls[i], hs[i]);
+                }
+            }
+
+            public void testGisBuildingServiceByGui()
+            {
+                Point lowerCorner = this.getMapLowerCorner();
+
+                Point upperCorner = this.getMapUpperCorner();
+
+                Point transformedLowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
+                Console.WriteLine("Transformed Lower Corner");
+                transformedLowerCorner.printString();
+
+                Point transformedUpperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+                Console.WriteLine("Transformed Upper Corner");
+                transformedUpperCorner.printString();
+
+                Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedUpperCorner.getX(), transformedLowerCorner.getY()));
+                Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedLowerCorner.getX(), transformedUpperCorner.getY()));
+
+                this.readFeatureMembers();
+                this.readPosLists();
+                this.readArchHs();
+
+                List<Point[]> pls = new List<Point[]>();
+                List<double> hs = new List<double>();
+
+                for (int i = 0; i < this.getFeatureMembersCnt(); i++)
+                {
+                    double h = Convert.ToDouble(NSDI_BULD_HGs[i].InnerText);
+                    if (h > 0)
+                    {
+                        hs.Add(h);
+
+                        Point[] pl = this.getPosList(i);
+                        Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
+
+                        // 프로그램상의 좌표계로 변환
+                        // 지도 범위의 왼쪽 위를 기준으로 한다.
+                        Point[] plOnSystem = calcIndexOnProg(transformedPl, transformedLowerCorner.getX(), transformedUpperCorner.getY());
+
+                        pls.Add(plOnSystem);
+                    }
+                }
+
+                archs = new Architecture[pls.Count];
+                for (int i = 0; i < pls.Count; i++)
                 {
                     archs[i] = new Architecture();
                     archs[i].define_Architecture(pls[i], hs[i]);
