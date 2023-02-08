@@ -59,6 +59,7 @@ namespace surveillance_system
 
             private string url;
             private string apiEndPoint = "http://apis.data.go.kr/1611000/nsdi/GisBuildingService";
+            private string gisMethodName;
             private string serviceKey = "?ServiceKey=";     // 필수
             private string typeName = "&typename=";
             private string bbox = "&bbox=";
@@ -67,6 +68,7 @@ namespace surveillance_system
             private string resultType = "&resultType=";
             private string srsName = "&srsName=";
 
+            private bool IsSetGisMethodNameCalled = false;
             private bool IsSetServiceKeyCalled = false;
             private bool IsSetTypeNameCalled = false;
             private bool IsSetBBoxCalled = false;
@@ -87,6 +89,27 @@ namespace surveillance_system
             /* --------------------------------------
              * setter
             -------------------------------------- */
+            public void setGisMethodName(string gisMethodName)
+            {
+                this.IsSetGisMethodNameCalled = true;
+
+                if(gisMethodName == "국토교통부 GIS건물일반정보WMS조회")
+                {
+                    this.gisMethodName = "/wms/getGisGnrlBuildingWMS";
+                }
+                else if(gisMethodName == "국토교통부 GIS건물일반정보WFS조회")
+                {
+                    this.gisMethodName = "/wfs/getGisGnrlBuildingWFS";
+                }
+                else if(gisMethodName == "국토교통부 GIS건물집합정보WMS조회")
+                {
+                    this.gisMethodName = "/wms/getGisAggrBuildingWMS";
+                }
+                else if(gisMethodName == "국토교통부 GIS건물집합정보WFS조회")
+                {
+                    this.gisMethodName = "/wfs/getGisAggrBuildingWFS";
+                }
+            }
             public void setServiceKey(string serviceKey)
             {
                 this.IsSetServiceKeyCalled = true;
@@ -125,6 +148,8 @@ namespace surveillance_system
 
             public void setEndPointUrl(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
+                if (methodName != "")
+                    this.setGisMethodName(methodName);
                 if (serviceKey != "")
                     this.setServiceKey(serviceKey);
                 if (bbox != "")
@@ -140,7 +165,7 @@ namespace surveillance_system
                 if (srsName != "")
                     this.setSrsName(srsName);
 
-                this.url = this.apiEndPoint + methodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
+                this.url = this.apiEndPoint + this.gisMethodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
                 if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
                 if (this.IsSetTypeNameCalled) this.url += this.typeName;
                 if (this.IsSetBBoxCalled) this.url += this.bbox;
