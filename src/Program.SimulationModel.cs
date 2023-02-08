@@ -21,7 +21,7 @@ namespace surveillance_system
         const double aUnitTime = 100 * 0.001; // (sec)
         public static Road road = new Road();
 
-        public class Simulator
+        public class SimulationModel
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
             private bool getArchNumFromUser = false;
@@ -996,7 +996,7 @@ namespace surveillance_system
                 int[,] candidate_detected_arch_h = new int[N_CCTV, N_Arch];
                 int[,] candidate_detected_arch_v = new int[N_CCTV, N_Arch];
 
-                    // cctv에 잡힌 건물의 cos 좌표
+                // cctv에 잡힌 건물의 cos 좌표
                 double[,] cosine_Arch_h1 = new double[N_CCTV, N_Arch];
                 double[,] cosine_Arch_h2 = new double[N_CCTV, N_Arch];
                 double[,] cosine_Arch_v1 = new double[N_CCTV, N_Arch];
