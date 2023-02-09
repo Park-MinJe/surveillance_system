@@ -12,16 +12,18 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public static Architecture[] archs;
-        public static CCTV[] cctvs;
-        public static Pedestrian[] peds;
-        public static Car[] cars;
+        /****************************class Map으로 Migrate****************************/
+        //public static Architecture[] archs;
+        //public static CCTV[] cctvs;
+        //public static Pedestrian[] peds;
+        //public static Car[] cars;
+        //public static Road road = new Road();
+        /*****************************************************************************/
 
         // Configuration: simulation time
         const double aUnitTime = 100 * 0.001; // (sec)
-        public static Road road = new Road();
 
-        public class SimulationModel
+        public class Simulator
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
             private bool getArchNumFromUser = false;

@@ -10,9 +10,11 @@ namespace surveillance_system
     {
         public class Road
         {
+            /****************************class Map으로 Migrate****************************/
             // Map의 실제 범위
-            public Point lowerCorner;
-            public Point upperCorner;
+            //public Point lowerCorner;
+            //public Point upperCorner;
+            /*****************************************************************************/
 
             public double[] laneVector;
 
@@ -59,20 +61,23 @@ namespace surveillance_system
                 //this.mapSize = n_interval * intvl + wd * lane_num;
                 //this.grid_num = this.mapSize / 10000 + 2;
                 // 실제 데이터로부터의 mapSize
-                lowerCorner = gbs.getMapLowerCorner();
-                upperCorner = gbs.getMapUpperCorner();
 
-                lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
-                upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+                /****************************class Map으로 Migrate****************************/
+                //lowerCorner = gbs.getMapLowerCorner();
+                //upperCorner = gbs.getMapUpperCorner();
 
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
-                //Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
-                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                //lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
+                //upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
 
-                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
+                //this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
+                ////Console.WriteLine("x map size: {0}", this.X_mapSize);
+                //this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
+                ////Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                /*****************************************************************************/
+
+                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 1;
                 //Console.WriteLine("x grid num: {0}", this.X_grid_num);
-                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
+                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 1;
                 //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
                 this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;

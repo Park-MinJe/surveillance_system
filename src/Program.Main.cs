@@ -193,11 +193,11 @@ namespace surveillance_system
             }
 
 
-            SimulationModel[] sims = new SimulationModel[simulationTimesForCCTVSet];
+            Simulator[] sims = new Simulator[simulationTimesForCCTVSet];
             // s.simulateAll(cctvMode);
             for(int i = 0; i < simulationTimesForCCTVSet; i++)
             {
-                sims[i] = new SimulationModel();
+                sims[i] = new Simulator();
                 sims[i].setcreateCSV(InputcreateCSV);
                 sims[i].setCctvFixMode(inputCctvRotate);
                 sims[i].setgetArchNumFromUser(inputNArchOption);
