@@ -4,19 +4,24 @@ namespace surveillance_system_form
 {
     public partial class Form1 : Form
     {
+        List<Panel> panelList = new List<Panel>();
+
         public Form1()
         {
             InitializeComponent();
 
-            this.btn_Confirm.Click += BtnConfirmClick;
+            this.btn_gisConfirm.Click += gisConfirmClick;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            panelList.Add(gisInfoPage);
+            panelList.Add(simOptionInfoPage);
+
+            panelList[0].BringToFront();
         }
 
-        private void BtnConfirmClick(object sender, EventArgs e)
+        private void gisConfirmClick(object sender, EventArgs e)
         {
             string message = string.Empty;
 
@@ -46,6 +51,8 @@ namespace surveillance_system_form
 
             gbs.setEndPointUrl();
             //gbs.loadArchDataFromApiAsXml();
+
+            panelList[1].BringToFront();
         }
     }
 }

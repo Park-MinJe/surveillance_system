@@ -209,7 +209,7 @@ namespace surveillance_system
                 }
 
                 //Debug
-                //Console.WriteLine(results);
+                Console.WriteLine(results);
 
                 this.xml = new XmlDocument();
                 xml.LoadXml(results);
@@ -254,8 +254,8 @@ namespace surveillance_system
                 Point rt = new Point(Convert.ToDouble(lowerCornerCoordinate[0]), Convert.ToDouble(lowerCornerCoordinate[1]), 0d);
 
                 //Debug
-                //Console.WriteLine("Raw Lower Corner");
-                //rt.printString();
+                Console.WriteLine("Raw Lower Corner");
+                rt.printString();
 
                 return rt;
             }
@@ -268,8 +268,8 @@ namespace surveillance_system
                 Point rt = new Point(Convert.ToDouble(upperCornerCoordinate[0]), Convert.ToDouble(upperCornerCoordinate[1]), 0d);
 
                 //Debug
-                //Console.WriteLine("Raw Lower Corner");
-                //rt.printString();
+                Console.WriteLine("Raw Lower Corner");
+                rt.printString();
 
                 return rt;
             }
@@ -392,13 +392,6 @@ namespace surveillance_system
 
                         pls.Add(plOnSystem);
                     }
-                }
-
-                archs = new Architecture[pls.Count];
-                for (int i = 0; i < pls.Count; i++)
-                {
-                    archs[i] = new Architecture();
-                    archs[i].define_Architecture(pls[i], hs[i]);
                 }
             }
         }
