@@ -60,9 +60,9 @@ namespace surveillance_system
 
                 //this.mapSize = n_interval * intvl + wd * lane_num;
                 //this.grid_num = this.mapSize / 10000 + 2;
-                // 실제 데이터로부터의 mapSize
 
-                /****************************class Map으로 Migrate****************************/
+                /*********************** class initWorldByGis로 Migrate ***********************/
+                // 실제 데이터로부터의 mapSize
                 //lowerCorner = gbs.getMapLowerCorner();
                 //upperCorner = gbs.getMapUpperCorner();
 

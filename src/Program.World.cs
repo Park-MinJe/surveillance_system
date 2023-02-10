@@ -10,53 +10,84 @@ namespace surveillance_system
         public class World
         {
             // World 제원
-                // Map의 실제 범위
-            private Point lowerCorner;
-            private Point upperCorner;
+            // Map의 실제 범위
+            public Point lowerCorner { get; private set; }
+            public Point upperCorner { get; private set; }
 
-                // Map의 가로/세로 길이
-            private double X_mapSize;
-            private double Y_mapSize;
+            // Map의 가로/세로 길이
+            public double X_mapSize { get; private set; }
+            public double Y_mapSize { get; private set; }
 
 
             // World를 구성하는 구조물
-                // 도로
-            private Road road;
+            // 도로
+            public Road road { get; private set; }
 
-                // 건물
-            private Architecture[] archs;
+            // 건물
+            public int nArch { get; private set; }
+            public Architecture[] archs { get; private set; }
 
 
             // World 내의 카메라
-                // CCTV
-            private CCTV[] cctvs;
+            // CCTV
+            public int nCctv { get; private set; }
+            public CCTV[] cctvs { get; private set; }
 
 
             // World를 구성하는 구성원
-                // 감시 대상
-            private SurveillanceTarget[] surveillanceTargets;
+            // 감시 대상
+            public int nPed { get; private set; }
+            public int nCar { get; private set; }
+            public int nTrg { get; private set; }
+            public SurveillanceTarget[] surveillanceTargets { get; private set; }
 
-            public World()
+            public World(int nCctv, int nPed, int nCar, initWorld initWorldBy)
             {
                 // World 제원 초기화
-                    // GIS open api로 부터 받은 탐색 범위
-                lowerCorner = gbs.getMapLowerCorner();
-                upperCorner = gbs.getMapUpperCorner();
 
-                    // 실제 탐색 범위 좌표를 프로그램에서 사용할 좌표계로 변환
-                lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
-                upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+                // EPSG:4326 좌표계 기반 탐색 범위
+                this.lowerCorner = initWorldBy.initLowerCorner();
+                this.upperCorner = initWorldBy.initUpperCorner();
 
-                    // 실제 탐색 범위 좌표를 이용해 탐색 범위의 가로/세로 제원 획득
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
+                // 실제 탐색 범위 좌표를 이용해 탐색 범위의 가로/세로 제원 획득
+                this.X_mapSize = initWorldBy.X_mapSize(this.lowerCorner, this.upperCorner);
                 //Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
+                this.Y_mapSize = initWorldBy.Y_mapSize(this.lowerCorner, this.upperCorner);
                 //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
+                
 
-                // World를 구성하는 구조물 초기화
-                    // 도로
-                road = 
+                // World 구성 요소 갯수 입력
+                
+                // 임의의 값을 세팅할 때 필요  ex) 현재 보행자, 차량, cctv
+                this.nCctv = nCctv;
+                this.nPed = nPed;
+                this.nCar = nCar;
+                this.nTrg = this.nPed + this.nCar;
+
+
+
+                // World를 구성하는 구조물 할당
+
+                // 도로
+                this.road = new RoadFactory().createRoad();
+
+                // 건물
+
+
+
+
+                // World 내의 카메라 할당
+
+                // CCTV
+                
+
+
+
+                // World를 구성원 할당
+
+                // 감시 대상
+                
             }
         }
     }
