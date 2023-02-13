@@ -16,7 +16,8 @@ namespace surveillance_system
             //public Point upperCorner;
             /*****************************************************************************/
 
-            public double[] laneVector;
+            // 230206 쓰이지 않고 있음 _Minje
+            /*public double[] laneVector;
 
             // 가로 도로 좌표
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = y 값
@@ -28,33 +29,37 @@ namespace surveillance_system
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = x 값
             public double[,] lane_v; // 세로 - 중앙선 x값
             public double[,] lane_v_left; // 세로- 중앙선 왼쪽 라인 x값
-            public double[,] lane_v_right; // 세로 중앙선 오른쪽 라인 x값
+            public double[,] lane_v_right; // 세로 중앙선 오른쪽 라인 x값*/
 
-            public double[,] DST; // 도로 교차점
-            public double[,] intersectionArea; // 도로 교차구간
-            public double X_mapSize;
-            public double Y_mapSize;
-            public int X_grid_num;
-            public int Y_grid_num;
+            public Point[] DST; // 도로 교차점
+            public Point[,] intersectionArea; // 도로 교차구간
+            /****************************class Map으로 Migrate****************************/
+            //public double X_mapSize;
+            //public double Y_mapSize;
+            //public int X_grid_num;
+            //public int Y_grid_num;
+            /*****************************************************************************/
             public int lane_num;
             public double X_interval;
             public double Y_interval;
             public int width;
 
-            // 건물 위치
-            public int[,] archPos;
-            // CCTV 위치
-            public int[,] cctvPos;
-            // Ped 위치
-            public int[,] pedPos;
-            // Car 위치
-            public int[,] carPos;
+            /****************************class Map으로 Migrate****************************/
+            //// 건물 위치
+            //public int[,] archPos;
+            //// CCTV 위치
+            //public int[,] cctvPos;
+            //// Ped 위치
+            //public int[,] pedPos;
+            //// Car 위치
+            //public int[,] carPos;
+            /*****************************************************************************/
 
-            public void roadBuilder(int wd, int intvl, int n_interval)
+            // 도로 데이터를 받아올 api의 출력 양식에 따라 변경 필요
+            // 우선 리펙토링 절차의 결과 확인을 위해 기존의 방식대로 진행하나, 수정 필요
+            public void define_Road(double X_mapSize, double Y_mapSize, int wd, int n_interval, initRoad initRoadBy)
             {
                 this.lane_num = n_interval + 1;
-                DST = new double[lane_num * lane_num, 2];
-                intersectionArea = new double[lane_num * lane_num, 4];
                 //this.interval = intvl;
                 this.width = wd;
 
@@ -73,32 +78,39 @@ namespace surveillance_system
                 ////Console.WriteLine("x map size: {0}", this.X_mapSize);
                 //this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
                 ////Console.WriteLine("y map size: {0}", this.Y_mapSize);
+
+                //this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 1;
+                ////Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                //this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 1;
+                ////Console.WriteLine("y grid num: {0}", this.Y_grid_num);
                 /*****************************************************************************/
 
-                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 1;
-                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
-                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 1;
-                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+                this.X_interval = (X_mapSize - lane_num * this.width) / n_interval;
+                this.Y_interval = (Y_mapSize - lane_num * this.width) / n_interval;
 
-                this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
-                this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
+                this.DST = initRoadBy.initDst(this.lane_num, this.X_interval, this.Y_interval, this.width);
+                this.intersectionArea = initRoadBy.initIntersectionArea(this.lane_num, this.DST, this.width);
 
+                /******************** class initRoadByUsrInput으로 Migrate ********************/
                 // 교차점, 교차구간 설정
-                int idx = 0;
-                for (int i = 0; i < lane_num; i++)
-                {
-                    for (int j = 0; j < lane_num; j++)
-                    {
-                        DST[idx, 0] = (this.X_interval + wd) * i + (wd / 2);
-                        DST[idx, 1] = (this.Y_interval + wd) * j + (wd / 2);
+                //this.DST = new double[lane_num * lane_num, 2];
+                //this.intersectionArea = new double[lane_num * lane_num, 4];
+                //int idx = 0;
+                //for (int i = 0; i < this.lane_num; i++)
+                //{
+                //    for (int j = 0; j < this.lane_num; j++)
+                //    {
+                //        this.DST[idx, 0] = (this.X_interval + this.width) * i + (this.width / 2);
+                //        this.DST[idx, 1] = (this.Y_interval + this.width) * j + (this.width / 2);
 
-                        intersectionArea[idx, 0] = DST[idx, 0] - (wd / 2); // x_min
-                        intersectionArea[idx, 1] = DST[idx, 0] + (wd / 2); // x_max
-                        intersectionArea[idx, 2] = DST[idx, 1] - (wd / 2); // y_min
-                        intersectionArea[idx, 3] = DST[idx, 1] + (wd / 2); // y_max
-                        idx++;
-                    }
-                }
+                //        this.intersectionArea[idx, 0] = this.DST[idx, 0] - (this.width / 2); // x_min
+                //        this.intersectionArea[idx, 1] = this.DST[idx, 0] + (this.width / 2); // x_max
+                //        this.intersectionArea[idx, 2] = this.DST[idx, 1] - (this.width / 2); // y_min
+                //        this.intersectionArea[idx, 3] = this.DST[idx, 1] + (this.width / 2); // y_max
+                //        idx++;
+                //    }
+                //}
+                /*****************************************************************************/
 
                 // 230206 쓰이지 않고 있음 _Minje
                 // 도로 벡터 초기화
@@ -110,7 +122,7 @@ namespace surveillance_system
                 for (int i = 0; i < laneVectorSize; i++)
                 {
                     laneVector[i] = i * incr;
-                }*/
+                }
 
                 // 가로 도로 좌표 설정
                 lane_h = new double[lane_num, 1];
@@ -133,7 +145,7 @@ namespace surveillance_system
                     lane_v[i, 0] = i * (intvl + wd) + (wd / 2);
                     lane_v_left[i, 0] = lane_h[i, 0] - wd / 2;
                     lane_v_right[i, 0] = lane_h[i, 0] + wd / 2;
-                }
+                }*/
 
                 // mode 0: pos cctv as grid    1: pos cctv as random    2: use prepared as random cctv set
                 /* switch (cctvMode)
@@ -323,14 +335,15 @@ namespace surveillance_system
                 pedPos = new int[this.Y_grid_num, this.X_grid_num];
                 for (int i = 0; i < n_ped; i++)
                 {
-                    Random rand = new Random();
-                    // int intersectidx = rand.Next(9);
-                    int intersectidx = rand.Next(lane_num * lane_num);
+                    /****************************class initSurvTrgByRandom으로 Migrate****************************/
+                    //Random rand = new Random();
+                    //// int intersectidx = rand.Next(9);
+                    //int intersectidx = rand.Next(lane_num * lane_num);
 
-                    // Console.WriteLine(intersectidx);
-                    double[,] newPos = getPointOfAdjacentRoad(intersectidx);
-                    peds[i].X = Math.Round(newPos[0, 0]);
-                    peds[i].Y = Math.Round(newPos[0, 1]);
+                    //// Console.WriteLine(intersectidx);
+                    //double[,] newPos = getPointOfAdjacentRoad(intersectidx);
+                    //peds[i].X = Math.Round(newPos[0, 0]);
+                    //peds[i].Y = Math.Round(newPos[0, 1]);
 
                     /*Random rand = new Random();
                     double opt = rand.NextDouble();
@@ -344,6 +357,7 @@ namespace surveillance_system
                         peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
                         peds[i].Y = Math.Round(laneVector.Max() * opt);
                     }*/
+                    /*********************************************************************************************/
                     pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
                 }
                 // for문 끝나고
@@ -357,32 +371,34 @@ namespace surveillance_system
                 carPos = new int[this.Y_grid_num, this.X_grid_num];
                 for (int i = 0; i < n_car; i++)
                 {
-                    Random rand = new Random();
-                    int intersectidx = rand.Next(lane_num * lane_num);
-                    cars[i].X = DST[intersectidx, 0];
-                    cars[i].Y = DST[intersectidx, 1];
+                    /****************************class initSurvTrgByRandom으로 Migrate****************************/
+                    //Random rand = new Random();
+                    //int intersectidx = rand.Next(lane_num * lane_num);
+                    //cars[i].X = DST[intersectidx, 0];
+                    //cars[i].Y = DST[intersectidx, 1];
 
-                    int carintersectidx = rand.Next(4); // 0, 1, 2, 3
-                    if (carintersectidx == 0)
-                    {// down left
-                        cars[i].X -= width / 4;
-                        cars[i].Y += width / 4;
-                    }
-                    else if (carintersectidx == 1)
-                    {// up left
-                        cars[i].X += width / 4;
-                        cars[i].Y += width / 4;
-                    }
-                    else if (carintersectidx == 2)
-                    {// up right
-                        cars[i].X += width / 4;
-                        cars[i].Y -= width / 4;
-                    }
-                    else if (carintersectidx == 3)
-                    {// down right
-                        cars[i].X -= width / 4;
-                        cars[i].Y -= width / 4;
-                    }
+                    //int carintersectidx = rand.Next(4); // 0, 1, 2, 3
+                    //if (carintersectidx == 0)
+                    //{// down left
+                    //    cars[i].X -= width / 4;
+                    //    cars[i].Y += width / 4;
+                    //}
+                    //else if (carintersectidx == 1)
+                    //{// up left
+                    //    cars[i].X += width / 4;
+                    //    cars[i].Y += width / 4;
+                    //}
+                    //else if (carintersectidx == 2)
+                    //{// up right
+                    //    cars[i].X += width / 4;
+                    //    cars[i].Y -= width / 4;
+                    //}
+                    //else if (carintersectidx == 3)
+                    //{// down right
+                    //    cars[i].X -= width / 4;
+                    //    cars[i].Y -= width / 4;
+                    //}
+                    /*********************************************************************************************/
                     carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
                 }
                 // for문 끝나고

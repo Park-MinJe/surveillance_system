@@ -6,7 +6,7 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public class GuiManagerForGisBuildingService 
+        public class GuiManagerForGisBuildingService
         {
             public void setGisMethodNameByGui(string methodName)
             {

@@ -41,12 +41,12 @@ namespace surveillance_system
 
             public double X_mapSize(Point lowerCorner, Point upperCorner)
             {
-                return getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
+                return getDistanceBetweenPointsOfepsg4326(lowerCorner.x, lowerCorner.y, upperCorner.x, lowerCorner.y);
             }
 
             public double Y_mapSize(Point lowerCorner, Point upperCorner)
             {
-                return getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY()); ;
+                return getDistanceBetweenPointsOfepsg4326(lowerCorner.x, lowerCorner.y, lowerCorner.x, upperCorner.y);
             }
         }
     }

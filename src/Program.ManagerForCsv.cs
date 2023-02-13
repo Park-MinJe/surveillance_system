@@ -139,7 +139,14 @@ namespace surveillance_system
 
         public class TargetCSVReader
         {
-            public void initialPedsFromCSV(int simIdx)
+            public StreamReader getStreamReader(string fileName)
+            {
+                FileStream fs = new FileStream(@fileName, FileMode.Open);
+                StreamReader sr = new StreamReader(fs, Encoding.UTF8, false);
+                return sr;
+            }
+
+            /*public void initialPedsFromCSV(int simIdx)
             {
                 try
                 {
@@ -327,7 +334,7 @@ namespace surveillance_system
                 {
                     Console.WriteLine(e.ToString());
                 }
-            }
+            }*/
         }
 
         /* --------------------------------------

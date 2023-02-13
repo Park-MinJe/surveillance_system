@@ -11,8 +11,8 @@ namespace surveillance_system
     {
         public class lVector
         {
-            private double componet_x;
-            private double componet_y;
+            public double componet_x { get; private set; }
+            public double componet_y { get; private set; }
 
             public lVector() { }
 
@@ -31,14 +31,13 @@ namespace surveillance_system
             {
                 this.componet_y = p2.getY() - p1.getY();
             }
-
-            public double getComponetX() { return this.componet_x; }
-            public double getComponetY() { return this.componet_y; }
         }
 
         public class Point
         {
-            private double x, y, z;
+            public double x { get; private set; }
+            public double y { get; private set; }
+            public double z { get; private set; }
 
             public Point() { }
 
@@ -56,13 +55,24 @@ namespace surveillance_system
                 this.z = z;
             }
 
+            public void setPoint(Point p)
+            {
+                this.x = p.x;
+                this.y = p.y;
+                this.z = p.z;
+            }
+
             public void setX(double x) { this.x = x; }
             public void setY(double y) { this.y = y; }
             public void setZ(double z) { this.z = z; }
 
-            public double getX() { return this.x; }
-            public double getY() { return this.y; }
-            public double getZ() { return this.z; }
+            public void addX(double x) { this.x += x; }
+            public void addY(double y) { this.y += y; }
+            public void addZ(double z) { this.z += z; }
+
+            public void subX(double x) { this.x -= x; }
+            public void subY(double y) { this.y -= y; }
+            public void subZ(double z) { this.z -= z; }
 
             public void printString()
             {
@@ -72,8 +82,8 @@ namespace surveillance_system
 
         public class Segment
         {
-            private Point p1;
-            private Point p2;
+            public Point p1 { get; private set; }
+            public Point p2 { get; private set; }
 
             public Segment(Point p1, Point p2)
             {
@@ -88,14 +98,11 @@ namespace surveillance_system
 
             public void setP1(Point p1) { this.p1 = p1; }
             public void setP2(Point p2) { this.p2 = p2; }
-
-            public Point getP1() { return this.p1; }
-            public Point getP2() { return this.p2; }
         }
 
         public class Polygon
         {
-            private Segment[] segments;
+            public Segment[] segments { get; private set; }
 
             public Polygon(Segment[] segments) { this.segments = segments; }
             public Polygon(Point[] vertexes)
@@ -107,8 +114,6 @@ namespace surveillance_system
                     segments[i] = new Segment(vertexes[i], vertexes[i + 1]);
                 }
             }
-
-            public Segment[] getSegments() { return segments; }
 
             public Segment getSegmentByIdx(int idx) { return segments[idx]; }
 

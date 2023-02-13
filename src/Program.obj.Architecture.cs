@@ -83,8 +83,8 @@ namespace surveillance_system
                 this.pointsOfTop = new Point[dotCnt];
                 for (int i = 0; i < dotCnt; i++)
                 {
-                    this.pointsOfBottom[i] = new Point(p[i].getX(), p[i].getY(), 0);
-                    this.pointsOfTop[i] = new Point(p[i].getX(), p[i].getY(), this.H);
+                    this.pointsOfBottom[i] = new Point(p[i].x, p[i].y, 0);
+                    this.pointsOfTop[i] = new Point(p[i].x, p[i].y, this.H);
                 }
 
                 this.facesOfArch = new Polygon[dotCnt + 1];
@@ -120,9 +120,9 @@ namespace surveillance_system
                 }
 
                 Point midpointOfPolygon = calcMidpointOfPolygon(facesOfArch[0]);
-                this.X = midpointOfPolygon.getX();
-                this.Y = midpointOfPolygon.getY();
-                this.Z = midpointOfPolygon.getZ();
+                this.X = midpointOfPolygon.x;
+                this.Y = midpointOfPolygon.y;
+                this.Z = midpointOfPolygon.z;
             }
 
             // 벡터 H1H2의 직교 벡터를 이용해 Direction 연산
@@ -130,14 +130,14 @@ namespace surveillance_system
             {
                 double rt;
 
-                lVector H1H2Vector = new lVector(l.getP2().getX() - l.getP1().getX(), 
-                                                    l.getP2().getY() - l.getP1().getY());
+                lVector H1H2Vector = new lVector(l.p2.x - l.p1.x, 
+                                                    l.p2.y - l.p1.y);
 
-                lVector verticalVector = new lVector(-H1H2Vector.getComponetY(), H1H2Vector.getComponetX());
+                lVector verticalVector = new lVector(-H1H2Vector.componet_y, H1H2Vector.componet_x);
 
                 lVector XunitVector = new lVector(0.001, 0);
                 rt = Math.Round(Math.Acos(InnerProduct(verticalVector, XunitVector) / (Norm(verticalVector) * Norm(XunitVector))), 8);
-                if (verticalVector.getComponetY() < 0)
+                if (verticalVector.componet_y < 0)
                 {
                     rt = Math.Round(2 * Math.PI - rt, 8);
                 }
@@ -158,8 +158,8 @@ namespace surveillance_system
                         Console.WriteLine("\t-선분 {0}", j);
                         Segment tmp = facesOfArch[i].getSegmentByIdx(j);
                         Console.WriteLine("\t  P1 : ({0},{1},{2})   P2 : ({3},{4},{5})",
-                            tmp.getP1().getX(), tmp.getP1().getY(), tmp.getP1().getZ(),
-                            tmp.getP2().getX(), tmp.getP2().getY(), tmp.getP2().getZ());
+                            tmp.p1.x, tmp.p1.y, tmp.p1.z,
+                            tmp.p2.x, tmp.p2.y, tmp.p2.z);
                     }
                 }
 
@@ -171,11 +171,11 @@ namespace surveillance_system
                 for(int i = 0; i<this.H_Segment.Length; i++)
                 {
                     Console.WriteLine("\nPos_H1 : ({0},{1},{2})   Pos_H2 : ({3},{4},{5})",
-                        this.H_Segment[i].getP1().getX(), this.H_Segment[i].getP1().getY(), this.H_Segment[i].getP1().getZ(), 
-                        this.H_Segment[i].getP2().getX(), this.H_Segment[i].getP2().getY(), this.H_Segment[i].getP1().getZ());
+                        this.H_Segment[i].p1.x, this.H_Segment[i].p1.y, this.H_Segment[i].p1.z, 
+                        this.H_Segment[i].p2.x, this.H_Segment[i].p2.y, this.H_Segment[i].p1.z);
                     Console.WriteLine("Pos_V1 : ({0},{1},{2})   Pos_V2 : ({3},{4},{5})",
-                        this.V_Segment[i].getP1().getX(), this.V_Segment[i].getP1().getY(), this.V_Segment[i].getP1().getZ(), 
-                        this.V_Segment[i].getP2().getX(), this.V_Segment[i].getP2().getY(), this.V_Segment[i].getP2().getZ());
+                        this.V_Segment[i].p1.x, this.V_Segment[i].p1.y, this.V_Segment[i].p1.z, 
+                        this.V_Segment[i].p2.x, this.V_Segment[i].p2.y, this.V_Segment[i].p2.z);
                 }
             }
         }

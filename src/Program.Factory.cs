@@ -10,11 +10,12 @@ namespace surveillance_system
     {
         public class WorldFactory
         {
-            public World createWorld(int nCctv, int nPed, int nCar)
+            public World createWorld()
             {
                 // Map 초기화에 사용하는 데이터 출처에 따라 initWorld interface를 상속하는 class 중 하나를 선택
                 // 또는 사용자에게 그 출처의 선택을 맡기는 경우, WorldFactory 안에 createWorld 메소드를 여러개 생성할 수도 있음.
-                return new World(nCctv, nPed, nCar, new initWorldByGis());
+                // ex) ~ByGis / ~ByCsv / ...
+                return new World();
             }
         }
 
@@ -28,9 +29,14 @@ namespace surveillance_system
 
         public class ArchFactory
         {
-            public Architecture createArchitecture()
+            public Architecture createArch()
             {
                 return new Architecture();
+            }
+
+            public Architecture[] createArchArr(int n)
+            {
+                return new Architecture[n];
             }
         }
 
@@ -40,26 +46,39 @@ namespace surveillance_system
             {
                 return new CCTV();
             }
+
+            public CCTV[] createCctvArr(int n)
+            {
+                return new CCTV[n];
+            }
         }
 
         public class SurveillanceTargetFactory
         {
+            // SurveillanceTarget
+            public SurveillanceTarget[] createSurvArr(int n)
+            {
+                return new SurveillanceTarget[n];
+            }
 
-        }
-
-        public class PedFactory
-        {
+            // Pedestrian
             public Pedestrian createPed()
             {
                 return new Pedestrian();
             }
-        }
+            public Pedestrian[] createPedArr(int n)
+            {
+                return new Pedestrian[n];
+            }
 
-        public class CarFactory
-        {
+            // Car
             public Car createCar()
             {
                 return new Car();
+            }
+            public Car[] createCarArr(int n)
+            {
+                return new Car[n];
             }
         }
     }

@@ -676,93 +676,96 @@ namespace surveillance_system
                 Console.WriteLine("Architecture Setting Completed\n");
             }
 
-            public void initPed()
-            {
-                try
-                {
-                    foreach (Pedestrian ped in peds)
-                    {
-                        double minDist = 0.0;
-                        //int idx_minDist = 0;
-                        //double[] Dist_Map = new double[road.DST.GetLength(0)];
+            /****************************class World + class initSurvTrgImpl으로 Migrate****************************/
+            //public void initPed()
+            //{
+            //    try
+            //    {
+            //        foreach (Pedestrian ped in peds)
+            //        {
+            //            double minDist = 0.0;
+            //            //int idx_minDist = 0;
+            //            //double[] Dist_Map = new double[road.DST.GetLength(0)];
 
-                        // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
-                        double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
-                        double dst_x = Math.Round(newPos[0, 0]);
-                        double dst_y = Math.Round(newPos[0, 1]);
+            //            // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
+            //            double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.xy.x, ped.xy.y));
+            //            double dst_x = Math.Round(newPos[0, 0]);
+            //            double dst_y = Math.Round(newPos[0, 1]);
 
-                        // Car object일경우 가까운 도착지 설정
-                        // double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(ped.X, ped.Y), ped.X, ped.Y);
-                        // double dst_x = Math.Round(newPos[0, 0]);
-                        // double dst_y = Math.Round(newPos[0, 1]);
+            //            // Car object일경우 가까운 도착지 설정
+            //            // double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(ped.X, ped.Y), ped.X, ped.Y);
+            //            // double dst_x = Math.Round(newPos[0, 0]);
+            //            // double dst_y = Math.Round(newPos[0, 1]);
 
-                        //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+            //            //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
 
-                        //double dst_x = road.DST[idx_minDist, 0];
-                        //double dst_y = road.DST[idx_minDist, 1];
+            //            //double dst_x = road.DST[idx_minDist, 0];
+            //            //double dst_y = road.DST[idx_minDist, 1];
 
-                        // 보행자~목적지 벡터
-                        /*
-                        double[] A = new double[2];
-                        A[0] = dst_x - ped.X;
-                        A[1] = dst_y - ped.Y;        
+            //            // 보행자~목적지 벡터
+            //            /*
+            //            double[] A = new double[2];
+            //            A[0] = dst_x - ped.X;
+            //            A[1] = dst_y - ped.Y;        
 
-                        double[] B = { 0.001, 0 };
-                        double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
-                        if(ped.Y > dst_y)
-                        {
-                            direction = Math.Round(2 * Math.PI - direction, 8); 
-                        }
-                        */
-                        ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
-                        ped.setDirection();
-                        ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
-                        // ped.printTargetInfo();
-                    }
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine("Err while initializing Pedestrians\n");
-                    Console.WriteLine(ex.Message);
-                }
-                Console.WriteLine("PED Setting Completed\n");
-            }
+            //            double[] B = { 0.001, 0 };
+            //            double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
+            //            if(ped.Y > dst_y)
+            //            {
+            //                direction = Math.Round(2 * Math.PI - direction, 8); 
+            //            }
+            //            */
+            //            ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
+            //            ped.setDirection();
+            //            ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
+            //            // ped.printTargetInfo();
+            //        }
+            //    }
+            //    catch(Exception ex)
+            //    {
+            //        Console.WriteLine("Err while initializing Pedestrians\n");
+            //        Console.WriteLine(ex.Message);
+            //    }
+            //    Console.WriteLine("PED Setting Completed\n");
+            //}
+            
 
-            public void initCar()
-            {
-                try
-                {
-                    foreach (Car car in cars)
-                    {
-                        double minDist = 0.0;
+            //public void initCar()
+            //{
+            //    try
+            //    {
+            //        foreach (Car car in cars)
+            //        {
+            //            double minDist = 0.0;
 
-                        // Car object일경우 가까운 도착지 설정
-                        double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
-                        // debug
-                        // Console.WriteLine("get destination Completed\n");
-                        double dst_x = Math.Round(newPos[0, 0]);
-                        double dst_y = Math.Round(newPos[0, 1]);
+            //            // Car object일경우 가까운 도착지 설정
+            //            double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.xy.x, car.xy.y), car.xy.x, car.xy.y);
+            //            // debug
+            //            // Console.WriteLine("get destination Completed\n");
+            //            double dst_x = Math.Round(newPos[0, 0]);
+            //            double dst_y = Math.Round(newPos[0, 1]);
 
-                        // debug
-                        // Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+            //            // debug
+            //            // Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
 
-                        car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
-                        // debug
-                        // Console.WriteLine("define_TARGET Completed\n");
-                        car.setDirection();
-                        // debug
-                        // Console.WriteLine("setDirection Completed\n");
-                        car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
-                        // car.printTargetInfo();
-                    }
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine("Err while initializing Cars\n");
-                    Console.WriteLine(ex.Message);
-                }
-                Console.WriteLine("CAR Setting Completed\n");
-            }
+            //            car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
+            //            // debug
+            //            // Console.WriteLine("define_TARGET Completed\n");
+            //            car.setDirection();
+            //            // debug
+            //            // Console.WriteLine("setDirection Completed\n");
+            //            car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
+            //            // car.printTargetInfo();
+            //        }
+            //    }
+            //    catch(Exception ex)
+            //    {
+            //        Console.WriteLine("Err while initializing Cars\n");
+            //        Console.WriteLine(ex.Message);
+            //    }
+            //    Console.WriteLine("CAR Setting Completed\n");
+            //}
+            /********************************************************************************************************/
 
             public void initCCTV()
             {
