@@ -8,6 +8,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="surveillance_system_Form\**" />
+    <EmbeddedResource Remove="surveillance_system_Form\**" />
+    <None Remove="surveillance_system_Form\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="DotSpatial.Projections" Version="4.0.656" />
   </ItemGroup>
 

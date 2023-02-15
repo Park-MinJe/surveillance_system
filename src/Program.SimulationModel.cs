@@ -662,7 +662,7 @@ namespace surveillance_system
                         archs[i] = new Architecture();
                         archs[i].define_Architecture(pls[i], hs[i]);
                         //Debug
-                        //archs[i].printArchInfo();
+                        archs[i].printArchInfo();
                     }
                     road.setArch(this.N_Arch);
                 }
