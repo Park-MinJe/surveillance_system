@@ -125,6 +125,12 @@ namespace surveillance_system
                 this.Z = midpointOfPolygon.z;
             }
 
+            // interface initArch를 이용한 객체 초기화
+            public void define_Architecture(initArchitecture initArchBy)
+            {
+
+            }
+
             // 벡터 H1H2의 직교 벡터를 이용해 Direction 연산
             public double calcDirection(Segment l)
             {

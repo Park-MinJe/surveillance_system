@@ -15,17 +15,26 @@ namespace surveillance_system
             double initZ();
             double initH();
             Point[] initPointsOfBottom();
+            Point[] initPointsOfTop();
             double[] initDirections();
             Point[] initMidPoints();
             Segment[] initH_Segment();
             Segment[] initV_Segment();
             Polygon[] initFacesOfArch();
+
+            bool nextArch();
         }
 
         public class initArchByGis : initArchitecture
         {
             List<Point[]> pls;
             List<double> hs;
+
+            int archIdx;
+            int dotCnt;
+
+            Point[] pl;
+            double h;
 
             public initArchByGis(Point lowerCorner, Point upperCorner)
             {
@@ -53,12 +62,10 @@ namespace surveillance_system
                         pls.Add(plOnSystem);
                     }
                 }
+
+                archIdx = -1;
             }
 
-            public int getNArchs()
-            {
-                return pls.Count;
-            }
             public double initX()
             {
                 
@@ -73,11 +80,19 @@ namespace surveillance_system
             }
             public double initH()
             {
-
+                return this.hs[archIdx];
             }
             public Point[] initPointsOfBottom()
             {
-
+                Point[] rt = new Point[this.dotCnt];
+                for (int i = 0; i < this.dotCnt; i++)
+                {
+                    rt[i] = new Point(p[i].x, p[i].y, 0);
+                }
+            }
+            Point[] initPointsOfTop()
+            {
+                Point[] rt = new Point[dotCnt];
             }
             public double[] initDirections()
             {
@@ -98,6 +113,22 @@ namespace surveillance_system
             public Polygon[] initFacesOfArch()
             {
 
+            }
+
+            public bool nextArch()
+            {
+                if ((this.archIdx + 1) < this.pls.Count)
+                {
+                    this.archIdx++;
+                    this.dotCnt = this.pls[this.archIdx].Length;
+                    this.pl = this.pls[this.archIdx];
+                    this.h = this.hs[this.archIdx];
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }

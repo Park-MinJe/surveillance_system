@@ -41,7 +41,7 @@ namespace surveillance_system
 
             // 건물
             public int nArch { get; private set; }
-            public Architecture[] archs { get; private set; }
+            public List<Architecture> archs { get; private set; }
 
 
             // World 내의 카메라
@@ -111,17 +111,24 @@ namespace surveillance_system
                 this.road = new RoadFactory().createRoad();
 
                 // 초기화
-                this.road.define_Road(this.X_mapSize, this.Y_mapSize, wd, n_interval, new intiRoadByUsrInput());
+                this.road.define_Road(this.X_mapSize, this.Y_mapSize, wd, n_interval, new initRoadByUsrInput());
             }
 
             // 건물
             public void initArch(initArchType initType)
             {
-                if(initType == initArchType.GIS)
-                {
-                    initArchByGis initArchBy = new initArchByGis(this.lowerCorner, this.upperCorner);
+                this.archs = new ArchFactory().createArchList();
+                initArchitecture initArchBy;
 
-                    this.nArch = initArchBy.getNArchs();
+                if (initType == initArchType.GIS)
+                {
+                    initArchBy = new initArchByGis(lowerCorner, upperCorner);
+
+                    for (; initArchBy.nextArch();)
+                    {
+                        Architecture tmpArch = new ArchFactory().createArch();
+                        tmpArch.define_Architecture(initArchBy);
+                    }
                 }
             }
 
@@ -131,7 +138,7 @@ namespace surveillance_system
                 this.cctvs = new CctvFactory().createCctvArr(this.nCctv);
                 for (int i = 0; i < this.nCctv; i++)
                 {
-                    this.archs[i] = new ArchFactory().createArch();
+                    
                 }
 
 

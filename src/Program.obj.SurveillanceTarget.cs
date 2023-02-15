@@ -65,31 +65,27 @@ namespace surveillance_system
                 initSurvTrg initSurvTrgBy
             )
             {
-                // interface initSurvTrg 사용
-                if(initSurvTrgBy is initSurvTrgByRandom)
-                {
-                    this.xy.setPoint(initSurvTrgBy.initXy());
-                    this.W = initSurvTrgBy.initW();
-                    this.H = initSurvTrgBy.initH();
-                    this.D1 = initSurvTrgBy.initD1();
-                    this.D2 = initSurvTrgBy.initD2();
-                    this.W2 = initSurvTrgBy.initW2();
+                this.xy.setPoint(initSurvTrgBy.initXy());
+                this.W = initSurvTrgBy.initW();
+                this.H = initSurvTrgBy.initH();
+                this.D1 = initSurvTrgBy.initD1();
+                this.D2 = initSurvTrgBy.initD2();
+                this.W2 = initSurvTrgBy.initW2();
 
-                    this.Pos_H1.setPoint(initSurvTrgBy.initPos_H1());
-                    this.Pos_H2.setPoint(initSurvTrgBy.initPos_H2());
-                    this.Pos_V1.setPoint(initSurvTrgBy.initPos_V1());
-                    this.Pos_V2.setPoint(initSurvTrgBy.initPos_V2());
+                this.Pos_H1.setPoint(initSurvTrgBy.initPos_H1());
+                this.Pos_H2.setPoint(initSurvTrgBy.initPos_H2());
+                this.Pos_V1.setPoint(initSurvTrgBy.initPos_V1());
+                this.Pos_V2.setPoint(initSurvTrgBy.initPos_V2());
 
-                    this.DST_xy.setPoint(initSurvTrgBy.initDST());
+                this.DST_xy.setPoint(initSurvTrgBy.initDST());
 
-                    this.Direction = initSurvTrgBy.initDirection();
+                this.Direction = initSurvTrgBy.initDirection();
 
-                    this.Velocity = initSurvTrgBy.initVelocity();
+                this.Velocity = initSurvTrgBy.initVelocity();
 
-                    this.Unit_Travel_Dist = initSurvTrgBy.initUnit_Travel_Dist();
+                this.Unit_Travel_Dist = initSurvTrgBy.initUnit_Travel_Dist();
 
-                    this.N_Surv = initSurvTrgBy.initN_Surv();
-                }
+                this.N_Surv = initSurvTrgBy.initN_Surv();
 
 
                 // 기존 구현

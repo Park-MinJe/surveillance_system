@@ -34,9 +34,9 @@ namespace surveillance_system
                 return new Architecture();
             }
 
-            public Architecture[] createArchArr(int n)
+            public List<Architecture> createArchList()
             {
-                return new Architecture[n];
+                return new List<Architecture>();
             }
         }
 

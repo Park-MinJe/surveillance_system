@@ -15,7 +15,7 @@ namespace surveillance_system
             Point[,] initIntersectionArea(int lane_num, Point[] dst, int wd);
         }
 
-        public class intiRoadByUsrInput : initRoad
+        public class initRoadByUsrInput : initRoad
         {
             public Point[] initDst(int lane_num, double X_interval, double Y_interval, int wd)
             {
