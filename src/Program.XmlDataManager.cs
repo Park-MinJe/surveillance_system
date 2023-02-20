@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using static surveillance_system.Program;
@@ -60,6 +61,7 @@ namespace surveillance_system
 
             private string url;
             private string apiEndPoint = "http://apis.data.go.kr/1611000/nsdi/GisBuildingService";
+            private string methodName = "";
             private string serviceKey = "?ServiceKey=";     // 필수
             private string typeName = "&typename=";
             private string bbox = "&bbox=";
@@ -68,6 +70,7 @@ namespace surveillance_system
             private string resultType = "&resultType=";
             private string srsName = "&srsName=";
 
+            private bool IsSetMethodNameCalled = false;
             private bool IsSetServiceKeyCalled = false;
             private bool IsSetTypeNameCalled = false;
             private bool IsSetBBoxCalled = false;
@@ -88,6 +91,19 @@ namespace surveillance_system
             /* --------------------------------------
              * setter
             -------------------------------------- */
+            public void setGisMethodName(string methodName)
+            {
+                this.IsSetMethodNameCalled = true;
+
+                if (methodName == "국토교통부 GIS건물일반정보WMS조회")
+                    this.methodName += "/wms/getGisGnrlBuildingWMS";
+                else if (methodName == "국토교통부 GIS건물일반정보WFS조회")
+                    this.methodName += "/wfs/getGisGnrlBuildingWFS";
+                else if (methodName == "국토교통부 GIS건물집합정보WMS조회")
+                    this.methodName += "/wms/getGisAggrBuildingWMS";
+                else if (methodName == "국토교통부 GIS건물집합정보WFS조회")
+                    this.methodName += "/wfs/getGisAggrBuildingWFS";
+            }
             public void setServiceKey(string serviceKey)
             {
                 this.IsSetServiceKeyCalled = true;
@@ -154,6 +170,22 @@ namespace surveillance_system
                 //Console.WriteLine(url);
             }
 
+            public void setEndPointUrl()
+            {
+                this.url = this.apiEndPoint;
+                if (this.IsSetMethodNameCalled) this.url += this.methodName;
+                if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
+                if (this.IsSetTypeNameCalled) this.url += this.typeName;
+                if (this.IsSetBBoxCalled) this.url += this.bbox;
+                if (this.IsSetPnuCalled) this.url += this.pnu;
+                if (this.IsSetMaxFeatureCalled) this.url += this.maxFeature;
+                if (this.IsSetResultTypeCalled) this.url += this.resultType;
+                if (this.IsSetSrsNameCalled) this.url += this.srsName;
+
+                // debug;
+                Console.WriteLine(url);
+            }
+
             /* --------------------------------------
              * load data as xml
             -------------------------------------- */
@@ -171,7 +203,7 @@ namespace surveillance_system
                 }
 
                 //Debug
-                //Console.WriteLine(results);
+                Console.WriteLine(results);
 
                 this.xml = new XmlDocument();
                 xml.LoadXml(results);

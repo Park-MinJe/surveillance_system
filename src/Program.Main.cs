@@ -24,6 +24,8 @@ namespace surveillance_system
         public static OsmReader or = new OsmReader();
         public static GisBuildingService gbs = new GisBuildingService();
 
+        public static GuiManagerForGisBuildingService gmfgbs = new GuiManagerForGisBuildingService();
+
         static void Main(string[] args)
         {
             // 도로 정보

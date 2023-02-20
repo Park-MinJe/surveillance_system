@@ -345,7 +345,6 @@
             this.simOptionInfoPage.Name = "simOptionInfoPage";
             this.simOptionInfoPage.Size = new System.Drawing.Size(483, 316);
             this.simOptionInfoPage.TabIndex = 1;
-            this.simOptionInfoPage.Paint += new System.Windows.Forms.PaintEventHandler(this.simOptionInfoPage_Paint);
             // 
             // label1
             // 

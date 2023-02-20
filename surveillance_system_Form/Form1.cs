@@ -50,14 +50,9 @@ namespace surveillance_system_form
             gmfgbs.setSrsNameByGui(message);
 
             gbs.setEndPointUrl();
-            //gbs.loadArchDataFromApiAsXml();
+            gbs.loadBuildingDataFromApiAsXml();
 
             panelList[1].BringToFront();
-        }
-
-        private void simOptionInfoPage_Paint(object sender, PaintEventArgs e)
-        {
-
         }
     }
 }
