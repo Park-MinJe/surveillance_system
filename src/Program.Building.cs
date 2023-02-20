@@ -7,7 +7,7 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public class Architecture
+        public class Building
         {
             // 실제 데이터 미사용 시에만 사용
             /*public double W;
@@ -42,9 +42,9 @@ namespace surveillance_system
 
             public Segment[] V_Segment;
 
-            public Polygon[] facesOfArch;       // 첫번째 면은 바닥면과 두번째 면은 옥상면
+            public Polygon[] facesOfBuilding;       // 첫번째 면은 바닥면과 두번째 면은 옥상면
 
-            /*public void define_Architecture(
+            /*public void define_Building(
                 double Width, 
                 double Height
             )
@@ -74,7 +74,7 @@ namespace surveillance_system
             }*/
 
             // 실제 data를 이용해 건물 객체 생성
-            public void define_Architecture(Point[] p, double h)
+            public void define_Building(Point[] p, double h)
             {
                 int dotCnt = p.Length;
                 this.H = h;
@@ -87,9 +87,9 @@ namespace surveillance_system
                     this.pointsOfTop[i] = new Point(p[i].getX(), p[i].getY(), this.H);
                 }
 
-                this.facesOfArch = new Polygon[dotCnt + 1];
-                this.facesOfArch[0] = new Polygon(this.pointsOfBottom);
-                this.facesOfArch[1] = new Polygon(this.pointsOfTop);
+                this.facesOfBuilding = new Polygon[dotCnt + 1];
+                this.facesOfBuilding[0] = new Polygon(this.pointsOfBottom);
+                this.facesOfBuilding[1] = new Polygon(this.pointsOfTop);
 
                 this.Directions = new double[dotCnt - 1];
                 this.midPoints = new Point[dotCnt - 1];
@@ -99,7 +99,7 @@ namespace surveillance_system
                 /*---------------------- 다각형과 H가 이루는 다면체의 각 면마다 연산 필요 ----------------------*/
                 for(int i = 0; i< dotCnt - 1; i++)
                 {
-                    this.H_Segment[i] = facesOfArch[0].getSegmentByIdx(i);
+                    this.H_Segment[i] = facesOfBuilding[0].getSegmentByIdx(i);
 
                     this.V_Segment[i] = new Segment(this.pointsOfBottom[i], this.pointsOfTop[i]);
 
@@ -113,13 +113,13 @@ namespace surveillance_system
                     Segment[] segments = new Segment[4];
                     segments[0] = this.H_Segment[i];
                     segments[1] = this.V_Segment[(i + 1) % (dotCnt - 1)];
-                    segments[2] = facesOfArch[1].getSegmentByIdx(i);
+                    segments[2] = facesOfBuilding[1].getSegmentByIdx(i);
                     segments[3] = this.V_Segment[i];
 
-                    this.facesOfArch[faceIdx] = new Polygon(segments);
+                    this.facesOfBuilding[faceIdx] = new Polygon(segments);
                 }
 
-                Point midpointOfPolygon = calcMidpointOfPolygon(facesOfArch[0]);
+                Point midpointOfPolygon = calcMidpointOfPolygon(facesOfBuilding[0]);
                 this.X = midpointOfPolygon.getX();
                 this.Y = midpointOfPolygon.getY();
                 this.Z = midpointOfPolygon.getZ();
@@ -145,18 +145,18 @@ namespace surveillance_system
                 return rt;
             }
 
-            public void printArchInfo()
+            public void printBuildingInfo()
             {
                 Console.WriteLine("======================Info======================");
                 Console.WriteLine("면 좌표 :");
-                for (int i = 0; i < facesOfArch.Length; i++)
+                for (int i = 0; i < facesOfBuilding.Length; i++)
                 {
                     Console.Write("#면 {0}", i);
-                    int segmentNum = facesOfArch[i].getSegmentCnt();
+                    int segmentNum = facesOfBuilding[i].getSegmentCnt();
                     for(int j = 0; j<segmentNum; j++)
                     {
                         Console.WriteLine("\t-선분 {0}", j);
-                        Segment tmp = facesOfArch[i].getSegmentByIdx(j);
+                        Segment tmp = facesOfBuilding[i].getSegmentByIdx(j);
                         Console.WriteLine("\t  P1 : ({0},{1},{2})   P2 : ({3},{4},{5})",
                             tmp.getP1().getX(), tmp.getP1().getY(), tmp.getP1().getZ(),
                             tmp.getP2().getX(), tmp.getP2().getY(), tmp.getP2().getZ());

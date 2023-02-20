@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Xml;
+using static surveillance_system.Program;
 
 namespace surveillance_system
 {
@@ -156,7 +157,7 @@ namespace surveillance_system
             /* --------------------------------------
              * load data as xml
             -------------------------------------- */
-            public void loadArchDataFromApiAsXml()
+            public void loadBuildingDataFromApiAsXml()
             {
                 var request = (HttpWebRequest)WebRequest.Create(url);
                 request.Method = "GET";
@@ -199,7 +200,7 @@ namespace surveillance_system
                 gml_posLists = xml.GetElementsByTagName("gml:posList");
             }
 
-            public void readArchHs()
+            public void readBuildingHs()
             {
                 NSDI_BULD_HGs = xml.GetElementsByTagName("NSDI:BULD_HG");
             }
@@ -240,7 +241,7 @@ namespace surveillance_system
                 return this.gml_featureMembers.Count;
             }
 
-            public double getArchH(int idx)
+            public double getBuildingH(int idx)
             {
                 return Convert.ToDouble(NSDI_BULD_HGs[idx].InnerText);
             }
@@ -263,7 +264,7 @@ namespace surveillance_system
             {
                 this.setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
 
-                this.loadArchDataFromApiAsXml();
+                this.loadBuildingDataFromApiAsXml();
 
                 Point lowerCorner = this.getMapLowerCorner();
 
@@ -282,7 +283,7 @@ namespace surveillance_system
 
                 this.readFeatureMembers();
                 this.readPosLists();
-                this.readArchHs();
+                this.readBuildingHs();
 
                 List<Point[]> pls = new List<Point[]>();
                 List<double> hs = new List<double>();
@@ -305,11 +306,11 @@ namespace surveillance_system
                     }
                 }
 
-                archs = new Architecture[pls.Count];
+                buildings = new Building[pls.Count];
                 for(int i = 0; i<pls.Count; i++)
                 {
-                    archs[i] = new Architecture();
-                    archs[i].define_Architecture(pls[i], hs[i]);
+                    buildings[i] = new Building();
+                    buildings[i].define_Building(pls[i], hs[i]);
                 }
             }
         }

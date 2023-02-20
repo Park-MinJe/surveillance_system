@@ -54,5 +54,10 @@ namespace surveillance_system_form
 
             panelList[1].BringToFront();
         }
+
+        private void simOptionInfoPage_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

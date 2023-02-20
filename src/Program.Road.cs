@@ -40,7 +40,7 @@ namespace surveillance_system
             public int width;
 
             // 건물 위치
-            public int[,] archPos;
+            public int[,] buildingPos;
             // CCTV 위치
             public int[,] cctvPos;
             // Ped 위치
@@ -208,13 +208,13 @@ namespace surveillance_system
             -------------------------------------- */
 
             // set Architecture object
-            public void setArch(int n_arch)
+            public void setBuilding(int n_building)
             {
-                archPos = new int[this.Y_grid_num, this.X_grid_num];
+                buildingPos = new int[this.Y_grid_num, this.X_grid_num];
 
-                for (int i = 0; i < n_arch; i++)
+                for (int i = 0; i < n_building; i++)
                 {
-                    archPos[Convert.ToInt32((archs[i].Y) / 10000), Convert.ToInt32((archs[i].X / 10000))] += 1;
+                    buildingPos[Convert.ToInt32((buildings[i].Y) / 10000), Convert.ToInt32((buildings[i].X / 10000))] += 1;
                 }
             }
 
@@ -606,10 +606,10 @@ namespace surveillance_system
                 }
             }
 
-            public void printArchPos()
+            public void printBuildingPos()
             {
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Architecture Position");
-                printPos(this.archPos);
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Print Building Position");
+                printPos(this.buildingPos);
             }
 
             public void printCctvPos()
@@ -648,7 +648,7 @@ namespace surveillance_system
                         string tmp = "";
                         if (this.cctvPos[i, j] > 0) tmp += "&" + cctvPos[i, j];
 
-                        if (this.archPos[i, j] > 0) tmp += "A" + archPos[i, j];
+                        if (this.buildingPos[i, j] > 0) tmp += "A" + buildingPos[i, j];
 
                         if (this.pedPos[i, j] > 0) tmp += "P" + pedPos[i, j];
 

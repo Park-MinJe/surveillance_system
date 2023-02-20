@@ -48,10 +48,10 @@
             this.lb_pnu = new System.Windows.Forms.Label();
             this.lb_maxFeature = new System.Windows.Forms.Label();
             this.simOptionInfoPage = new System.Windows.Forms.Panel();
-            this.lb_cctvSetNum = new System.Windows.Forms.Label();
-            this.lb_simNum = new System.Windows.Forms.Label();
-            this.lb_cctvLocMode = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.lb_cctvLocMode = new System.Windows.Forms.Label();
+            this.lb_simNum = new System.Windows.Forms.Label();
+            this.lb_cctvSetNum = new System.Windows.Forms.Label();
             this.gisInfoPage.SuspendLayout();
             this.simOptionInfoPage.SuspendLayout();
             this.SuspendLayout();
@@ -345,24 +345,16 @@
             this.simOptionInfoPage.Name = "simOptionInfoPage";
             this.simOptionInfoPage.Size = new System.Drawing.Size(483, 316);
             this.simOptionInfoPage.TabIndex = 1;
+            this.simOptionInfoPage.Paint += new System.Windows.Forms.PaintEventHandler(this.simOptionInfoPage_Paint);
             // 
-            // lb_cctvSetNum
+            // label1
             // 
-            this.lb_cctvSetNum.AutoSize = true;
-            this.lb_cctvSetNum.Location = new System.Drawing.Point(79, 20);
-            this.lb_cctvSetNum.Name = "lb_cctvSetNum";
-            this.lb_cctvSetNum.Size = new System.Drawing.Size(121, 15);
-            this.lb_cctvSetNum.TabIndex = 2;
-            this.lb_cctvSetNum.Text = "CCTV 배치 세트 개수";
-            // 
-            // lb_simNum
-            // 
-            this.lb_simNum.AutoSize = true;
-            this.lb_simNum.Location = new System.Drawing.Point(59, 45);
-            this.lb_simNum.Name = "lb_simNum";
-            this.lb_simNum.Size = new System.Drawing.Size(141, 15);
-            this.lb_simNum.TabIndex = 3;
-            this.lb_simNum.Text = "CCTV당 시뮬레이션 횟수";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(107, 110);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(39, 15);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "label1";
             // 
             // lb_cctvLocMode
             // 
@@ -373,14 +365,23 @@
             this.lb_cctvLocMode.TabIndex = 4;
             this.lb_cctvLocMode.Text = "CCTV 배치 유형";
             // 
-            // label1
+            // lb_simNum
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(107, 110);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 15);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "label1";
+            this.lb_simNum.AutoSize = true;
+            this.lb_simNum.Location = new System.Drawing.Point(59, 45);
+            this.lb_simNum.Name = "lb_simNum";
+            this.lb_simNum.Size = new System.Drawing.Size(141, 15);
+            this.lb_simNum.TabIndex = 3;
+            this.lb_simNum.Text = "CCTV당 시뮬레이션 횟수";
+            // 
+            // lb_cctvSetNum
+            // 
+            this.lb_cctvSetNum.AutoSize = true;
+            this.lb_cctvSetNum.Location = new System.Drawing.Point(79, 20);
+            this.lb_cctvSetNum.Name = "lb_cctvSetNum";
+            this.lb_cctvSetNum.Size = new System.Drawing.Size(121, 15);
+            this.lb_cctvSetNum.TabIndex = 2;
+            this.lb_cctvSetNum.Text = "CCTV 배치 세트 개수";
             // 
             // Form1
             // 

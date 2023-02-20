@@ -257,7 +257,7 @@ namespace surveillance_system
               return Math.Sqrt(Math.Pow(Math.Abs(X - trg.X),2) 
                               + Math.Pow(Math.Abs(Y - trg.Y),2));
             }
-            public double calcDistToArchFace(Polygon face)
+            public double calcDistToBuildingFace(Polygon face)
             {
                 Point p = calcMidpointOfPolygon(face);
                 // 이차원 상 거리

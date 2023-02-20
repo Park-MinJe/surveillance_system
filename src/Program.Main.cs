@@ -9,8 +9,8 @@ namespace surveillance_system
     public partial class Program
     {
         // Data Handler
-        public static ArchCSVWriter aw = new ArchCSVWriter();
-        public static ArchCSVReader ar = new ArchCSVReader();
+        public static BuildingCSVWriter aw = new BuildingCSVWriter();
+        public static BuildingCSVReader ar = new BuildingCSVReader();
 
         public static TargetCSVWriter tw = new TargetCSVWriter();
         public static TargetCSVReader tr = new TargetCSVReader();
@@ -49,20 +49,20 @@ namespace surveillance_system
             string srsName = Console.ReadLine();
 
             /*gbs.testGisBuildingService(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
-            foreach(Architecture arch in archs)
+            foreach(Building building in buildings)
             {
                 Console.WriteLine();
-                arch.printArchInfo();
+                building.printBuildingInfo();
             }*/
 
             gbs.setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
-            gbs.loadArchDataFromApiAsXml();
+            gbs.loadBuildingDataFromApiAsXml();
 
-            int nArch = 0, nCctv = 0, nPed = 0, nCar = 0, 
+            int nBuilding = 0, nCctv = 0, nPed = 0, nCar = 0, 
                 cctvMode = 0, 
                 numberOfCCTVSet = 1, 
                 simulationTimesForCCTVSet = 100;
-            string inputNArchOption = "N", 
+            string inputNBuildingOption = "N", 
                 inputNCctvOption = "N", 
                 inputCctvRotate = "N", 
                 inputNPedOption = "N",
@@ -117,10 +117,10 @@ namespace surveillance_system
             while (true)
             {
                 Console.Write("\nDo you want to enter Architecture Numbers(Y/N)? ");
-                inputNArchOption = Console.ReadLine();
+                inputNBuildingOption = Console.ReadLine();
 
-                if (inputNArchOption == "N" || inputNArchOption == "n") { break; }
-                else if (inputNArchOption == "Y" || inputNArchOption == "y") { break; }
+                if (inputNBuildingOption == "N" || inputNBuildingOption == "n") { break; }
+                else if (inputNBuildingOption == "Y" || inputNBuildingOption == "y") { break; }
                 else { continue; }
             }
 
@@ -166,10 +166,10 @@ namespace surveillance_system
 
             Console.WriteLine("");
 
-            if (inputNArchOption == "Y" || inputNArchOption == "y")
+            if (inputNBuildingOption == "Y" || inputNBuildingOption == "y")
             {
-                Console.Write("input number of Architecture: ");
-                nArch = Convert.ToInt32(Console.ReadLine());
+                Console.Write("input number of Building: ");
+                nBuilding = Convert.ToInt32(Console.ReadLine());
             }
 
             if (inputNCctvOption == "Y" || inputNCctvOption == "y")
@@ -198,12 +198,12 @@ namespace surveillance_system
                 sims[i] = new SimulationModel();
                 sims[i].setcreateCSV(InputcreateCSV);
                 sims[i].setCctvFixMode(inputCctvRotate);
-                sims[i].setgetArchNumFromUser(inputNArchOption);
+                sims[i].setgetBuildingNumFromUser(inputNBuildingOption);
                 sims[i].setgetCCTVNumFromUser(inputNCctvOption);
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
 
-                sims[i].initNArch(nArch);
+                sims[i].initNBuilding(nBuilding);
                 sims[i].initNCctv(nCctv);
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
@@ -214,7 +214,7 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 sims[i].initMap(cctvMode);
-                sims[i].initialArchsToCSV(i);
+                sims[i].initialBuildingsToCSV(i);
                 sims[i].initialPedsToCSV(i);
                 sims[i].initialCarsToCSV(i);
                 //pedestrianAtSim.Add(peds);

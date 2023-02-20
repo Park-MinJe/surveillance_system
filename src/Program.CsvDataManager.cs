@@ -12,16 +12,16 @@ namespace surveillance_system
         /* --------------------------------------
          * 건물 객체 CSV
         -------------------------------------- */
-        public class ArchCSVWriter
+        public class BuildingCSVWriter
         {
-            private int N_Arch;
+            private int N_Building;
 
             /* --------------------------------------
              * Set Data
             -------------------------------------- */
-            public void setArchCSVWriter(int N_Arch)
+            public void setBuildingCSVWriter(int N_Building)
             {
-                this.N_Arch = N_Arch;
+                this.N_Building = N_Building;
             }
 
             /* --------------------------------------
@@ -29,43 +29,43 @@ namespace surveillance_system
             -------------------------------------- */
 
             // 임의 좌표 사용시
-            /*public void initialArchsToCSV(int simIdx)
+            /*public void initialBuildingsToCSV(int simIdx)
             {
-                string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
+                string fileName = "object\\building\\Sim" + simIdx + ".Buildings.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,X,Y,Direction,W,H,D1,D2,W2");
-                    for (int j = 0; j < N_Arch; j++)
+                    for (int j = 0; j < N_Building; j++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].X, archs[j].Y, archs[j].Direction, archs[j].W, archs[j].H, archs[j].D1, archs[j].D2, archs[j].W2);
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, buildings[j].X, buildings[j].Y, buildings[j].Direction, buildings[j].W, buildings[j].H, buildings[j].D1, buildings[j].D2, buildings[j].W2);
                     }
                 }
 
-                fileName = "object\\architecture\\Sim" + simIdx + ".Archs.Pos.csv";
+                fileName = "object\\building\\Sim" + simIdx + ".Buildings.Pos.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
-                    for (int j = 0; j < N_Arch; j++)
+                    for (int j = 0; j < N_Building; j++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, archs[j].Pos_H1[0], archs[j].Pos_H1[1], archs[j].Pos_H2[0], archs[j].Pos_H2[0], archs[j].Pos_V1[0], archs[j].Pos_V1[1], archs[j].Pos_V2[0], archs[j].Pos_V2[1]);
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8}", j, buildings[j].Pos_H1[0], buildings[j].Pos_H1[1], buildings[j].Pos_H2[0], buildings[j].Pos_H2[0], buildings[j].Pos_V1[0], buildings[j].Pos_V1[1], buildings[j].Pos_V2[0], buildings[j].Pos_V2[1]);
                     }
                 }
             }*/
-            public void initialArchsToCSV(int simIdx)
+            public void initialBuildingsToCSV(int simIdx)
             {
-                string fileName = "object\\architecture\\Sim" + simIdx + ".Archs.csv";
+                string fileName = "object\\building\\Sim" + simIdx + ".Buildings.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
-                    //Console.WriteLine("{0}", archs.Length);
+                    //Console.WriteLine("{0}", buildings.Length);
                     file.WriteLine("#idx,X,Y,Z,H");
-                    for (int j = 0; j < N_Arch; j++)
+                    for (int j = 0; j < N_Building; j++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4}", j, archs[j].X, archs[j].Y, archs[j].Z, archs[j].H);
+                        file.WriteLine("{0},{1},{2},{3},{4}", j, buildings[j].X, buildings[j].Y, buildings[j].Z, buildings[j].H);
                     }
                 }
             }
         }
-        public class ArchCSVReader
+        public class BuildingCSVReader
         {
 
         }
@@ -516,11 +516,11 @@ namespace surveillance_system
             public double getV(int logIdx) { return this.detectedV[logIdx];}
             public double getT(int logIdx) { return this.detectedT[logIdx];}
 
-            // Shadowed by Architecture Log
+            // Shadowed by Building Log
             private int shadowedLogSize;
 
             private List<int> shadowedCctvIdx;
-            private List<int> shadowedArchIdx;
+            private List<int> shadowedBuildingIdx;
             private List<char> shadowedType;
             private List<string> shadowedTargetType;
             private List<int> shadowedTargetIdx;
@@ -534,7 +534,7 @@ namespace surveillance_system
                 this.shadowedLogSize = 0;
 
                 this.shadowedCctvIdx = new List<int>();
-                this.shadowedArchIdx = new List<int>();
+                this.shadowedBuildingIdx = new List<int>();
                 this.shadowedType = new List<char>();
                 this.shadowedTargetType = new List<string>();
                 this.shadowedTargetIdx = new List<int>();
@@ -544,10 +544,10 @@ namespace surveillance_system
                 this.shadowedT = new List<double>();
             }
 
-            public void addShadowedLog(int cctvIdx, int archIdx, char shadowType, string targetType, int targetIdx, double x, double y, double v, double t)
+            public void addShadowedLog(int cctvIdx, int buildingIdx, char shadowType, string targetType, int targetIdx, double x, double y, double v, double t)
             {
                 this.shadowedCctvIdx.Add(cctvIdx);
-                this.shadowedArchIdx.Add(archIdx);
+                this.shadowedBuildingIdx.Add(buildingIdx);
                 this.shadowedType.Add(shadowType);
                 this.shadowedTargetType.Add(targetType);
                 this.shadowedTargetIdx.Add(targetIdx);
@@ -574,7 +574,7 @@ namespace surveillance_system
                 this.shadowedLogSize = 0;
 
                 this.shadowedCctvIdx.Clear();
-                this.shadowedArchIdx.Clear();
+                this.shadowedBuildingIdx.Clear();
                 this.shadowedType.Clear();
                 this.shadowedTargetType.Clear();
                 this.shadowedTargetIdx.Clear();
@@ -597,15 +597,15 @@ namespace surveillance_system
                 }
             }
 
-            public void ShadowedByArchLogToCSV(int cctvSetIdx, int simIdx)
+            public void ShadowedByBuildingLogToCSV(int cctvSetIdx, int simIdx)
             {
-                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".ShadowedByArchLog.csv";
+                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".ShadowedByBuildingLog.csv";
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
-                    file.WriteLine("#idx,CCTV,ARCHITECTURE,SHADOW_TYPE,TARGET_TYPE,TARGET,X,Y,V,Time");
+                    file.WriteLine("#idx,CCTV,BUILDING,SHADOW_TYPE,TARGET_TYPE,TARGET,X,Y,V,Time");
                     for (int i = 0; i < this.shadowedLogSize; i++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", i, this.shadowedCctvIdx[i], this.shadowedArchIdx[i], this.shadowedType[i], this.shadowedTargetType[i], this.shadowedTargetIdx[i], this.shadowedX[i], this.shadowedY[i], this.shadowedV[i], this.shadowedT[i]);
+                        file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}", i, this.shadowedCctvIdx[i], this.shadowedBuildingIdx[i], this.shadowedType[i], this.shadowedTargetType[i], this.shadowedTargetIdx[i], this.shadowedX[i], this.shadowedY[i], this.shadowedV[i], this.shadowedT[i]);
                     }
                 }
             }
