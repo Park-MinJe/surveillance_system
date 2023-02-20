@@ -24,7 +24,7 @@ namespace surveillance_system
         public static OsmReader or = new OsmReader();
         public static GisBuildingService gbs = new GisBuildingService();
 
-        public static GuiManagerForGisBuildingService gmfgbs = new GuiManagerForGisBuildingService();
+        public static GuiManager gm = new GuiManager();
 
         static void Main(string[] args)
         {
