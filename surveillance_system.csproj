@@ -6,6 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="surveillance_system_Form\**" />
@@ -14,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotSpatial.Projections" Version="4.0.656" />
+    <PackageReference Include="Silk.NET" Version="2.16.0" />
   </ItemGroup>
 
 </Project>
