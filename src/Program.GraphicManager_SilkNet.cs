@@ -163,7 +163,7 @@ namespace surveillance_system
                 Matrix4X4<float> view = Matrix4X4.CreateTranslation<float>(0.0f, 0.0f, -3.0f);
                 Matrix4X4<float> projection = Matrix4X4.CreatePerspectiveFieldOfView<float>((float)DegToRad(45.0), SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
-
+                gl.UniformMatrix4()
 
                 // 실제 그리는 부분
                 gl.DrawElements(GLEnum.Triangles, 6, GLEnum.UnsignedInt, null);
