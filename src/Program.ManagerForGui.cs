@@ -89,7 +89,7 @@ namespace surveillance_system
             }
 
             // 시뮬레이션 시작
-            public bool startSimulationByGui()
+            public void startSimulationByGui()
             {
                 List<double> successRates = new List<double>();
 
@@ -181,8 +181,6 @@ namespace surveillance_system
                 Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
                 road.setCctvswithCSV(bestCCTVIdx);
                 road.printPos(road.cctvPos);
-
-                return true;
             }
         }
     }

@@ -72,7 +72,6 @@
             this.Controls.Add(this.lb_startSimulation);
             this.Name = "startSimulation";
             this.Text = "startSimulation";
-            this.Load += new System.EventHandler(this.startSimulation_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

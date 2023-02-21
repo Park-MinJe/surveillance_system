@@ -12,7 +12,10 @@ namespace surveillance_system_form
         {
             InitializeComponent();
 
+            this.btn_gisConfirm.Click -= gisConfirmClick;
             this.btn_gisConfirm.Click += gisConfirmClick;
+
+            this.btn_simulationSettingConfirm.Click -= btn_simulationSettingConfirm_Click;
             this.btn_simulationSettingConfirm.Click += btn_simulationSettingConfirm_Click;
         }
 

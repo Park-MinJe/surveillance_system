@@ -662,8 +662,8 @@ namespace surveillance_system
                     {
                         buildings[i] = new Building();
                         buildings[i].define_Building(pls[i], hs[i]);
-                        //Debug
-                        buildings[i].printBuildingInfo();
+                        // Debug
+                        //buildings[i].printBuildingInfo();
                     }
                     road.setBuilding(this.N_Building);
                 }

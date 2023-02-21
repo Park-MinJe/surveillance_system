@@ -142,6 +142,8 @@ namespace surveillance_system
 
             public void setEndPointUrl(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
+                if (methodName != "")
+                    this.setGisMethodName(methodName);
                 if (serviceKey != "")
                     this.setServiceKey(serviceKey);
                 if (bbox != "")
@@ -157,7 +159,7 @@ namespace surveillance_system
                 if (srsName != "")
                     this.setSrsName(srsName);
 
-                this.url = this.apiEndPoint + methodName + this.serviceKey + this.typeName + this.bbox + this.maxFeature + this.resultType + this.srsName;
+                this.url = this.apiEndPoint + this.methodName;
                 if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
                 if (this.IsSetTypeNameCalled) this.url += this.typeName;
                 if (this.IsSetBBoxCalled) this.url += this.bbox;
@@ -183,7 +185,7 @@ namespace surveillance_system
                 if (this.IsSetSrsNameCalled) this.url += this.srsName;
 
                 // debug;
-                Console.WriteLine(url);
+                //Console.WriteLine(url);
             }
 
             /* --------------------------------------
@@ -203,7 +205,7 @@ namespace surveillance_system
                 }
 
                 //Debug
-                Console.WriteLine(results);
+                //Console.WriteLine(results);
 
                 this.xml = new XmlDocument();
                 xml.LoadXml(results);
