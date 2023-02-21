@@ -15,7 +15,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotSpatial.Projections" Version="4.0.656" />
+    <PackageReference Include="OpenTK" Version="4.7.5" />
     <PackageReference Include="Silk.NET" Version="2.16.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="shader\" />
   </ItemGroup>
 
 </Project>

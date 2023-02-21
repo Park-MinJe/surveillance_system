@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
-using System.Text;
-using Silk.NET;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -12,12 +10,16 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public class GraphicManager_TriangleTutorial
+        public class GraphicManager_slik
         {
             private IWindow window;
             private IInputContext input;
             private GL gl;
             private uint program;
+
+            // settings
+            const int SCR_WIDTH = 800;
+            const int SCR_HEIGHT = 600;
 
             private readonly string VertexShaderSource = @"
             #version 330 core   //Using version GLSL version 3.3
@@ -26,10 +28,14 @@ namespace surveillance_system
 
             out vec4 outCol;
 
+            uniform mat4 model;
+            uniform mat4 view;
+            uniform mat4 projection;
+
             void main()
             {
                 outCol = vCol;
-                gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
+                gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0) * model * view * projection;
             }
             ";
 
@@ -49,7 +55,7 @@ namespace surveillance_system
             {
                 WindowOptions options = WindowOptions.Default;
                 options.Title = "Silk Tutorial";
-                options.Size = new Vector2D<int>(1280, 720);
+                options.Size = new Vector2D<int>(SCR_WIDTH, SCR_HEIGHT);
                 window = Window.Create(options);
 
                 window.Load += OnWindowOnLoad;
@@ -66,13 +72,13 @@ namespace surveillance_system
 
                 foreach(IMouse mouse in input.Mice)
                 {
-                    mouse.Click += (IMouse cursor, MouseButton button, Vector2 pos) =>
+                    mouse.Click += (IMouse cursor, Silk.NET.Input.MouseButton button, Vector2 pos) =>
                     {
                         Console.WriteLine("I Clicked!");
                     };
                 }
 
-                gl.ClearColor(2.0f, 0.0f, 0.0f, 1.0f);
+                gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
                 uint vshader = gl.CreateShader(ShaderType.VertexShader);
                 //uint vshader = gl.CreateShader(GLEnum.VertexShader);
@@ -113,19 +119,30 @@ namespace surveillance_system
 
                 float[] vertexArray = new float[]
                 {
-                    -0.5f, -0.5f, 0.0f,
+                    //삼각형
+                    /*-0.5f, -0.5f, 0.0f,
                     +0.5f, -0.5f, 0.0f,
-                    0.0f, +0.5f, 0.0f,
+                    0.0f, +0.5f, 0.0f*/
+
+                    //사각형
+                     0.5f,  0.5f, 0.0f,  // top right
+                     0.5f, -0.5f, 0.0f,  // bottom right
+                    -0.5f, -0.5f, 0.0f,  // bottom left
+                    -0.5f,  0.5f, 0.0f   // top left 
                 };
 
                 float[] colorArray = new float[]
                 {
                     1.0f, 0.0f, 0.0f, 1.0f,
                     0.0f, 0.0f, 1.0f, 1.0f,
-                    0.0f, 1.0f, 0.0f, 1.0f,
+                    0.0f, 1.0f, 0.0f, 1.0f, 
+                    0.0f, 1.0f, 1.0f, 1.0f
                 };
 
-                uint[] indexArray = new uint[] { 0, 1, 2 };
+                uint[] indexArray = new uint[] {
+                    0, 1, 3, 
+                    1, 2, 3
+                };
 
                 gl.BindBuffer(GLEnum.ArrayBuffer, vertices);
                 gl.BufferData(GLEnum.ArrayBuffer, (ReadOnlySpan<float>)vertexArray.AsSpan(), GLEnum.StaticDraw);
@@ -142,7 +159,14 @@ namespace surveillance_system
 
                 gl.BindBuffer(GLEnum.ArrayBuffer, 0);
                 gl.UseProgram(program);
-                gl.DrawElements(GLEnum.Triangles, 3, GLEnum.UnsignedInt, null);
+
+                Matrix4X4<float> view = Matrix4X4.CreateTranslation<float>(0.0f, 0.0f, -3.0f);
+                Matrix4X4<float> projection = Matrix4X4.CreatePerspectiveFieldOfView<float>((float)DegToRad(45.0), SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+
+
+
+                // 실제 그리는 부분
+                gl.DrawElements(GLEnum.Triangles, 6, GLEnum.UnsignedInt, null);
 
                 gl.BindBuffer(GLEnum.ElementArrayBuffer, 0);
                 gl.BindVertexArray(vao);

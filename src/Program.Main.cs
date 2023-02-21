@@ -26,13 +26,19 @@ namespace surveillance_system
 
         public static GuiManager gm = new GuiManager();
 
-        public static GraphicManager graphic = new GraphicManager();
+        public static GraphicManager_slik graphic_Silk = new GraphicManager_slik();
+        //public static GraphicManager_OpneTK graphic = new GraphicManager_OpneTK();
 
         static void Main(string[] args)
         {
             // graphic tutorial
             // 230221 1135 pmj6823
-            graphic.graphicTutorial();
+            graphic_Silk.graphicTutorial();
+
+            /*using (GraphicManager_OpneTK graphic = new GraphicManager_OpneTK(800, 600, "LearnOpenTK"))
+            {
+                graphic.Run();
+            }*/
 
             //// 도로 정보
 
