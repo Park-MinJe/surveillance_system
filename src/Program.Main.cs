@@ -3,6 +3,7 @@ using static surveillance_system.Program;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tutorial;
 
 namespace surveillance_system
 {
@@ -33,7 +34,9 @@ namespace surveillance_system
         {
             // graphic tutorial
             // 230221 1135 pmj6823
-            graphic_Silk.graphicTutorial();
+            //graphic_Silk.graphicTutorial();
+            SilkProgram sp = new SilkProgram();
+            sp.tutorial_2_2();
 
             /*using (GraphicManager_OpneTK graphic = new GraphicManager_OpneTK(800, 600, "LearnOpenTK"))
             {
