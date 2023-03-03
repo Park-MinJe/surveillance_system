@@ -48,7 +48,7 @@ namespace surveillance_system
             // Car 위치
             public int[,] carPos;
 
-            public void roadBuilder(int wd, int intvl, int n_interval)
+            public void roadBuilder(int wd, int intvl, int n_interval, Point upperCorner, Point lowerCorner)
             {
                 this.lane_num = n_interval + 1;
                 DST = new double[lane_num * lane_num, 2];
@@ -59,15 +59,15 @@ namespace surveillance_system
                 //this.mapSize = n_interval * intvl + wd * lane_num;
                 //this.grid_num = this.mapSize / 10000 + 2;
                 // 실제 데이터로부터의 mapSize
-                lowerCorner = gbs.getMapLowerCorner();
-                upperCorner = gbs.getMapUpperCorner();
+                //lowerCorner = buildingfromApi.getMapLowerCorner();
+                //upperCorner = buildingfromApi.getMapUpperCorner();
 
-                lowerCorner = TransformCoordinate(lowerCorner, 5174, 4326);
-                upperCorner = TransformCoordinate(upperCorner, 5174, 4326);
+                this.lowerCorner = TransformCoordinate(lowerCorner, 3857, 4326);
+                this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
 
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), upperCorner.getX(), lowerCorner.getY());
+                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.getX(), this.lowerCorner.getY(), this.upperCorner.getX(), this.lowerCorner.getY());
                 //Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), lowerCorner.getY(), lowerCorner.getX(), upperCorner.getY());
+                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.getX(), this.lowerCorner.getY(), this.lowerCorner.getX(), this.upperCorner.getY());
                 //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
                 this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;

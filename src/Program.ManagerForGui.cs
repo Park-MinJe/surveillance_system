@@ -22,22 +22,25 @@ namespace surveillance_system
                 Console.WriteLine(resultType);
                 Console.WriteLine(srsName);
 
-                gbs.setGisMethodName(methodName);
-                gbs.setServiceKey(serviceKey);
-                gbs.setTypeName(typeName);
-                gbs.setBBox(bbox);
-                gbs.setPnu(pnu);
-                gbs.setMaxFeature(maxFeature);
-                gbs.setMaxFeature(maxFeature);
-                gbs.setResultType(resultType);
-                gbs.setSrsName(srsName);
+                buildingfromApi.setRequest(methodName);
+                buildingfromApi.setServiceKey(serviceKey);
+                buildingfromApi.setTypename(typeName);
+                buildingfromApi.setBbox(bbox);
+                buildingfromApi.setSrsname(srsName);
 
-                gbs.setEndPointUrl();
+                if(buildingfromApi is GisBuildingService)
+                {
+                    (buildingfromApi as GisBuildingService).setPnu(pnu);
+                    (buildingfromApi as GisBuildingService).setMaxFeature(maxFeature);
+                    (buildingfromApi as GisBuildingService).setResultType(resultType);
+                }
+
+                buildingfromApi.setEndPointUrl();
             }
 
             public void loadBuildingDataFromApiAsXmlByGui()
             {
-                gbs.loadBuildingDataFromApiAsXml();
+                buildingfromApi.loadBuildingDataFromApiAsXml();
             }
 
             // 시뮬레이션 기본 세팅
@@ -108,7 +111,7 @@ namespace surveillance_system
                     sims[i].initTimer();
 
                     // sims[i].startTimer();
-                    sims[i].initMap(cctvArrangementModeByInt);
+                    sims[i].initMap(cctvArrangementModeByInt, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
                     sims[i].initialBuildingsToCSV(i);
                     sims[i].initialPedsToCSV(i);
                     sims[i].initialCarsToCSV(i);

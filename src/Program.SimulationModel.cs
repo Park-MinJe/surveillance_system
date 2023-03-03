@@ -127,77 +127,77 @@ namespace surveillance_system
             /* --------------------------------------
              * 전체 시뮬레이션 함수
             -------------------------------------- */
-            public double simulateAll(int cctvMode)
-            {
-                /*------------------------------------------------------------------------
-                  % note 1) To avoid confusing, all input parameters for a distance has a unit as a milimeter
-                -------------------------------------------------------------------------*/
-                // Configuration: surveillance cameras
-                // constant
+            //public double simulateAll(int cctvMode)
+            //{
+            //    /*------------------------------------------------------------------------
+            //      % note 1) To avoid confusing, all input parameters for a distance has a unit as a milimeter
+            //    -------------------------------------------------------------------------*/
+            //    // Configuration: surveillance cameras
+            //    // constant
 
 
-                /*------------------------------------------------------------------------
-                  % Xml Document
-                -------------------------------------------------------------------------*/
-                // XmlDocument xdoc = new XmlDocument();
-                // xdoc.Load(@"XMLFile1.xml");
+            //    /*------------------------------------------------------------------------
+            //      % Xml Document
+            //    -------------------------------------------------------------------------*/
+            //    // XmlDocument xdoc = new XmlDocument();
+            //    // xdoc.Load(@"XMLFile1.xml");
 
-                /* ---------------------------변수 초기화------------------------------*/
-                this.setgetCCTVNumFromUser();
-                this.setgetPedNumFromUser();
-                this.setgetCarNumFromUser();
+            //    /* ---------------------------변수 초기화------------------------------*/
+            //    this.setgetCCTVNumFromUser();
+            //    this.setgetPedNumFromUser();
+            //    this.setgetCarNumFromUser();
 
-                this.initVariables();
-
-
-                /* ---------------------------실행 시간 측정---------------------------*/
-                this.initTimer();
-                this.startTimer();
+            //    this.initVariables();
 
 
-                /* -------------------------------------------
-                *  도로 정보 생성 + 보행자/CCTV 초기화 시작
-                *  타이머 작동
-                ------------------------------------------- */
-                this.initMap(cctvMode);
-                road.printRoadInfo();
+            //    /* ---------------------------실행 시간 측정---------------------------*/
+            //    this.initTimer();
+            //    this.startTimer();
 
-                /* -------------------------------------------
-                *  도로 정보 생성 + 보행자/CCTV 초기화 끝
-                ------------------------------------------- */
 
-                // Console.WriteLine(">>> Simulating . . . \n");
+            //    /* -------------------------------------------
+            //    *  도로 정보 생성 + 보행자/CCTV 초기화 시작
+            //    *  타이머 작동
+            //    ------------------------------------------- */
+            //    this.initMap(cctvMode);
+            //    road.printRoadInfo();
 
-                /* -------------------------------------------
-                *  시뮬레이션 진행
-                ------------------------------------------- */
-                this.operateSim();
-                this.stopTimer();
-                /* -------------------------------------------
-                *  시뮬레이션 종료
-                *  타이머 stop
-                ------------------------------------------- */
+            //    /* -------------------------------------------
+            //    *  도로 정보 생성 + 보행자/CCTV 초기화 끝
+            //    ------------------------------------------- */
 
-                // create .csv file
-                this.TraceLogToCSV(0, 0);
+            //    // Console.WriteLine(">>> Simulating . . . \n");
 
-                // 결과(탐지율)
-                double successRate = this.printResultRate();
+            //    /* -------------------------------------------
+            //    *  시뮬레이션 진행
+            //    ------------------------------------------- */
+            //    this.operateSim();
+            //    this.stopTimer();
+            //    /* -------------------------------------------
+            //    *  시뮬레이션 종료
+            //    *  타이머 stop
+            //    ------------------------------------------- */
 
-                // 결과(탐지 결과)
-                // 시뮬레이션 결과, 탐지된 기록을 출력한다.
-                this.printDetectedResults();
+            //    // create .csv file
+            //    this.TraceLogToCSV(0, 0);
 
-                // 결과(시간)
-                // Console.WriteLine("Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
-                // accTime += stopwatch.ElapsedMilliseconds;
+            //    // 결과(탐지율)
+            //    double successRate = this.printResultRate();
 
-                // Console.WriteLine("\n============ RESULT ============");
-                // Console.WriteLine("CCTV: {0}, Ped: {1}", N_CCTV, N_Ped);
-                // Console.WriteLine("Execution time : {0}\n", (accTime / 1000.0 ) + " sec");
+            //    // 결과(탐지 결과)
+            //    // 시뮬레이션 결과, 탐지된 기록을 출력한다.
+            //    this.printDetectedResults();
 
-                return successRate;
-            }
+            //    // 결과(시간)
+            //    // Console.WriteLine("Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
+            //    // accTime += stopwatch.ElapsedMilliseconds;
+
+            //    // Console.WriteLine("\n============ RESULT ============");
+            //    // Console.WriteLine("CCTV: {0}, Ped: {1}", N_CCTV, N_Ped);
+            //    // Console.WriteLine("Execution time : {0}\n", (accTime / 1000.0 ) + " sec");
+
+            //    return successRate;
+            //}
 
             /* --------------------------------------
              * 입력 활성화 함수
@@ -566,7 +566,7 @@ namespace surveillance_system
                 clog.setShadowedLogCSVWriter();
             }
 
-            public void initMap(int cctvMode)
+            public void initMap(int cctvMode, Point upperCorner, Point lowerCorner)
             {
                 // mode 0: pos cctv as grid    1: pos cctv as random
                 try
@@ -574,7 +574,7 @@ namespace surveillance_system
                     if (On_Road_Builder)
                     {
                         // 도로 정보 생성, 보행자 정보 생성
-                        road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval);
+                        road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
                         //road.setBuilding(N_Building);
                         road.setPed(N_Ped);
                         road.setCar(N_Car);
@@ -630,22 +630,25 @@ namespace surveillance_system
             {
                 try
                 {
-                    gbs.readFeatureMembers();
-                    gbs.readPosLists();
-                    gbs.readBuildingHs();
+                    buildingfromApi.readFeatureMembers();
+                    buildingfromApi.readPosLists();
+                    buildingfromApi.readBuildingHs();
 
                     List<Point[]> pls = new List<Point[]>();
                     List<double> hs = new List<double>();
 
-                    for (int i = 0; i < gbs.getFeatureMembersCnt(); i++)
+                    //debug
+                    Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
+
+                    for (int i = 0; i < buildingfromApi.getFeatureMembersCnt(); i++)
                     {
-                        double h = gbs.getBuildingH(i);
+                        double h = buildingfromApi.getBuildingHByIdx(i);
                         if (h > 0)
                         {
                             hs.Add(h);
 
-                            Point[] pl = gbs.getPosList(i);
-                            Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
+                            Point[] pl = buildingfromApi.getPosListByIdx(i);
+                            Point[] transformedPl = TransformCoordinate(pl, 3857, 4326);
 
                             // 프로그램상의 좌표계로 변환
                             // 지도 범위의 왼쪽 위를 기준으로 한다.
@@ -656,6 +659,9 @@ namespace surveillance_system
                     }
 
                     this.N_Building = pls.Count;
+                    //debug
+                    Console.WriteLine("N_Building = {0}", this.N_Building);
+
                     buildings = new Building[this.N_Building];
                     aw.setBuildingCSVWriter(this.N_Building);
                     for (int i = 0; i < this.N_Building; i++)

@@ -12,6 +12,8 @@ namespace surveillance_system
 {
     public partial class Program
     {
+        
+
         public class OsmReader
         {
             string fileName;
@@ -55,7 +57,26 @@ namespace surveillance_system
             }
         }
 
-        public class GisBuildingService
+        public interface InputFromApi
+        {
+            public void setRequest(string methodname);
+            public void setServiceKey(string key);
+            public void setTypename(string typename);
+            public void setBbox(string bbox);
+            public void setSrsname(string srsname);
+            public void setEndPointUrl();
+            public void loadBuildingDataFromApiAsXml();
+            public void readFeatureMembers();
+            public void readPosLists();
+            public void readBuildingHs();
+            public Point getMapLowerCorner();
+            public Point getMapUpperCorner();
+            public int getFeatureMembersCnt();
+            public double getBuildingHByIdx(int idx);
+            public Point[] getPosListByIdx(int idx);
+        }
+
+        public class GisBuildingService : InputFromApi
         {
             private HttpClient client = new HttpClient();
 
@@ -91,7 +112,7 @@ namespace surveillance_system
             /* --------------------------------------
              * setter
             -------------------------------------- */
-            public void setGisMethodName(string methodName)
+            public void setRequest(string methodName)
             {
                 this.IsSetMethodNameCalled = true;
 
@@ -109,12 +130,12 @@ namespace surveillance_system
                 this.IsSetServiceKeyCalled = true;
                 this.serviceKey += serviceKey;
             }
-            public void setTypeName(string typeName)
+            public void setTypename(string typeName)
             {
                 this.IsSetTypeNameCalled = true;
                 this.typeName += typeName;
             }
-            public void setBBox(string bbox) 
+            public void setBbox(string bbox) 
             {
                 this.IsSetBBoxCalled = true;
                 this.bbox += bbox;
@@ -134,7 +155,7 @@ namespace surveillance_system
                 this.IsSetResultTypeCalled = true;
                 this.resultType += resultType;
             }
-            public void setSrsName(string srsName) 
+            public void setSrsname(string srsName) 
             {
                 this.IsSetSrsNameCalled = true;
                 this.srsName += srsName; 
@@ -143,21 +164,21 @@ namespace surveillance_system
             public void setEndPointUrl(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
                 if (methodName != "")
-                    this.setGisMethodName(methodName);
+                    this.setRequest(methodName);
                 if (serviceKey != "")
                     this.setServiceKey(serviceKey);
                 if (bbox != "")
-                    this.setBBox(bbox);
+                    this.setBbox(bbox);
                 if (pnu != "")
                     this.setPnu(pnu);
                 if (typeName != "")
-                    this.setTypeName(typeName);
+                    this.setTypename(typeName);
                 if (maxFeature != "")
                     this.setMaxFeature(maxFeature);
                 if (resultType != "")
                     this.setResultType(resultType);
                 if (srsName != "")
-                    this.setSrsName(srsName);
+                    this.setSrsname(srsName);
 
                 this.url = this.apiEndPoint + this.methodName;
                 if (this.IsSetServiceKeyCalled) this.url += this.serviceKey;
@@ -275,12 +296,12 @@ namespace surveillance_system
                 return this.gml_featureMembers.Count;
             }
 
-            public double getBuildingH(int idx)
+            public double getBuildingHByIdx(int idx)
             {
                 return Convert.ToDouble(NSDI_BULD_HGs[idx].InnerText);
             }
 
-            public Point[] getPosList(int idx)
+            public Point[] getPosListByIdx(int idx)
             {
                 string phrase = gml_posLists[idx].InnerText;
                 string[] words = phrase.Split(" ");
@@ -329,7 +350,7 @@ namespace surveillance_system
                     {
                         hs.Add(h);
 
-                        Point[] pl = this.getPosList(i);
+                        Point[] pl = this.getPosListByIdx(i);
                         Point[] transformedPl = TransformCoordinate(pl, 5174, 4326);
 
                         // 프로그램상의 좌표계로 변환
@@ -346,6 +367,154 @@ namespace surveillance_system
                     buildings[i] = new Building();
                     buildings[i].define_Building(pls[i], hs[i]);
                 }
+            }
+        }
+
+        public class VworldService : InputFromApi
+        {
+            private string url = "http://api.vworld.kr/req/wfs",
+                request = "?request=",      //필수
+                key = "&key=",              //필수
+                typename = "&typename=",    //필수
+                bbox = "&bbox=",            //필수
+                srsname = "&srsname=";
+
+            private bool isSetRequestCalled = false,
+                isSetKeyCalled = false,
+                isSetTypenameCalled = false,
+                isSetBboxCalled = false,
+                isSetSrsnameCalled = false;
+
+            // 데이터 저장 메모리
+            // 데이터 베이스 또는 문서로 확장할까?
+            XmlDocument xml;
+            XmlNodeList gml_featureMembers;
+            XmlNodeList sop_ag_geom;
+            XmlNodeList sop_heights;
+
+            Point upperCorner, lowerCorner;
+
+            /* --------------------------------------
+             * setter
+            -------------------------------------- */
+            public void setRequest(string request) { this.request += request; this.isSetRequestCalled = true; }
+            public void setServiceKey(string key) { this.key += key; this.isSetKeyCalled = true; }
+            public void setTypename(string typename) { this.typename += typename; this.isSetTypenameCalled = true; }
+            public void setBbox(string bbox) 
+            { 
+                this.bbox += bbox;
+                this.isSetBboxCalled = true;
+
+                string tmp_string = bbox;
+                string[] tmp_word = bbox.Split(',');
+                lowerCorner = new Point(Convert.ToDouble(tmp_word[0]), Convert.ToDouble(tmp_word[1]), 0);
+                upperCorner = new Point(Convert.ToDouble(tmp_word[2]), Convert.ToDouble(tmp_word[3]), 0);
+            }
+            public void setSrsname(string srsname) { this.srsname += srsname; this.isSetSrsnameCalled = true; }
+
+            public void setEndPointUrl()
+            {
+                if (isSetRequestCalled) url += request;
+                if (isSetKeyCalled) url += key;
+                if (isSetTypenameCalled) url += typename;
+                if (isSetBboxCalled) url += bbox;
+                if (isSetSrsnameCalled) url += srsname;
+
+                //debug
+                //Console.WriteLine(url);
+            }
+
+            /* --------------------------------------
+             * load data as xml
+            -------------------------------------- */
+            public void loadBuildingDataFromApiAsXml()
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = "GET";
+
+                string results = string.Empty;
+                HttpWebResponse response;
+                using (response = request.GetResponse() as HttpWebResponse)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
+                    results = reader.ReadToEnd();
+                }
+
+                //Debug
+                //Console.WriteLine(results);
+
+                this.xml = new XmlDocument();
+                xml.LoadXml(results);
+            }
+
+            /* --------------------------------------
+             * read from xml
+            -------------------------------------- */
+            public void readFeatureMembers()
+            {
+                gml_featureMembers = xml.GetElementsByTagName("gml:featureMember");
+            }
+
+            public void readPosLists()
+            {
+                sop_ag_geom = xml.GetElementsByTagName("sop:ag_geom");
+            }
+
+            public void readBuildingHs()
+            {
+                sop_heights = xml.GetElementsByTagName("sop:height");
+            }
+
+            /* --------------------------------------
+             * get data from xml as local class
+            -------------------------------------- */
+            public Point getMapLowerCorner()
+            {
+                Point rt = lowerCorner;
+
+                //Debug
+                //Console.WriteLine("Raw Lower Corner");
+                //rt.printString();
+
+                return rt;
+            }
+
+            public Point getMapUpperCorner()
+            {
+                Point rt = upperCorner;
+
+                //Debug
+                //Console.WriteLine("Raw Lower Corner");
+                //rt.printString();
+
+                return rt;
+            }
+
+            public int getFeatureMembersCnt()
+            {
+                return this.gml_featureMembers.Count;
+            }
+
+            public double getBuildingHByIdx(int idx)
+            {
+                return Convert.ToDouble(sop_heights[idx].InnerText);
+            }
+
+            public Point[] getPosListByIdx(int idx)
+            {
+                string phrase = sop_ag_geom[idx].InnerText;
+                string[] words = phrase.Split(" ");
+                Point[] rt = new Point[words.Length];
+                for (int i = 0; i < words.Length; i++)
+                {
+                    string[] coordinate = words[i].Split(",");
+                    rt[i] = new Point(Convert.ToDouble(coordinate[0]), Convert.ToDouble(coordinate[1]), 0d);
+                    //debug
+                    //rt[i].printString();
+                    //Console.WriteLine();
+                }
+
+                return rt;
             }
         }
     }

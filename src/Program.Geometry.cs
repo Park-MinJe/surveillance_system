@@ -108,6 +108,16 @@ namespace surveillance_system
                 }
             }
 
+            public void setPolygon(Point[] vertexes)
+            {
+                int vertexNum = vertexes.Length;
+                segments = new Segment[vertexNum - 1];
+                for (int i = 0; i < vertexNum - 1; i++)
+                {
+                    segments[i] = new Segment(vertexes[i], vertexes[i + 1]);
+                }
+            }
+
             public Segment[] getSegments() { return segments; }
 
             public Segment getSegmentByIdx(int idx) { return segments[idx]; }
