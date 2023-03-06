@@ -355,7 +355,7 @@ namespace surveillance_system
 
                         // 프로그램상의 좌표계로 변환
                         // 지도 범위의 왼쪽 위를 기준으로 한다.
-                        Point[] plOnSystem = calcIndexOnProg(transformedPl, transformedLowerCorner.getX(), transformedUpperCorner.getY());
+                        Point[] plOnSystem = calcIndexOnProg(transformedPl, transformedLowerCorner, transformedUpperCorner);
 
                         pls.Add(plOnSystem);
                     }

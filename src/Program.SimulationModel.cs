@@ -638,7 +638,8 @@ namespace surveillance_system
                     List<double> hs = new List<double>();
 
                     //debug
-                    Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
+                    //int hs_cnt = 0;
+                    //Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
 
                     for (int i = 0; i < buildingfromApi.getFeatureMembersCnt(); i++)
                     {
@@ -652,7 +653,15 @@ namespace surveillance_system
 
                             // 프로그램상의 좌표계로 변환
                             // 지도 범위의 왼쪽 위를 기준으로 한다.
-                            Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner.getX(), road.upperCorner.getY());
+                            Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner, road.upperCorner);
+
+                            //debug
+                            //hs_cnt++;
+                            //for (int j = 0; j < plOnSystem.Length; j++)
+                            //{
+                            //    plOnSystem[j].printString();
+                            //}
+                            //Console.WriteLine();
 
                             pls.Add(plOnSystem);
                         }
@@ -660,7 +669,10 @@ namespace surveillance_system
 
                     this.N_Building = pls.Count;
                     //debug
-                    Console.WriteLine("N_Building = {0}", this.N_Building);
+                    //Console.WriteLine("N_Building = {0}", this.N_Building);
+                    //Console.WriteLine("pls count = {0}", pls.Count);
+                    //Console.WriteLine("hs count = {0}", hs.Count);
+                    //Console.WriteLine("hs_cnt = {0}", hs_cnt);
 
                     buildings = new Building[this.N_Building];
                     aw.setBuildingCSVWriter(this.N_Building);
@@ -668,9 +680,13 @@ namespace surveillance_system
                     {
                         buildings[i] = new Building();
                         buildings[i].define_Building(pls[i], hs[i]);
+
                         // Debug
                         //buildings[i].printBuildingInfo();
                     }
+                    //Debug
+                    //Console.WriteLine("Err after defining building");
+
                     road.setBuilding(this.N_Building);
                 }
                 catch (Exception ex)

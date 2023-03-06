@@ -163,8 +163,9 @@ namespace surveillance_system
 
             return rt;
         }
+
         // proj4_epsg4326 to system 좌표계
-        public static Point[] calcIndexOnProg(Point[] ps, double lowerCornerX, double upperCornerY)
+        public static Point[] calcIndexOnProg(Point[] ps, Point lowerCorner, Point upperCorner)
         {
             Point[] rt = new Point[ps.Length];
             for(int i = 0; i<ps.Length; i++)
@@ -172,8 +173,8 @@ namespace surveillance_system
                 double x = ps[i].getX();
                 double y = ps[i].getY();
 
-                rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCornerX, y, x, y),
-                                    getDistanceBetweenPointsOfepsg4326(x, upperCornerY, x, y),
+                rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), y, x, y),
+                                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
                                     0d);
             }
 

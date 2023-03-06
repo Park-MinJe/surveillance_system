@@ -124,5 +124,41 @@ namespace surveillance_system
 
             public int getSegmentCnt() { return segments.Length; }
         }
+
+        public static int getPositionOfPointRelativeToSegment(Segment AB, Point anotherP)
+        {
+            double dxAB, dxAP, dyAB, dyAP;
+            int dir= 0;
+
+            dxAB = AB.getP2().getX() - AB.getP1().getX();
+            dyAB = AB.getP2().getY() - AB.getP1().getY();
+
+            dxAP = anotherP.getX() - AB.getP1().getX();
+            dyAP = anotherP.getY() - AB.getP1().getY();
+
+            if (dxAB * dyAP < dyAB * dxAP) dir = 1;     // AB 기울기 > AP 기울기
+            if (dxAB * dyAP > dyAB * dxAP) dir = -1;    // AB 기울기 < AP 기울기
+            if(dxAB*dyAP == dyAB * dxAP)                // AB 기울기 = AP 기울기
+            {
+                if (dxAB == 0 && dyAB == 0) dir = 0;
+                if ((dxAB * dxAP < 0) || (dyAB * dyAP < 0)) dir = -1;
+                else if ((dxAB * dxAB + dyAB * dyAB) >= (dxAP * dxAP + dyAP * dyAP)) dir = 0;
+                else dir = 1;
+            }
+
+            return dir;
+        }
+
+        public static bool segmentIntersection(Segment AB, Segment CD)
+        {
+            bool SegmentCrossing = false;
+            if (((getPositionOfPointRelativeToSegment(AB, CD.getP1()) * getPositionOfPointRelativeToSegment(AB, CD.getP2())) <= 0) &&
+                ((getPositionOfPointRelativeToSegment(CD, AB.getP1()) * getPositionOfPointRelativeToSegment(CD, AB.getP2())) <= 0))
+            {
+                SegmentCrossing = true;
+            }
+            else SegmentCrossing = false;
+            return SegmentCrossing;
+        }
     }
 }

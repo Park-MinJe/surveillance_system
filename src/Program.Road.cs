@@ -214,7 +214,19 @@ namespace surveillance_system
 
                 for (int i = 0; i < n_building; i++)
                 {
-                    buildingPos[Convert.ToInt32((buildings[i].Y) / 10000), Convert.ToInt32((buildings[i].X / 10000))] += 1;
+                    int grid_Y = Convert.ToInt32((buildings[i].Y) / 10000),
+                        grid_X = Convert.ToInt32((buildings[i].X / 10000));
+
+                    if(grid_Y > this.Y_grid_num)
+                    {
+                        grid_Y = this.Y_grid_num - 1;
+                    }
+                    if(grid_X > this.X_grid_num)
+                    {
+                        grid_X = this.X_grid_num - 1;
+                    }
+
+                    buildingPos[grid_Y, grid_X] += 1;
                 }
             }
 
