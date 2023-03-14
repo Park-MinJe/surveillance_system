@@ -165,6 +165,7 @@ namespace surveillance_system
         }
 
         // proj4_epsg4326 to system 좌표계
+        // 여러 점 한번에
         public static Point[] calcIndexOnProg(Point[] ps, Point lowerCorner, Point upperCorner)
         {
             Point[] rt = new Point[ps.Length];
@@ -177,6 +178,21 @@ namespace surveillance_system
                                     getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
                                     0d);
             }
+
+            return rt;
+        }
+
+        // proj4_epsg4326 to system 좌표계
+        // 한 개 점만
+        public static Point calcIndexOnProg(Point p, Point lowerCorner, Point upperCorner)
+        {
+            Point rt = new Point();
+            double x = p.getX();
+            double y = p.getY();
+
+            rt = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), y, x, y),
+                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
+                    0d);
 
             return rt;
         }

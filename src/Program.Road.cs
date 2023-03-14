@@ -301,6 +301,7 @@ namespace surveillance_system
                 // this.printCctvPos();
             }
 
+            // 무작위 좌표에 cctv 배치
             public void setCCTVbyRandomInInt(int n_cctv)
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
@@ -319,6 +320,37 @@ namespace surveillance_system
 
                     //debug
                     cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                }
+
+                // this.printCctvPos();
+            }
+
+            // 파일로부터 읽은 cctv 위치
+            public void setCCTVbyRealWorldData(int n_cctv)
+            {
+                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+
+                Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
+
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Real World Data");
+                for (int i = 0, j = 0; i < cr.realWorldCctvData.Count(); i++)
+                {
+                    Point cctvPositionAsWGS84 = new Point(Convert.ToDouble(cr.realWorldCctvData[i][8]), Convert.ToDouble(cr.realWorldCctvData[i][7]), 0);
+                    Point cctvLocationOnSystem = calcIndexOnProg(cctvPositionAsWGS84, this.lowerCorner, this.upperCorner);
+
+                    int cctvNumAtPosition = Convert.ToInt32(cr.realWorldCctvData[i][2]);
+                    for (int k = 0; k < cctvNumAtPosition; j++, k++)
+                    {
+                        cctvs[j].X = Convert.ToInt32(cctvLocationOnSystem.getX());
+                        cctvs[j].Y = Convert.ToInt32(cctvLocationOnSystem.getY());
+
+                        //debug
+                        Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
+                        Console.WriteLine();
+
+                        //debug
+                        cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                    }
                 }
 
                 // this.printCctvPos();

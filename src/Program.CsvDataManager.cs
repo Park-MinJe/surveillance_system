@@ -428,9 +428,16 @@ namespace surveillance_system
                                 }
 
                                 values = lines.Split(",");
-                                realWorldCctvNum += Convert.ToInt32(values[5]);
 
-                                realWorldCctvData.Add(values);
+                                Console.WriteLine(values[7] + "," + values[8]);
+                                double y = Convert.ToDouble(values[7]);
+                                double x = Convert.ToDouble(values[8]);
+                                if ((y > road.lowerCorner.getY() && y < road.upperCorner.getY())
+                                    && (x > road.lowerCorner.getX() && x < road.upperCorner.getX()))
+                                {
+                                    realWorldCctvNum += Convert.ToInt32(values[2]);
+                                    realWorldCctvData.Add(values);
+                                }
                             }
                         }
                     }
@@ -438,6 +445,17 @@ namespace surveillance_system
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
+                }
+
+                //debug
+                Console.WriteLine("Real World CCTV Num = {0}", this.realWorldCctvNum);
+                for(int i = 0; i < realWorldCctvData.Count(); i++)
+                {
+                    for(int j = 0; j < realWorldCctvData[i].Length; j++)
+                    {
+                        Console.Write(realWorldCctvData[i][j] + ",");
+                    }
+                    Console.WriteLine();
                 }
             }
         }

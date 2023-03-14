@@ -611,7 +611,7 @@ namespace surveillance_system
 
                         // 건물 init
                         this.initBuilding();
-                        
+
                         // ped init
                         this.initPed();
 
@@ -619,7 +619,14 @@ namespace surveillance_system
                         this.initCar();
 
                         // cctv init
-                        this.initCCTV();
+                        if (cctvMode == 3)
+                        {
+                            this.initCCTVByRealWorldData();
+                        }
+                        else
+                        {
+                            this.initCCTV();
+                        }
                     }
                 }
                 catch(Exception ex)

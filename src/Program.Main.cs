@@ -37,6 +37,74 @@ namespace surveillance_system
 
         static void Main(string[] args)
         {
+            int operatingMode;          // 0: 디지털 모델링   1: 시뮬레이션
+
+            Console.WriteLine("\ninput Operating Mode: ");
+            while (true)
+            {
+                Console.Write("(0: 디지털 모델링   1: 시뮬레이션)? ");
+                operatingMode = Convert.ToInt32(Console.ReadLine());
+
+                if (operatingMode == 0 || operatingMode == 1) { break; }
+                else { continue; }
+            }
+
+            if(operatingMode == 0)
+            {
+                
+            }
+
+            else if(operatingMode == 1)
+            {
+                operateSimulation();
+            }
+        }
+
+        static void vworldTest()
+        {
+            // 230227 1649 pmj
+            // vworld api
+            if (buildingfromApi is VworldService)
+            {
+                buildingfromApi.setRequest("GetFeature");
+                buildingfromApi.setServiceKey("9A183823-9348-31F4-9B73-C38E3C014311");
+                buildingfromApi.setTypename("lt_c_bldginfo");
+                buildingfromApi.setBbox("14135114.246047439,4517725.3072321005,14135687.864251547,4518285.658803624");
+                buildingfromApi.setSrsname("EPSG:3857");
+                buildingfromApi.setEndPointUrl();
+
+                buildingfromApi.loadBuildingDataFromApiAsXml();
+                buildingfromApi.readFeatureMembers();
+                buildingfromApi.readPosLists();
+                buildingfromApi.readBuildingHs();
+
+                Point lower = TransformCoordinate(buildingfromApi.getMapLowerCorner(), 3857, 4326);
+                lower.printString();
+
+                Point upper = TransformCoordinate(buildingfromApi.getMapUpperCorner(), 3857, 4326);
+                upper.printString();
+
+                int building_cnt = buildingfromApi.getFeatureMembersCnt();
+                Console.WriteLine("building_cnt: {0}", building_cnt);
+                for (int i = 0; i < building_cnt; i++)
+                {
+                    if (buildingfromApi.getBuildingHByIdx(i) == 53)
+                    {
+                        Console.WriteLine("H: {0}", buildingfromApi.getBuildingHByIdx(i));
+
+                        Point[] tmp = TransformCoordinate(buildingfromApi.getPosListByIdx(i), 3857, 4326);
+                        foreach (Point p in tmp)
+                        {
+                            p.printString();
+                            Console.WriteLine();
+                        }
+                    }
+                }
+            }
+        }
+
+        static void operateSimulation()
+        {
             // 230221 1135 pmj6823
             // graphic tutorial
             //graphic_Silk.graphicTutorial();
@@ -77,9 +145,9 @@ namespace surveillance_system
                 building.printBuildingInfo();
             }*/
 
-            if(buildingfromApi is GisBuildingService)
+            if (buildingfromApi is GisBuildingService)
                 (buildingfromApi as GisBuildingService).setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
-            else if(buildingfromApi is VworldService)
+            else if (buildingfromApi is VworldService)
             {
                 buildingfromApi.setRequest(methodName);
                 buildingfromApi.setServiceKey(serviceKey);
@@ -133,7 +201,9 @@ namespace surveillance_system
                 Console.Write("(0: pos cctv as grid    1: pos cctv as random at DST    2: pos cctv as random in int)? ");
                 cctvMode = Convert.ToInt32(Console.ReadLine());
 
-                if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2) { break; }
+                // 230314 박민제
+                // cctvMode 3은 realWorldCctvFromCSV() 함수 테스팅을 위함 임시 모드로, 디지털 매핑 과정으로 분기 예정
+                if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2 || cctvMode == 3) { break; }
                 else { continue; }
             }
 
@@ -252,7 +322,7 @@ namespace surveillance_system
                 sims[i].initialCarsToCSV(i);
                 //pedestrianAtSim.Add(peds);
                 //carAtSim.Add(cars);
-                // sims[i].stopTimer();
+                //sims[i].stopTimer();
             }
 
             for (int i = 0; i < numberOfCCTVSet; i++)
@@ -281,6 +351,9 @@ namespace surveillance_system
                                     break;
                                 case 2:
                                     road.setCCTVbyRandomInInt(sims[j].getNCCTV());
+                                    break;
+                                case 3:
+                                    road.setCCTVbyRealWorldData(sims[j].getNCCTV());
                                     break;
                             }
                         }
@@ -319,49 +392,6 @@ namespace surveillance_system
             Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
             road.setCctvswithCSV(bestCCTVIdx);
             road.printPos(road.cctvPos);
-        }
-
-        static void vworldTest()
-        {
-            // 230227 1649 pmj
-            // vworld api
-            if (buildingfromApi is VworldService)
-            {
-                buildingfromApi.setRequest("GetFeature");
-                buildingfromApi.setServiceKey("9A183823-9348-31F4-9B73-C38E3C014311");
-                buildingfromApi.setTypename("lt_c_bldginfo");
-                buildingfromApi.setBbox("14135114.246047439,4517725.3072321005,14135687.864251547,4518285.658803624");
-                buildingfromApi.setSrsname("EPSG:3857");
-                buildingfromApi.setEndPointUrl();
-
-                buildingfromApi.loadBuildingDataFromApiAsXml();
-                buildingfromApi.readFeatureMembers();
-                buildingfromApi.readPosLists();
-                buildingfromApi.readBuildingHs();
-
-                Point lower = TransformCoordinate(buildingfromApi.getMapLowerCorner(), 3857, 4326);
-                lower.printString();
-
-                Point upper = TransformCoordinate(buildingfromApi.getMapUpperCorner(), 3857, 4326);
-                upper.printString();
-
-                int building_cnt = buildingfromApi.getFeatureMembersCnt();
-                Console.WriteLine("building_cnt: {0}", building_cnt);
-                for (int i = 0; i < building_cnt; i++)
-                {
-                    if (buildingfromApi.getBuildingHByIdx(i) == 53)
-                    {
-                        Console.WriteLine("H: {0}", buildingfromApi.getBuildingHByIdx(i));
-
-                        Point[] tmp = TransformCoordinate(buildingfromApi.getPosListByIdx(i), 3857, 4326);
-                        foreach (Point p in tmp)
-                        {
-                            p.printString();
-                            Console.WriteLine();
-                        }
-                    }
-                }
-            }
         }
     }
 }
