@@ -538,11 +538,15 @@ namespace surveillance_system
                 {
                     buildings[i] = new Building();
                 }*/
-                cctvs = new CCTV[N_CCTV];
+
+                // 230314 박민제
+                // 실제 데이터 활용
+                /*cctvs = new CCTV[N_CCTV];
                 for (int i = 0; i < N_CCTV; i++)
                 {
                     cctvs[i] = new CCTV();
-                }
+                }*/
+
                 peds = new Pedestrian[N_Ped];
                 for (int i = 0; i < N_Ped; i++)
                 {
@@ -558,7 +562,7 @@ namespace surveillance_system
 
                 tw.setTargetCSVWriter(N_Ped, N_Car);
 
-                cw.setCctvCSVWriter(N_CCTV);
+                //cw.setCctvCSVWriter(N_CCTV);
 
                 tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
@@ -848,6 +852,67 @@ namespace surveillance_system
                     }
                 }
                 catch(Exception ex)
+                {
+                    Console.WriteLine("Err while initializing CCTVs\n");
+                    Console.WriteLine(ex.Message);
+                }
+                Console.WriteLine("\nCCTV Setting Completed\n");
+            }
+
+            // 230314 박민제
+            // 실제 데이터를 활용한 cctv 객체 초기화
+            // 우선 위치 데이터와 카메라 댓수 활용
+            public void initCCTVByRealWorldData()
+            {
+                try
+                {
+                    cr.realWorldCctvFromCSV();
+                    this.N_CCTV = cr.realWorldCctvNum;
+                    cctvs = new CCTV[N_CCTV];
+                    for (int i = 0; i < N_CCTV; i++)
+                    {
+                        cctvs[i] = new CCTV();
+                    }
+
+                    for (int i = 0; i < N_CCTV; i++)
+                    {
+                        cctvs[i].setZ((int)Math.Ceiling(rand.NextDouble() * (Height.Max() - 3000)) + 3000);
+                        cctvs[i].WD = WD;
+                        cctvs[i].HE = HE;
+                        cctvs[i].imW = (int)imW;
+                        cctvs[i].imH = (int)imH;
+                        cctvs[i].Focal_Length = Lens_FocalLength;
+
+                        cctvs[i].setViewAngleH(rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
+                        cctvs[i].setViewAngleV(-45.0 * Math.PI / 180);   // (23-02-02) modified by 0BoO, deg -> rad
+
+
+                        cctvs[i].setFixMode(fixMode); // default (rotate)
+
+                        cctvs[i].H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));
+                        cctvs[i].V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));
+
+                        // 기기 성능상의 최대 감시거리 (임시값)
+                        cctvs[i].Max_Dist = 50 * 100 * 10; // 50m (milimeter)
+                                                           // cctvs[i].Max_Dist = 500 * 100 * 100; // 500m (milimeter)
+
+                        cctvs[i]
+                            .get_PixelDensity(Dist,
+                            cctvs[i].WD,
+                            cctvs[i].HE,
+                            cctvs[i].Focal_Length,
+                            cctvs[i].imW,
+                            cctvs[i].imH);
+
+                        cctvs[i].get_H_FOV(Dist, cctvs[i].WD, cctvs[i].Focal_Length, cctvs[i].ViewAngleH, cctvs[i].X, cctvs[i].Y);
+                        cctvs[i].get_V_FOV(Dist, cctvs[i].HE, cctvs[i].Focal_Length, cctvs[i].ViewAngleV, cctvs[i].X, cctvs[i].Z);
+                        // cctvs[i].printCCTVInfo();
+
+                        cctvs[i].calcBlindToPed();          // (23-02-01) added by 0BoO
+                        cctvs[i].calcEffDistToPed(3000);     // (23-02-01) added by 0BoO, input value is 3000mm(3meter)
+                    }
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine("Err while initializing CCTVs\n");
                     Console.WriteLine(ex.Message);

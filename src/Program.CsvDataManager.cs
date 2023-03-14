@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using static surveillance_system.Program;
@@ -358,6 +359,11 @@ namespace surveillance_system
 
         public class CctvCSVReader
         {
+            // csv 파일을 저장하기 위한 리스트
+            public List<string[]> realWorldCctvData { get; private set; }
+            public int realWorldCctvNum { get; private set; }
+
+            // csv 파일료 저장된 초기 cctv 객체 데이터를 읽어와 cctv 위치 데이터를 초기화해준다.
             public void initialCctvsFromCSV(int cctvSetIdx)
             {
                 try
@@ -385,6 +391,46 @@ namespace surveillance_system
                                 int idx = Convert.ToInt32(values[0]);
                                 cctvs[idx].X = Convert.ToInt32(values[1]);
                                 cctvs[idx].Y = Convert.ToInt32(values[2]);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+            }
+
+            public void realWorldCctvFromCSV()
+            {
+                realWorldCctvData = new List<string[]>();
+                realWorldCctvNum = 0;
+
+                try
+                {
+                    // 파일 위치 예시
+                    string fileName = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv";
+                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    {
+                        using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
+                        {
+                            string lines = null;
+                            //string[] keys = null;
+                            string[] values = null;
+
+                            while ((lines = sr.ReadLine()) != null)
+                            {
+                                if (string.IsNullOrEmpty(lines)) return;
+
+                                if (lines.Substring(0, 1).Equals("#"))  // 첫줄에 #이 있을 경우 Key로 처리
+                                {
+                                    continue;
+                                }
+
+                                values = lines.Split(",");
+                                realWorldCctvNum += Convert.ToInt32(values[5]);
+
+                                realWorldCctvData.Add(values);
                             }
                         }
                     }

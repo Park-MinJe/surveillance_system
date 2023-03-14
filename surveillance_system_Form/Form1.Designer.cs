@@ -114,7 +114,8 @@
             "국토교통부 GIS건물일반정보WMS조회",
             "국토교통부 GIS건물일반정보WFS조회",
             "국토교통부 GIS건물집합정보WMS조회",
-            "국토교통부 GIS건물집합정보WFS조회"});
+            "국토교통부 GIS건물집합정보WFS조회",
+            "GetFeature"});
             this.cb_methodNM.Location = new System.Drawing.Point(251, 32);
             this.cb_methodNM.Name = "cb_methodNM";
             this.cb_methodNM.Size = new System.Drawing.Size(121, 23);
