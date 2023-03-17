@@ -103,6 +103,8 @@ namespace surveillance_system
             }
         }
 
+        // 230317 박민제
+        // 실제 데이터를 이용한 디지털 매핑
         static void operateMapping()
         {
             // 도로 정보
@@ -148,139 +150,7 @@ namespace surveillance_system
             }
             buildingfromApi.loadBuildingDataFromApiAsXml();
 
-            int nBuilding = 0, nCctv = 0, nPed = 0, nCar = 0,
-                cctvMode = 0,
-                numberOfCCTVSet = 1,
-                simulationTimesForCCTVSet = 100;
-            string inputNBuildingOption = "N",
-                inputNCctvOption = "N",
-                inputCctvRotate = "N",
-                inputNPedOption = "N",
-                inputNCarOption = "N",
-                InputcreateCSV = "N";
-
-            List<double> successRates = new List<double>();
-            //List<CCTV[]> cctvAtSim = new List<CCTV[]>();
-            //List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
-            //List<Car[]> carAtSim = new List<Car[]>();
-
-            //List<int[,]> cctvPosAtSim = new List<int[,]>();
-
-            while (true)
-            {
-                Console.Write("\ninput Number of CCTV set( 1~ ): ");
-                numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
-
-                if (numberOfCCTVSet < 1) { continue; }
-                else { break; }
-            }
-
-            while (true)
-            {
-                Console.Write("input Simulation times for Each CCTV set( 1~ ): ");
-                simulationTimesForCCTVSet = Convert.ToInt32(Console.ReadLine());
-
-                if (simulationTimesForCCTVSet < 1) { continue; }
-                else { break; }
-            }
-
-            Console.WriteLine("\ninput CCTV collocating mode: ");
-            while (true)
-            {
-                Console.Write("(0: pos cctv as grid    1: pos cctv as random at DST    2: pos cctv as random in int)? ");
-                cctvMode = Convert.ToInt32(Console.ReadLine());
-
-                // 230314 박민제
-                // cctvMode 3은 realWorldCctvFromCSV() 함수 테스팅을 위함 임시 모드로, 디지털 매핑 과정으로 분기 예정
-                if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2 || cctvMode == 3) { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("\nDo you want to rotate cctv(Y/N)? ");
-                inputCctvRotate = Console.ReadLine();
-
-                if (inputCctvRotate == "N" || inputCctvRotate == "n") { break; }
-                else if (inputCctvRotate == "Y" || inputCctvRotate == "y") { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("\nDo you want to enter Architecture Numbers(Y/N)? ");
-                inputNBuildingOption = Console.ReadLine();
-
-                if (inputNBuildingOption == "N" || inputNBuildingOption == "n") { break; }
-                else if (inputNBuildingOption == "Y" || inputNBuildingOption == "y") { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("Do you want to enter CCTV Numbers(Y/N)? ");
-                inputNCctvOption = Console.ReadLine();
-
-                if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
-                else if (inputNCctvOption == "Y" || inputNCctvOption == "y") { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("Do you want to enter Pedestrian Numbers(Y/N)? ");
-                inputNPedOption = Console.ReadLine();
-
-                if (inputNPedOption == "N" || inputNPedOption == "n") { break; }
-                else if (inputNPedOption == "Y" || inputNPedOption == "y") { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("Do you want to enter Car Numbers(Y/N)? ");
-                inputNCarOption = Console.ReadLine();
-
-                if (inputNCarOption == "N" || inputNCarOption == "n") { break; }
-                else if (inputNCarOption == "Y" || inputNCarOption == "y") { break; }
-                else { continue; }
-            }
-
-            while (true)
-            {
-                Console.Write("Do you wand results as csv file(Y/N)? ");
-                InputcreateCSV = Console.ReadLine();
-
-                if (InputcreateCSV == "N" || InputcreateCSV == "n") { break; }
-                else if (InputcreateCSV == "Y" || InputcreateCSV == "y") { break; }
-                else { continue; }
-            }
-
-            Console.WriteLine("");
-
-            if (inputNBuildingOption == "Y" || inputNBuildingOption == "y")
-            {
-                Console.Write("input number of Building: ");
-                nBuilding = Convert.ToInt32(Console.ReadLine());
-            }
-
-            if (inputNCctvOption == "Y" || inputNCctvOption == "y")
-            {
-                Console.Write("input number of CCTV: ");
-                nCctv = Convert.ToInt32(Console.ReadLine());
-            }
-
-            if (inputNPedOption == "Y" || inputNPedOption == "y")
-            {
-                Console.Write("input number of Pedestrian: ");
-                nPed = Convert.ToInt32(Console.ReadLine());
-            }
-
-            if (inputNCarOption == "Y" || inputNCarOption == "y")
-            {
-                Console.Write("input number of Car: ");
-                nCar = Convert.ToInt32(Console.ReadLine());
-            }
+            int cctvMode = 3;
 
             DigitalMappingModule mappingModule = new DigitalMappingModule();
             mappingModule.initVariables();
@@ -295,6 +165,8 @@ namespace surveillance_system
             road.printAllPos();
         }
 
+        // 230317 박민제
+        // 디지털 매핑된 것을 기반으로 시뮬레이션 구현
         //static void operateSimulation()
         //{
         //    // 230221 1135 pmj6823
