@@ -345,15 +345,16 @@ namespace surveillance_system
                         cctvs[j].Y = Convert.ToInt32(cctvLocationOnSystem.getY());
 
                         //debug
-                        Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
-                        Console.WriteLine();
+                        //Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", j, cctvs[i].X, cctvs[i].Y);
+                        //Console.WriteLine();
 
                         //debug
-                        cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                        cctvPos[(cctvs[j].Y) / 10000, (cctvs[j].X) / 10000] += 1;
                     }
                 }
 
-                // this.printCctvPos();
+                //debug
+                //this.printCctvPos();
             }
 
             // 보행자 위치 처음 설정

@@ -341,17 +341,28 @@ namespace surveillance_system
             public void setCctvCSVWriter(int N_Cctv)
             {
                 this.N_Cctv= N_Cctv;
+
+                //debug
+                //Console.WriteLine(this.N_Cctv);
             }
 
             public void initialCctvsToCSV(int cctvSetIdx)
             {
                 string fileName = "object\\cctv\\CctvSet" + cctvSetIdx + ".csv";
+                
+                //debug
+                //Console.WriteLine(fileName);
+
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
                 {
                     file.WriteLine("#idx,X,Y,Z,WD,HE,H_AOV,V_AOV,imW,imH,Focal_Length,ViewAngleH,ViewAngleV,Eff_Dist_From,Eff_Dist_To,Direction,isFixed,Max_Dist");
+                    //debug
+                    //Console.WriteLine("#idx,X,Y,Z,WD,HE,H_AOV,V_AOV,imW,imH,Focal_Length,ViewAngleH,ViewAngleV,Eff_Dist_From,Eff_Dist_To,Direction,isFixed,Max_Dist");
                     for (int j = 0; j < N_Cctv; j++)
                     {
                         file.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}", j, cctvs[j].X, cctvs[j].Y, cctvs[j].Z, cctvs[j].WD, cctvs[j].HE, cctvs[j].H_AOV, cctvs[j].V_AOV, cctvs[j].imW, cctvs[j].imH, cctvs[j].Focal_Length, cctvs[j].ViewAngleH, cctvs[j].ViewAngleV, cctvs[j].Eff_Dist_From, cctvs[j].Eff_Dist_To, cctvs[j].Direction, cctvs[j].isFixed, cctvs[j].Max_Dist);
+                        //debug
+                        //Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}", j, cctvs[j].X, cctvs[j].Y, cctvs[j].Z, cctvs[j].WD, cctvs[j].HE, cctvs[j].H_AOV, cctvs[j].V_AOV, cctvs[j].imW, cctvs[j].imH, cctvs[j].Focal_Length, cctvs[j].ViewAngleH, cctvs[j].ViewAngleV, cctvs[j].Eff_Dist_From, cctvs[j].Eff_Dist_To, cctvs[j].Direction, cctvs[j].isFixed, cctvs[j].Max_Dist);
                     }
                 }
             }
@@ -429,7 +440,8 @@ namespace surveillance_system
 
                                 values = lines.Split(",");
 
-                                Console.WriteLine(values[7] + "," + values[8]);
+                                //debug
+                                //Console.WriteLine(values[7] + "," + values[8]);
                                 double y = Convert.ToDouble(values[7]);
                                 double x = Convert.ToDouble(values[8]);
                                 if ((y > road.lowerCorner.getY() && y < road.upperCorner.getY())
@@ -448,15 +460,15 @@ namespace surveillance_system
                 }
 
                 //debug
-                Console.WriteLine("Real World CCTV Num = {0}", this.realWorldCctvNum);
-                for(int i = 0; i < realWorldCctvData.Count(); i++)
+                //Console.WriteLine("Real World CCTV Num = {0}", this.realWorldCctvNum);
+                /*for(int i = 0; i < realWorldCctvData.Count(); i++)
                 {
                     for(int j = 0; j < realWorldCctvData[i].Length; j++)
                     {
                         Console.Write(realWorldCctvData[i][j] + ",");
                     }
                     Console.WriteLine();
-                }
+                }*/
             }
         }
 

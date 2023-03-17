@@ -358,6 +358,7 @@ namespace surveillance_system
                             }
                         }
                         //cctvAtSim.Add(cctvs);
+                        cw.setCctvCSVWriter(sims[j].getNCCTV());
                         cw.initialCctvsToCSV(i);
                         //cctvPosAtSim.Add(road.cctvPos);
                     }

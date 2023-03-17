@@ -194,6 +194,9 @@ namespace surveillance_system
                     getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
                     0d);
 
+            //debug
+            //rt.printString();
+
             return rt;
         }
 
