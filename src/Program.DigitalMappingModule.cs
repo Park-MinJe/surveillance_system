@@ -517,7 +517,7 @@ namespace surveillance_system
                         cctvs[i].calcEffDistToPed(3000);     // (23-02-01) added by 0BoO, input value is 3000mm(3meter)
 
                         //debug
-                        cctvs[i].printCCTVInfo();
+                        //cctvs[i].printCCTVInfo();
                     }
                 }
                 catch (Exception ex)
