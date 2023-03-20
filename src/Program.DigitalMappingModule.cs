@@ -28,66 +28,66 @@ namespace surveillance_system
             private Random rand = new Random();
 
             /* ------------------------------CCTV 제원------------------------------*/
-            private const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
-            private const double WD = 3.6; // (mm) width, horizontal size of camera sensor
-            private const double HE = 2.7; // (mm) height, vertical size of camera sensor
+            public const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
+            public const double WD = 3.6; // (mm) width, horizontal size of camera sensor
+            public const double HE = 2.7; // (mm) height, vertical size of camera sensor
 
             // const double Diag = Math.Sqrt(WD*WD + HE*HE), diagonal size
-            private const double imW = 1920; // (pixels) image width
-            private const double imH = 1080; // (pixels) image height
+            public const double imW = 1920; // (pixels) image width
+            public const double imH = 1080; // (pixels) image height
 
-            private const double cctv_rotate_degree = -1; //90; --> 30초에 한바퀴?, -1: angle이 회전하는 옵션 disable (note 23-01-16)
-                                                          // Installation [line_23]
-            private const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
-            private const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
+            public const double cctv_rotate_degree = -1; //90; --> 30초에 한바퀴?, -1: angle이 회전하는 옵션 disable (note 23-01-16)
+                                                         // Installation [line_23]
+            public const double Angle_H = 0; // pi/2, (deg), Viewing Angle (Horizontal Aspects)
+            public const double Angle_V = 0; // pi/2, (deg), Viewing Angle (Vertical Aspects)
 
-            private bool fixMode = false;
-            private double rotateTerm = 30.0; // sec
+            public bool fixMode { get; private set; } = false;
+            public double rotateTerm { get; private set; } = 30.0; // sec
 
             // calculate vertical/horizontal AOV
-            private double H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
-            private double V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
+            public double H_AOV { get; private set; } = 2 * Math.Atan(WD / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(WD / (2 * Lens_FocalLength))); // Horizontal AOV
+            public double V_AOV { get; private set; } = 2 * Math.Atan(HE / (2 * Lens_FocalLength));//RadToDeg(2 * Math.Atan(HE / (2 * Lens_FocalLength))); // Vertical AOV
 
-            private double[] Dist = new double[25000];
-            private int dist_len = 100000;
-            private double[] Height = new double[25000];
+            public double[] Dist { get; private set; } = new double[25000];
+            public int dist_len { get; private set; } = 100000;
+            public double[] Height { get; private set; } = new double[25000];
 
             /* ------------------------------MAP 제원------------------------------*/
             // configuration: road
             // const int Road_WD = 5000; // 이거 안쓰는 변수? Road_Width 존재
-            private bool On_Road_Builder = true; // 0:No road, 1:Grid
+            public bool On_Road_Builder { get; private set; } = true; // 0:No road, 1:Grid
 
-            private int Road_Width = 0;
-            private int Road_Interval = 0;
-            private int Road_N_Interval = 0;
+            public int Road_Width { get; private set; } = 0;
+            public int Road_Interval { get; private set; } = 0;
+            public int Road_N_Interval { get; private set; } = 0;
 
-            private int road_min = 0;
-            private int road_max;
+            public int road_min { get; private set; } = 0;
+            public int road_max { get; private set; }
 
             /* ------------------------------건물 설정------------------------------*/
-            private const int Building_Width = 9000;
-            private const int Building_Height = 17000;
+            public const int Building_Width = 9000;
+            public const int Building_Height = 17000;
 
             /* ------------------------------PED 설정------------------------------*/
-            private bool Opt_Observation = false;
-            private bool Opt_Demo = false;
-            private int[] log_PED_position = null;
+            public bool Opt_Observation { get; private set; } = false;
+            public bool Opt_Demo { get; private set; } = false;
+            public int[] log_PED_position { get; private set; } = null;
 
             // Configuration: Pedestrian (Target Object)
             // When Pedestrian
-            private const int Ped_Width = 900; // (mm)
-            private const int Ped_Height = 1700; // (mm)
-            private const int Ped_Velocity = 1500; // (mm/s)
+            public const int Ped_Width = 900; // (mm)
+            public const int Ped_Height = 1700; // (mm)
+            public const int Ped_Velocity = 1500; // (mm/s)
 
             /* ------------------------------CAR 설정------------------------------*/
-            private int[] log_CAR_position = null;
+            public int[] log_CAR_position { get; private set; } = null;
 
             // Configuration: Pedestrian (Target Object)
             // When Car
-            private const int Car_Width = 1600; // (mm)
-            private const int Car_Height = 2000; // (mm)
-                                                 // const int Car_Length = 3600; // (mm)
-            private const int Car_Velocity = 14000; // (mm/s)
+            public const int Car_Width = 1600; // (mm)
+            public const int Car_Height = 2000; // (mm)
+                                                // const int Car_Length = 3600; // (mm)
+            public const int Car_Velocity = 14000; // (mm/s)
 
 
             /* --------------------------------------
@@ -563,26 +563,26 @@ namespace surveillance_system
             /* --------------------------------------
              * save initial objs as csv
             -------------------------------------- */
-            public void initialBuildingsToCSV(int simIdx)
-            {
-                aw.initialBuildingsToCSV(simIdx);
-            }
+            //public void initialBuildingsToCSV(string filename)
+            //{
+            //    aw.initialBuildingsToCSV(filename);
+            //}
 
-            public void initialPedsToCSV(int simIdx)
-            {
-                tw.initialPedsToCSV(simIdx);
-            }
+            //public void initialPedsToCSV(string filename)
+            //{
+            //    tw.initialPedsToCSV(filename);
+            //}
 
-            public void initialCarsToCSV(int simIdx)
-            {
-                tw.initialCarsToCSV(simIdx);
-            }
+            //public void initialCarsToCSV(string filename)
+            //{
+            //    tw.initialCarsToCSV(filename);
+            //}
 
-            public void initialCctvsToCSV(int cctvIdx)
-            {
-                cw.setCctvCSVWriter(this.N_CCTV);
-                cw.initialCctvsToCSV(cctvIdx);
-            }
+            //public void initialCctvsToCSV(string filename)
+            //{
+            //    cw.setCctvCSVWriter(this.N_CCTV);
+            //    cw.initialCctvsToCSV(filename);
+            //}
         }
     }
 }
