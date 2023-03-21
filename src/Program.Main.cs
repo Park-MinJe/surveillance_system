@@ -10,8 +10,8 @@ namespace surveillance_system
     public partial class Program
     {
         // Data Handler
-        public static BuildingCSVWriter aw = new BuildingCSVWriter();
-        public static BuildingCSVReader ar = new BuildingCSVReader();
+        public static BuildingCSVWriter bw = new BuildingCSVWriter();
+        public static BuildingCSVReader br = new BuildingCSVReader();
 
         public static TargetCSVWriter tw = new TargetCSVWriter();
         public static TargetCSVReader tr = new TargetCSVReader();
@@ -155,11 +155,13 @@ namespace surveillance_system
             DigitalMappingModule mappingModule = new DigitalMappingModule();
             mappingModule.initVariables();
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            mappingModule.initialBuildingsToCSV(0);
-            mappingModule.initialPedsToCSV(0);
-            mappingModule.initialCarsToCSV(0);
+            bw.BuildingsToCSV("DigitalMappingResult.Buildings");
+
+            tw.PedsToCSV("DigitalMappingResult.Peds");
+            tw.CarsToCSV("DigitalMappingResult.Cars");
+
             road.setCCTVbyRealWorldData(mappingModule.N_CCTV);
-            mappingModule.initialCctvsToCSV(0);
+            cw.CctvsToCSV("DigitalMappingResult.CctvSet");
 
             //debug
             road.printAllPos();

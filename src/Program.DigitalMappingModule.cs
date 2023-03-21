@@ -279,7 +279,7 @@ namespace surveillance_system
                     //Console.WriteLine("hs_cnt = {0}", hs_cnt);
 
                     buildings = new Building[this.N_Building];
-                    aw.setBuildingCSVWriter(this.N_Building);
+                    bw.setBuildingCSVWriter(this.N_Building);
                     for (int i = 0; i < this.N_Building; i++)
                     {
                         buildings[i] = new Building();
@@ -531,58 +531,58 @@ namespace surveillance_system
             /* --------------------------------------
              * init obj with csv
             -------------------------------------- */
-            public void initPedsWithCSV(int simIdx)
-            {
-                road.setPedswithCSV(simIdx);
-            }
+            //public void initPedsWithCSV(int simIdx)
+            //{
+            //    road.setPedswithCSV(simIdx);
+            //}
 
-            public void initCarsWithCSV(int simIdx)
-            {
-                road.setCarswithCSV(simIdx);
-            }
+            //public void initCarsWithCSV(int simIdx)
+            //{
+            //    road.setCarswithCSV(simIdx);
+            //}
 
-            public void initCctvsWithCSV(int cctvSetIdx)
-            {
-                road.setCctvswithCSV(cctvSetIdx);
-                foreach (CCTV cctv in cctvs)
-                {
-                    clog.clearCctvLog();
+            //public void initCctvsWithCSV(int cctvSetIdx)
+            //{
+            //    road.setCctvswithCSV(cctvSetIdx);
+            //    foreach (CCTV cctv in cctvs)
+            //    {
+            //        clog.clearCctvLog();
 
-                    cctv.get_PixelDensity(Dist,
-                            cctv.WD,
-                            cctv.HE,
-                            cctv.Focal_Length,
-                            cctv.imW,
-                            cctv.imH);
+            //        cctv.get_PixelDensity(Dist,
+            //                cctv.WD,
+            //                cctv.HE,
+            //                cctv.Focal_Length,
+            //                cctv.imW,
+            //                cctv.imH);
 
-                    cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
-                    cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
-                }
-            }
+            //        cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
+            //        cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
+            //    }
+            //}
 
             /* --------------------------------------
              * save initial objs as csv
             -------------------------------------- */
-            public void initialBuildingsToCSV(int simIdx)
-            {
-                aw.initialBuildingsToCSV(simIdx);
-            }
+            //public void initialBuildingsToCSV(int simIdx)
+            //{
+            //    aw.initialBuildingsToCSV(simIdx);
+            //}
 
-            public void initialPedsToCSV(int simIdx)
-            {
-                tw.initialPedsToCSV(simIdx);
-            }
+            //public void initialPedsToCSV(int simIdx)
+            //{
+            //    tw.initialPedsToCSV(simIdx);
+            //}
 
-            public void initialCarsToCSV(int simIdx)
-            {
-                tw.initialCarsToCSV(simIdx);
-            }
+            //public void initialCarsToCSV(int simIdx)
+            //{
+            //    tw.initialCarsToCSV(simIdx);
+            //}
 
-            public void initialCctvsToCSV(int cctvIdx)
-            {
-                cw.setCctvCSVWriter(this.N_CCTV);
-                cw.initialCctvsToCSV(cctvIdx);
-            }
+            //public void initialCctvsToCSV(int cctvIdx)
+            //{
+            //    cw.setCctvCSVWriter(this.N_CCTV);
+            //    cw.initialCctvsToCSV(cctvIdx);
+            //}
         }
     }
 }

@@ -32,8 +32,8 @@ namespace surveillance_system
             // 임의 좌표 사용시
             /*public void initialBuildingsToCSV(int simIdx)
             {
-                string fileName = "object\\building\\Sim" + simIdx + ".Buildings.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                string fn = "object\\building\\Sim" + simIdx + ".Buildings.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,X,Y,Direction,W,H,D1,D2,W2");
                     for (int j = 0; j < N_Building; j++)
@@ -42,8 +42,8 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\building\\Sim" + simIdx + ".Buildings.Pos.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                fn = "object\\building\\Sim" + simIdx + ".Buildings.Pos.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
                     for (int j = 0; j < N_Building; j++)
@@ -52,10 +52,13 @@ namespace surveillance_system
                     }
                 }
             }*/
-            public void initialBuildingsToCSV(int simIdx)
+
+            public void BuildingsToCSV(string filename)
             {
-                string fileName = "object\\building\\Sim" + simIdx + ".Buildings.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.Buildings"
+                // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Buildings"
+                string fn = "object\\building\\" + filename + ".csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     //Console.WriteLine("{0}", buildings.Length);
                     file.WriteLine("#idx,X,Y,Z,H");
@@ -91,10 +94,12 @@ namespace surveillance_system
             /* --------------------------------------
              * Print CSV
             -------------------------------------- */
-            public void initialPedsToCSV(int simIdx)
+            public void PedsToCSV(string filename)
             {
-                string fileName = "object\\target\\Sim" + simIdx + ".Peds.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.Peds"
+                // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Peds"
+                string fn = "object\\target\\" + filename + ".csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,X,Y,DST_X,DST_Y,Direction,Velocity,Unit_Travel_Dist,MAX_Dist_X,MAX_Dist_Y,ground,W,H,D1,D2,W2,N_Surv,TTL");
                     for (int j = 0; j < N_Ped; j++)
@@ -103,8 +108,8 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                fn = "object\\target\\" + filename + ".Pos.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
                     for (int j = 0; j < N_Ped; j++)
@@ -114,10 +119,12 @@ namespace surveillance_system
                 }
             }
 
-            public void initialCarsToCSV(int simIdx)
+            public void CarsToCSV(string filename)
             {
-                string fileName = "object\\target\\Sim" + simIdx + ".Cars.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.Cars"
+                // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Cars"
+                string fn = "object\\target\\" + filename + ".csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,X,Y,DST_X,DST_Y,Direction,Velocity,Unit_Travel_Dist,MAX_Dist_X,MAX_Dist_Y,ground,W,H,D1,D2,W2,N_Surv,TTL");
                     for (int j = 0; j < N_Car; j++)
@@ -126,8 +133,8 @@ namespace surveillance_system
                     }
                 }
 
-                fileName = "object\\target\\Sim" + simIdx + ".Cars.Pos.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                fn = "object\\target\\" + filename + ".Pos.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,Pos_H1_X,Pos_H1_Y,Pos_H2_X,Pos_H2_Y,Pos_V1_X,Pos_V1_Y,Pos_V2_X,Pos_V2_Y");
                     for (int j = 0; j < N_Car; j++)
@@ -140,12 +147,14 @@ namespace surveillance_system
 
         public class TargetCSVReader
         {
-            public void initialPedsFromCSV(int simIdx)
+            public void PedsFromCSV(string filename)
             {
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.Peds"
+                // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Peds"
                 try
                 {
-                    string fileName = "object\\target\\Sim" + simIdx + ".Peds.csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    string fn = "object\\target\\" + filename + ".csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -193,8 +202,8 @@ namespace surveillance_system
                         }
                     }
 
-                    fileName = "object\\target\\Sim" + simIdx + ".Peds.Pos.csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    fn = "object\\target\\" + filename + ".Pos.csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -235,12 +244,14 @@ namespace surveillance_system
                 }
             }
 
-            public void initialCarsFromCSV(int simIdx)
+            public void CarsFromCSV(string filename)
             {
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.Cars"
+                // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Cars"
                 try
                 {
-                    string fileName = "object\\target\\Sim" + simIdx + ".Cars.csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    string fn = "object\\target\\" + filename + ".csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -288,8 +299,8 @@ namespace surveillance_system
                         }
                     }
 
-                    fileName = "object\\target\\Sim" + simIdx + ".Cars.Pos.csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    fn = "object\\target\\" + filename + ".Pos.csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -346,14 +357,16 @@ namespace surveillance_system
                 //Console.WriteLine(this.N_Cctv);
             }
 
-            public void initialCctvsToCSV(int cctvSetIdx)
+            public void CctvsToCSV(string filename)
             {
-                string fileName = "object\\cctv\\CctvSet" + cctvSetIdx + ".csv";
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"
+                // 시뮬레이션 초기데이터의 파일명: "CctvSet" + cctvSetIdx
+                string fn = "object\\cctv\\" + filename + ".csv";
                 
                 //debug
-                //Console.WriteLine(fileName);
+                //Console.WriteLine(fn);
 
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,X,Y,Z,WD,HE,H_AOV,V_AOV,imW,imH,Focal_Length,ViewAngleH,ViewAngleV,Eff_Dist_From,Eff_Dist_To,Direction,isFixed,Max_Dist");
                     //debug
@@ -375,12 +388,14 @@ namespace surveillance_system
             public int realWorldCctvNum { get; private set; }
 
             // csv 파일료 저장된 초기 cctv 객체 데이터를 읽어와 cctv 위치 데이터를 초기화해준다.
-            public void initialCctvsFromCSV(int cctvSetIdx)
+            public void CctvsFromCSV(string filename)
             {
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"
+                // 시뮬레이션 초기데이터의 파일명: "CctvSet" + cctvSetIdx
                 try
                 {
-                    string fileName = "object\\cctv\\CctvSet" + cctvSetIdx + ".csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    string fn = "object\\cctv\\" + filename + ".csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -412,7 +427,7 @@ namespace surveillance_system
                 }
             }
 
-            public void realWorldCctvFromCSV()
+            public void realWorldCctvFromCSV(string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv")
             {
                 realWorldCctvData = new List<string[]>();
                 realWorldCctvNum = 0;
@@ -420,8 +435,7 @@ namespace surveillance_system
                 try
                 {
                     // 파일 위치 예시
-                    string fileName = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv";
-                    using (FileStream fs = new FileStream(@fileName, FileMode.Open))
+                    using (FileStream fs = new FileStream(@filename, FileMode.Open))
                     {
                         using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
                         {
@@ -531,8 +545,8 @@ namespace surveillance_system
             {
                 for (int i = 0; i < N_Target; i++)
                 {
-                    string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + ".csv";
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                    string fn = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + ".csv";
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                     {
                         file.WriteLine("#header,traffic_x,traffic_y,detection");
                         for (int j = 0; j < trace_idx; j++)
@@ -662,8 +676,8 @@ namespace surveillance_system
 
             public void DetectedLogToCSV(int cctvSetIdx, int simIdx)
             {
-                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".DetectedLog.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                string fn = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".DetectedLog.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,CCTV,TYPE,TARGET,X,Y,V,Time");
                     for (int i = 0; i < this.detectedLogSize; i++)
@@ -675,8 +689,8 @@ namespace surveillance_system
 
             public void ShadowedByBuildingLogToCSV(int cctvSetIdx, int simIdx)
             {
-                string fileName = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".ShadowedByBuildingLog.csv";
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fileName))
+                string fn = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".ShadowedByBuildingLog.csv";
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     file.WriteLine("#idx,CCTV,BUILDING,SHADOW_TYPE,TARGET_TYPE,TARGET,X,Y,V,Time");
                     for (int i = 0; i < this.shadowedLogSize; i++)
