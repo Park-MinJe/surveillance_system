@@ -149,9 +149,9 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects with csv
             -------------------------------------- */
-            public void setPedswithCSV(string filename)
+            public void setPedswithCSV(int simIdx)
             {
-                tr.initialPedsFromCSV(filename);
+                tr.initialPedsFromCSV(simIdx);
 
                 for (int i = 0; i < this.Y_grid_num; i++)
                 {
@@ -200,21 +200,6 @@ namespace surveillance_system
                 for (int i = 0; i < cctvs.Length; i++)
                 {
                     cctvPos[Convert.ToInt32((cctvs[i].Y) / 10000), Convert.ToInt32((cctvs[i].X / 10000))] += 1;
-                }
-
-                foreach (CCTV cctv in cctvs)
-                {
-                    clog.clearCctvLog();
-
-                    cctv.get_PixelDensity(Dist,
-                            cctv.WD,
-                            cctv.HE,
-                            cctv.Focal_Length,
-                            cctv.imW,
-                            cctv.imH);
-
-                    cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
-                    cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
                 }
             }
 
