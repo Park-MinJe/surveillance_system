@@ -39,8 +39,6 @@ namespace surveillance_system
         {
             int operatingMode;          // 0: 디지털 모델링   1: 시뮬레이션
 
-            DigitalMappingModule mappingModule = new DigitalMappingModule();
-
             Console.WriteLine("\ninput Operating Mode: ");
             while (true)
             {
@@ -53,7 +51,7 @@ namespace surveillance_system
 
             if(operatingMode == 0)
             {
-                operateMapping(mappingModule);
+                operateMapping();
             }
 
             else if(operatingMode == 1)
@@ -107,7 +105,7 @@ namespace surveillance_system
 
         // 230317 박민제
         // 실제 데이터를 이용한 디지털 매핑
-        static void operateMapping(DigitalMappingModule mappingModule)
+        static void operateMapping()
         {
             // 도로 정보
 
@@ -154,14 +152,14 @@ namespace surveillance_system
 
             int cctvMode = 3;
 
+            DigitalMappingModule mappingModule = new DigitalMappingModule();
             mappingModule.initVariables();
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            aw.initialBuildingsToCSV("DigitalMapping.Buildings");
-            tw.initialPedsToCSV("DigitalMapping.Peds");
-            tw.initialCarsToCSV("DigitalMapping.Cars");
+            mappingModule.initialBuildingsToCSV(0);
+            mappingModule.initialPedsToCSV(0);
+            mappingModule.initialCarsToCSV(0);
             road.setCCTVbyRealWorldData(mappingModule.N_CCTV);
-            cw.setCctvCSVWriter(mappingModule.N_CCTV);
-            cw.initialCctvsToCSV("DigitalMapping.CctvSet");
+            mappingModule.initialCctvsToCSV(0);
 
             //debug
             road.printAllPos();
@@ -169,261 +167,301 @@ namespace surveillance_system
 
         // 230317 박민제
         // 디지털 매핑된 것을 기반으로 시뮬레이션 구현
-        // 230320
-        // 여러 모드로 나눠서 시뮬레이션 할 수 있도록 하되 우선 다양한 CCTV 배치 알고리즘을 적용할 수 있도록 설계
-        // 추후 군중 시뮬레이션 등 다른 기능도 설계할 수 있도록 준비
-        static void operateSimulation()
-        {
-            // 230221 1135 pmj6823
-            // graphic tutorial
-            //graphic_Silk.graphicTutorial();
-            //SilkProgram sp = new SilkProgram();
-            //sp.tutorial_2_2();
+        //static void operateSimulation()
+        //{
+        //    // 230221 1135 pmj6823
+        //    // graphic tutorial
+        //    //graphic_Silk.graphicTutorial();
+        //    //SilkProgram sp = new SilkProgram();
+        //    //sp.tutorial_2_2();
 
-            /*using (GraphicManager_OpneTK graphic = new GraphicManager_OpneTK(800, 600, "LearnOpenTK"))
-            {
-                graphic.Run();
-            }*/
+        //    /*using (GraphicManager_OpneTK graphic = new GraphicManager_OpneTK(800, 600, "LearnOpenTK"))
+        //    {
+        //        graphic.Run();
+        //    }*/
 
-            //int nBuilding = 0, nCctv = 0, nPed = 0, nCar = 0,
-            //    cctvMode = 0,
-            //    numberOfCCTVSet = 1,
-            //    simulationTimesForCCTVSet = 100;
-            //string inputNBuildingOption = "N",
-            //    inputNCctvOption = "N",
-            //    inputCctvRotate = "N",
-            //    inputNPedOption = "N",
-            //    inputNCarOption = "N",
-            //    InputcreateCSV = "N";
+        //    // 도로 정보
 
-            //List<double> successRates = new List<double>();
-            ////List<CCTV[]> cctvAtSim = new List<CCTV[]>();
-            ////List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
-            ////List<Car[]> carAtSim = new List<Car[]>();
+        //    // 230207 pmj
+        //    // Open Api를 이용해 건물 정보 받아오기 test
+        //    // MSTest v2 test project로 분기 예정
+        //    Console.Write("사용 함수: ");
+        //    string methodName = Console.ReadLine();
+        //    Console.Write("서비스 키: ");
+        //    string serviceKey = Console.ReadLine();
+        //    Console.Write("Type Name: ");
+        //    string typeName = Console.ReadLine();
+        //    Console.Write("bbox: ");
+        //    string bbox = Console.ReadLine();
+        //    Console.Write("Pnu: ");
+        //    string pnu = Console.ReadLine();
+        //    Console.Write("검색 범위: ");
+        //    string maxFeature = Console.ReadLine();
+        //    Console.Write("Result Type: ");
+        //    string resultType = Console.ReadLine();
+        //    Console.Write("Srs Name: ");
+        //    string srsName = Console.ReadLine();
 
-            ////List<int[,]> cctvPosAtSim = new List<int[,]>();
+        //    /*gbs.testGisBuildingService(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
+        //    foreach(Building building in buildings)
+        //    {
+        //        Console.WriteLine();
+        //        building.printBuildingInfo();
+        //    }*/
 
-            //while (true)
-            //{
-            //    Console.Write("\ninput Number of CCTV set( 1~ ): ");
-            //    numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
+        //    if (buildingfromApi is GisBuildingService)
+        //        (buildingfromApi as GisBuildingService).setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
+        //    else if (buildingfromApi is VworldService)
+        //    {
+        //        buildingfromApi.setRequest(methodName);
+        //        buildingfromApi.setServiceKey(serviceKey);
+        //        buildingfromApi.setTypename(typeName);
+        //        buildingfromApi.setBbox(bbox);
+        //        buildingfromApi.setSrsname(srsName);
 
-            //    if (numberOfCCTVSet < 1) { continue; }
-            //    else { break; }
-            //}
+        //        buildingfromApi.setEndPointUrl();
+        //    }
+        //    buildingfromApi.loadBuildingDataFromApiAsXml();
 
-            //while (true)
-            //{
-            //    Console.Write("input Simulation times for Each CCTV set( 1~ ): ");
-            //    simulationTimesForCCTVSet = Convert.ToInt32(Console.ReadLine());
+        //    int nBuilding = 0, nCctv = 0, nPed = 0, nCar = 0,
+        //        cctvMode = 0,
+        //        numberOfCCTVSet = 1,
+        //        simulationTimesForCCTVSet = 100;
+        //    string inputNBuildingOption = "N",
+        //        inputNCctvOption = "N",
+        //        inputCctvRotate = "N",
+        //        inputNPedOption = "N",
+        //        inputNCarOption = "N",
+        //        InputcreateCSV = "N";
 
-            //    if (simulationTimesForCCTVSet < 1) { continue; }
-            //    else { break; }
-            //}
+        //    List<double> successRates = new List<double>();
+        //    //List<CCTV[]> cctvAtSim = new List<CCTV[]>();
+        //    //List<Pedestrian[]> pedestrianAtSim = new List<Pedestrian[]>();
+        //    //List<Car[]> carAtSim = new List<Car[]>();
 
-            //Console.WriteLine("\ninput CCTV collocating mode: ");
-            //while (true)
-            //{
-            //    Console.Write("(0: pos cctv as grid    1: pos cctv as random at DST    2: pos cctv as random in int)? ");
-            //    cctvMode = Convert.ToInt32(Console.ReadLine());
+        //    //List<int[,]> cctvPosAtSim = new List<int[,]>();
 
-            //    // 230314 박민제
-            //    // cctvMode 3은 realWorldCctvFromCSV() 함수 테스팅을 위함 임시 모드로, 디지털 매핑 과정으로 분기 예정
-            //    if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2 || cctvMode == 3) { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("\ninput Number of CCTV set( 1~ ): ");
+        //        numberOfCCTVSet = Convert.ToInt32(Console.ReadLine());
 
-            //while (true)
-            //{
-            //    Console.Write("\nDo you want to rotate cctv(Y/N)? ");
-            //    inputCctvRotate = Console.ReadLine();
+        //        if (numberOfCCTVSet < 1) { continue; }
+        //        else { break; }
+        //    }
 
-            //    if (inputCctvRotate == "N" || inputCctvRotate == "n") { break; }
-            //    else if (inputCctvRotate == "Y" || inputCctvRotate == "y") { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("input Simulation times for Each CCTV set( 1~ ): ");
+        //        simulationTimesForCCTVSet = Convert.ToInt32(Console.ReadLine());
 
-            //while (true)
-            //{
-            //    Console.Write("\nDo you want to enter Architecture Numbers(Y/N)? ");
-            //    inputNBuildingOption = Console.ReadLine();
+        //        if (simulationTimesForCCTVSet < 1) { continue; }
+        //        else { break; }
+        //    }
 
-            //    if (inputNBuildingOption == "N" || inputNBuildingOption == "n") { break; }
-            //    else if (inputNBuildingOption == "Y" || inputNBuildingOption == "y") { break; }
-            //    else { continue; }
-            //}
+        //    Console.WriteLine("\ninput CCTV collocating mode: ");
+        //    while (true)
+        //    {
+        //        Console.Write("(0: pos cctv as grid    1: pos cctv as random at DST    2: pos cctv as random in int)? ");
+        //        cctvMode = Convert.ToInt32(Console.ReadLine());
 
-            //while (true)
-            //{
-            //    Console.Write("Do you want to enter CCTV Numbers(Y/N)? ");
-            //    inputNCctvOption = Console.ReadLine();
+        //        // 230314 박민제
+        //        // cctvMode 3은 realWorldCctvFromCSV() 함수 테스팅을 위함 임시 모드로, 디지털 매핑 과정으로 분기 예정
+        //        if (cctvMode == 0 || cctvMode == 1 || cctvMode == 2 || cctvMode == 3) { break; }
+        //        else { continue; }
+        //    }
 
-            //    if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
-            //    else if (inputNCctvOption == "Y" || inputNCctvOption == "y") { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("\nDo you want to rotate cctv(Y/N)? ");
+        //        inputCctvRotate = Console.ReadLine();
 
-            //while (true)
-            //{
-            //    Console.Write("Do you want to enter Pedestrian Numbers(Y/N)? ");
-            //    inputNPedOption = Console.ReadLine();
+        //        if (inputCctvRotate == "N" || inputCctvRotate == "n") { break; }
+        //        else if (inputCctvRotate == "Y" || inputCctvRotate == "y") { break; }
+        //        else { continue; }
+        //    }
 
-            //    if (inputNPedOption == "N" || inputNPedOption == "n") { break; }
-            //    else if (inputNPedOption == "Y" || inputNPedOption == "y") { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("\nDo you want to enter Architecture Numbers(Y/N)? ");
+        //        inputNBuildingOption = Console.ReadLine();
 
-            //while (true)
-            //{
-            //    Console.Write("Do you want to enter Car Numbers(Y/N)? ");
-            //    inputNCarOption = Console.ReadLine();
+        //        if (inputNBuildingOption == "N" || inputNBuildingOption == "n") { break; }
+        //        else if (inputNBuildingOption == "Y" || inputNBuildingOption == "y") { break; }
+        //        else { continue; }
+        //    }
 
-            //    if (inputNCarOption == "N" || inputNCarOption == "n") { break; }
-            //    else if (inputNCarOption == "Y" || inputNCarOption == "y") { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("Do you want to enter CCTV Numbers(Y/N)? ");
+        //        inputNCctvOption = Console.ReadLine();
 
-            //while (true)
-            //{
-            //    Console.Write("Do you wand results as csv file(Y/N)? ");
-            //    InputcreateCSV = Console.ReadLine();
+        //        if (inputNCctvOption == "N" || inputNCctvOption == "n") { break; }
+        //        else if (inputNCctvOption == "Y" || inputNCctvOption == "y") { break; }
+        //        else { continue; }
+        //    }
 
-            //    if (InputcreateCSV == "N" || InputcreateCSV == "n") { break; }
-            //    else if (InputcreateCSV == "Y" || InputcreateCSV == "y") { break; }
-            //    else { continue; }
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("Do you want to enter Pedestrian Numbers(Y/N)? ");
+        //        inputNPedOption = Console.ReadLine();
 
-            //Console.WriteLine("");
+        //        if (inputNPedOption == "N" || inputNPedOption == "n") { break; }
+        //        else if (inputNPedOption == "Y" || inputNPedOption == "y") { break; }
+        //        else { continue; }
+        //    }
 
-            //if (inputNBuildingOption == "Y" || inputNBuildingOption == "y")
-            //{
-            //    Console.Write("input number of Building: ");
-            //    nBuilding = Convert.ToInt32(Console.ReadLine());
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("Do you want to enter Car Numbers(Y/N)? ");
+        //        inputNCarOption = Console.ReadLine();
 
-            //if (inputNCctvOption == "Y" || inputNCctvOption == "y")
-            //{
-            //    Console.Write("input number of CCTV: ");
-            //    nCctv = Convert.ToInt32(Console.ReadLine());
-            //}
+        //        if (inputNCarOption == "N" || inputNCarOption == "n") { break; }
+        //        else if (inputNCarOption == "Y" || inputNCarOption == "y") { break; }
+        //        else { continue; }
+        //    }
 
-            //if (inputNPedOption == "Y" || inputNPedOption == "y")
-            //{
-            //    Console.Write("input number of Pedestrian: ");
-            //    nPed = Convert.ToInt32(Console.ReadLine());
-            //}
+        //    while (true)
+        //    {
+        //        Console.Write("Do you wand results as csv file(Y/N)? ");
+        //        InputcreateCSV = Console.ReadLine();
 
-            //if (inputNCarOption == "Y" || inputNCarOption == "y")
-            //{
-            //    Console.Write("input number of Car: ");
-            //    nCar = Convert.ToInt32(Console.ReadLine());
-            //}
+        //        if (InputcreateCSV == "N" || InputcreateCSV == "n") { break; }
+        //        else if (InputcreateCSV == "Y" || InputcreateCSV == "y") { break; }
+        //        else { continue; }
+        //    }
 
+        //    Console.WriteLine("");
 
-            //SimulatorCore[] sims = new SimulatorCore[simulationTimesForCCTVSet];
-            //// s.simulateAll(cctvMode);
-            //for (int i = 0; i < simulationTimesForCCTVSet; i++)
-            //{
-            //    sims[i] = new SimulatorCore();
-            //    sims[i].setcreateCSV(InputcreateCSV);
-            //    sims[i].setCctvFixMode(inputCctvRotate);
-            //    sims[i].setgetBuildingNumFromUser(inputNBuildingOption);
-            //    sims[i].setgetCCTVNumFromUser(inputNCctvOption);
-            //    sims[i].setgetPedNumFromUser(inputNPedOption);
-            //    sims[i].setgetCarNumFromUser(inputNCarOption);
+        //    if (inputNBuildingOption == "Y" || inputNBuildingOption == "y")
+        //    {
+        //        Console.Write("input number of Building: ");
+        //        nBuilding = Convert.ToInt32(Console.ReadLine());
+        //    }
 
-            //    sims[i].initNBuilding(nBuilding);
-            //    sims[i].initNCctv(nCctv);
-            //    sims[i].initNPed(nPed);
-            //    sims[i].initNCar(nCar);
+        //    if (inputNCctvOption == "Y" || inputNCctvOption == "y")
+        //    {
+        //        Console.Write("input number of CCTV: ");
+        //        nCctv = Convert.ToInt32(Console.ReadLine());
+        //    }
 
-            //    sims[i].initSimulatorCoreVariables();
+        //    if (inputNPedOption == "Y" || inputNPedOption == "y")
+        //    {
+        //        Console.Write("input number of Pedestrian: ");
+        //        nPed = Convert.ToInt32(Console.ReadLine());
+        //    }
 
-            //    sims[i].initTimer();
-
-            //    // sims[i].startTimer();
-            //    sims[i].initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            //    aw.initialBuildingsToCSV("Sim" + i + ".Buildings");
-            //    tw.initialPedsToCSV("Sim" + i + ".Peds");
-            //    tw.initialCarsToCSV("Sim" + i + ".Cars");
-            //    //pedestrianAtSim.Add(peds);
-            //    //carAtSim.Add(cars);
-            //    //sims[i].stopTimer();
-            //}
-
-            //for (int i = 0; i < numberOfCCTVSet; i++)
-            //{
-            //    double successRateForCCTVSet = 0.0;
-            //    for (int j = 0; j < simulationTimesForCCTVSet; j++)
-            //    {
-            //        sims[j].initPedsWithCSV(j);
-            //        sims[j].initCarsWithCSV(j);
-            //        sims[j].startTimer();
-            //        if (j == 0)
-            //        {
-            //            if (i == 0 && numberOfCCTVSet > 1)
-            //            {
-            //                road.setCCTV(sims[j].N_CCTV, road.width, road.lane_num);
-            //            }
-            //            else
-            //            {
-            //                switch (cctvMode)
-            //                {
-            //                    case 0:
-            //                        road.setCCTV(sims[j].N_CCTV, road.width, road.lane_num);
-            //                        break;
-            //                    case 1:
-            //                        road.setCCTVbyRandomInDST(sims[j].N_CCTV);
-            //                        break;
-            //                    case 2:
-            //                        road.setCCTVbyRandomInInt(sims[j].N_CCTV);
-            //                        break;
-            //                    case 3:
-            //                        road.setCCTVbyRealWorldData(sims[j].N_CCTV);
-            //                        break;
-            //                }
-            //            }
-            //            //cctvAtSim.Add(cctvs);
-
-            //            // 230317 박민제
-            //            // Digital Mapping Module에서 처리
-            //            /*cw.setCctvCSVWriter(sims[j].getNCCTV());
-            //            cw.initialCctvsToCSV(i);*/
+        //    if (inputNCarOption == "Y" || inputNCarOption == "y")
+        //    {
+        //        Console.Write("input number of Car: ");
+        //        nCar = Convert.ToInt32(Console.ReadLine());
+        //    }
 
 
-            //            //cctvPosAtSim.Add(road.cctvPos);
-            //        }
-            //        road.printAllPos();
+        //    SimulationModel[] sims = new SimulationModel[simulationTimesForCCTVSet];
+        //    // s.simulateAll(cctvMode);
+        //    for (int i = 0; i < simulationTimesForCCTVSet; i++)
+        //    {
+        //        sims[i] = new SimulationModel();
+        //        sims[i].setcreateCSV(InputcreateCSV);
+        //        sims[i].setCctvFixMode(inputCctvRotate);
+        //        sims[i].setgetBuildingNumFromUser(inputNBuildingOption);
+        //        sims[i].setgetCCTVNumFromUser(inputNCctvOption);
+        //        sims[i].setgetPedNumFromUser(inputNPedOption);
+        //        sims[i].setgetCarNumFromUser(inputNCarOption);
 
-            //        Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
-            //        sims[j].operateSim();
-            //        sims[j].stopTimer();
-            //        sims[j].TraceLogToCSV(i, j);
-            //        double successRate = sims[j].printResultRate();
-            //        successRateForCCTVSet += successRate;
-            //        //sims[j].printDetectedResults();
-            //        sims[j].DetectedResultsToCSV(i, j);
-            //        sims[j].ShadowedLogToCSV(i, j);
+        //        sims[i].initNBuilding(nBuilding);
+        //        sims[i].initNCctv(nCctv);
+        //        sims[i].initNPed(nPed);
+        //        sims[i].initNCar(nCar);
 
-            //        sims[j].resetTimer();
-            //    }
-            //    successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSet);
-            //}
+        //        sims[i].initVariables();
 
-            //Console.WriteLine("\n\n====== Simulation Results ======");
-            //Console.WriteLine("print index of CCTV set and Target detected Rate\n");
-            //for (int i = 0; i < successRates.Count; i++)
-            //{
-            //    Console.WriteLine("CCTV set {0}\t{1:F2}%", i, successRates[i]);
-            //    Console.WriteLine();
-            //}
+        //        sims[i].initTimer();
 
-            //Console.WriteLine("\n\n====== Best CCTV set ======");
-            //int bestCCTVIdx = successRates.IndexOf(successRates.Max());
+        //        // sims[i].startTimer();
+        //        sims[i].initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
+        //        sims[i].initialBuildingsToCSV(i);
+        //        sims[i].initialPedsToCSV(i);
+        //        sims[i].initialCarsToCSV(i);
+        //        //pedestrianAtSim.Add(peds);
+        //        //carAtSim.Add(cars);
+        //        //sims[i].stopTimer();
+        //    }
 
-            //Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-            //road.setCctvswithCSV(bestCCTVIdx);
-            //road.printPos(road.cctvPos);
-        }
+        //    for (int i = 0; i < numberOfCCTVSet; i++)
+        //    {
+        //        double successRateForCCTVSet = 0.0;
+        //        for (int j = 0; j < simulationTimesForCCTVSet; j++)
+        //        {
+        //            sims[j].initPedsWithCSV(j);
+        //            sims[j].initCarsWithCSV(j);
+        //            sims[j].startTimer();
+        //            if (j == 0)
+        //            {
+        //                if (i == 0 && numberOfCCTVSet > 1)
+        //                {
+        //                    road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
+        //                }
+        //                else
+        //                {
+        //                    switch (cctvMode)
+        //                    {
+        //                        case 0:
+        //                            road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
+        //                            break;
+        //                        case 1:
+        //                            road.setCCTVbyRandomInDST(sims[j].getNCCTV());
+        //                            break;
+        //                        case 2:
+        //                            road.setCCTVbyRandomInInt(sims[j].getNCCTV());
+        //                            break;
+        //                        case 3:
+        //                            road.setCCTVbyRealWorldData(sims[j].getNCCTV());
+        //                            break;
+        //                    }
+        //                }
+        //                //cctvAtSim.Add(cctvs);
+
+        //                // 230317 박민제
+        //                // Digital Mapping Module에서 처리
+        //                /*cw.setCctvCSVWriter(sims[j].getNCCTV());
+        //                cw.initialCctvsToCSV(i);*/
+
+
+        //                //cctvPosAtSim.Add(road.cctvPos);
+        //            }
+        //            road.printAllPos();
+
+        //            Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
+        //            sims[j].operateSim();
+        //            sims[j].stopTimer();
+        //            sims[j].TraceLogToCSV(i, j);
+        //            double successRate = sims[j].printResultRate();
+        //            successRateForCCTVSet += successRate;
+        //            //sims[j].printDetectedResults();
+        //            sims[j].DetectedResultsToCSV(i, j);
+        //            sims[j].ShadowedLogToCSV(i, j);
+
+        //            sims[j].resetTimer();
+        //        }
+        //        successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSet);
+        //    }
+
+        //    Console.WriteLine("\n\n====== Simulation Results ======");
+        //    Console.WriteLine("print index of CCTV set and Target detected Rate\n");
+        //    for (int i = 0; i < successRates.Count; i++)
+        //    {
+        //        Console.WriteLine("CCTV set {0}\t{1:F2}%", i, successRates[i]);
+        //        Console.WriteLine();
+        //    }
+
+        //    Console.WriteLine("\n\n====== Best CCTV set ======");
+        //    int bestCCTVIdx = successRates.IndexOf(successRates.Max());
+
+        //    Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
+        //    road.setCctvswithCSV(bestCCTVIdx);
+        //    road.printPos(road.cctvPos);
+        //}
     }
 }
