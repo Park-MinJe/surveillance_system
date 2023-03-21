@@ -149,9 +149,9 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects with csv
             -------------------------------------- */
-            public void setPedswithCSV(int simIdx)
+            public void setPedswithCSV(string filename)
             {
-                tr.initialPedsFromCSV(simIdx);
+                tr.PedsFromCSV(filename);
 
                 for (int i = 0; i < this.Y_grid_num; i++)
                 {
@@ -167,9 +167,9 @@ namespace surveillance_system
                 }
             }
 
-            public void setCarswithCSV(int simIdx)
+            public void setCarswithCSV(string filename)
             {
-                tr.initialCarsFromCSV(simIdx);
+                tr.CarsFromCSV(filename);
 
                 for (int i = 0; i < this.Y_grid_num; i++)
                 {
@@ -185,9 +185,9 @@ namespace surveillance_system
                 }
             }
 
-            public void setCctvswithCSV(int cctvSetIdx)
+            public void setCctvswithCSV(string filename)
             {
-                cr.initialCctvsFromCSV(cctvSetIdx);
+                cr.CctvsFromCSV(filename);
 
                 for (int i = 0; i < this.Y_grid_num; i++)
                 {
