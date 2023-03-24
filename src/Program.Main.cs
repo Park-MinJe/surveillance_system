@@ -167,8 +167,12 @@ namespace surveillance_system
             road.printAllPos();
         }
 
+
+
         // 230317 박민제
         // 디지털 매핑된 것을 기반으로 시뮬레이션 구현
+
+        // 기존 시뮬레이션 부분
         //static void operateSimulation()
         //{
         //    // 230221 1135 pmj6823
