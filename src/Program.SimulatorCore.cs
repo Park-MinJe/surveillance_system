@@ -12,9 +12,17 @@ namespace surveillance_system
         // Configuration: simulation time
         const double aUnitTime = 100 * 0.001; // (sec)
 
+        public static double[] Dist = new double[25000];
+
         public class SimulatorCore
         {
             /* ---------------------------시뮬레이션 조건----------------------------*/
+            public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
+            public int N_CCTV { get; private set; } = 100;      // default 100
+            public int N_Ped { get; private set; } = 5;         // default 5
+            public int N_Car { get; private set; } = 5;         // default 5
+            public int N_Target { get; private set; }
+
             private bool getBuildingNumFromUser = false;
             private bool getCCTVNumFromUser = false;
             private bool getPedNumFromUser = false;
@@ -29,6 +37,16 @@ namespace surveillance_system
             private double Now = 0;
 
             private Stopwatch stopwatch;
+
+            /* ------------------------------CCTV 제원------------------------------*/
+            private const double cctv_rotate_degree = -1; //90; --> 30초에 한바퀴?, -1: angle이 회전하는 옵션 disable (note 23-01-16)
+
+            private bool fixMode = false;
+            private double rotateTerm = 30.0; // sec
+
+            /* ------------------------------MAP 제원------------------------------*/
+            private int road_min = 0;
+            private int road_max;
 
             /* ---------------------------시뮬레이션 결과----------------------------*/
             // Console.WriteLine(">>> Simulating . . . \n");
@@ -350,10 +368,7 @@ namespace surveillance_system
             }
             public void initNBuilding(int nBuilding)
             {
-                if (getBuildingNumFromUser)
-                {
-                    N_Building = nBuilding;
-                }
+                N_Building = nBuilding;
             }
 
             public void initNCctv()
@@ -366,10 +381,7 @@ namespace surveillance_system
             }
             public void initNCctv(int nCctv)
             {
-                if (getCCTVNumFromUser)
-                {
-                    N_CCTV = nCctv;
-                }
+                N_CCTV = nCctv;
             }
 
             public void initNPed()
@@ -382,10 +394,7 @@ namespace surveillance_system
             }
             public void initNPed(int nPed)
             {
-                if (getPedNumFromUser)
-                {
-                    N_Ped = nPed;
-                }
+                N_Ped = nPed;
             }
 
             public void initNCar()
@@ -398,10 +407,7 @@ namespace surveillance_system
             }
             public void initNCar(int nCar)
             {
-                if (getCarNumFromUser)
-                {
-                    N_Car = nCar;
-                }
+                N_Car = nCar;
             }
 
             /* ---------------------------시뮬레이션 환경----------------------------*/
@@ -411,6 +417,12 @@ namespace surveillance_system
                 N_Target = N_Ped + N_Car;
 
                 rand = new Random();
+
+                /* ------------------------------CCTV 제원------------------------------*/
+                for (int i = 0; i < 25000; i++)
+                {
+                    Dist[i] = i;
+                }
 
                 /* ---------------------------전역 변수 할당---------------------------*/
                 //aw.setBuildingCSVWriter(N_Building);
