@@ -18,6 +18,9 @@ namespace surveillance_system
 
         public class DigitalMappingModule
         {
+            /* -------------------------시뮬레이션 대상 객체-------------------------*/
+            
+
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
             public int N_CCTV { get; private set; } = 100;      // default 100
@@ -94,7 +97,7 @@ namespace surveillance_system
              * 초기화 함수
             -------------------------------------- */
             /* ---------------------------시뮬레이션 환경----------------------------*/
-            public void initVariables()
+            public void initDigitalMappingVariables()
             {
                 /* ------------------------------CCTV 제원------------------------------*/
                 /* double D_AOV = RadToDeg(2 * Math.Atan(Diag / (2 * Lens_FocalLength)));

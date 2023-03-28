@@ -201,6 +201,21 @@ namespace surveillance_system
                 {
                     cctvPos[Convert.ToInt32((cctvs[i].Y) / 10000), Convert.ToInt32((cctvs[i].X / 10000))] += 1;
                 }
+
+                foreach (CCTV cctv in cctvs)
+                {
+                    clog.clearCctvLog();
+
+                    cctv.get_PixelDensity(Dist,
+                            cctv.WD,
+                            cctv.HE,
+                            cctv.Focal_Length,
+                            cctv.imW,
+                            cctv.imH);
+
+                    cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
+                    cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
+                }
             }
 
             /* --------------------------------------
