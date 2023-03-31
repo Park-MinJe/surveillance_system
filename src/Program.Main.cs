@@ -368,11 +368,8 @@ namespace surveillance_system
                     sims[j].startTimer();
                     if (j == 0)
                     {
-                        if (i == 0 && numberOfCCTVSet > 1)
-                        {
-                            road.setCCTV(sims[j].N_CCTV, road.width, road.lane_num);
-                        }
-                        else
+                        // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
+                        if (!(i == 0 && numberOfCCTVSet > 1))
                         {
                             switch (cctvMode)
                             {
@@ -390,11 +387,17 @@ namespace surveillance_system
 
                                     break;
                             }
+                            cw.setCctvCSVWriter(sims[j].N_CCTV);
+                            cw.CctvsToCSV("CctvSet" + i);
+                        }
+                        else
+                        {
+                            cw.setCctvCSVWriter(sims[j].N_CCTV);
+                            cw.CctvsToCSV("DigitalMappingResult.CctvSet");
                         }
                         //cctvAtSim.Add(cctvs);
 
                         // 230317 박민제
-                        // Digital Mapping Module에서 처리
                         //cw.setCctvCSVWriter(sims[j].N_CCTV);
                         //cw.CctvsToCSV("CctvSet" + i);
 
@@ -428,9 +431,18 @@ namespace surveillance_system
 
             Console.WriteLine("\n\n====== Best CCTV set ======");
             int bestCCTVIdx = successRates.IndexOf(successRates.Max());
+            Console.WriteLine(bestCCTVIdx);
 
-            Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-            road.setCctvswithCSV("CctvSet" + bestCCTVIdx);
+            if (bestCCTVIdx == 0)
+            {
+                Console.WriteLine("====== Real World CCTV set ======");
+                road.setCctvswithCSV("DigitalMappingResult.CctvSet");
+            }
+            else
+            {
+                Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
+                road.setCctvswithCSV("CctvSet" + bestCCTVIdx);
+            }
             road.printPos(road.cctvPos);
         }
 
