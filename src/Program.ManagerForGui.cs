@@ -92,99 +92,99 @@ namespace surveillance_system
             }
 
             // 시뮬레이션 시작
-            public void startSimulationByGui()
-            {
-                List<double> successRates = new List<double>();
+            //public void startSimulationByGui()
+            //{
+            //    List<double> successRates = new List<double>();
 
-                SimulationModel[] sims = new SimulationModel[simulationTimesForCCTVSetByInt];
-                // s.simulateAll(cctvMode);
-                for (int i = 0; i < simulationTimesForCCTVSetByInt; i++)
-                {
-                    sims[i] = new SimulationModel();
+            //    SimulationModel[] sims = new SimulationModel[simulationTimesForCCTVSetByInt];
+            //    // s.simulateAll(cctvMode);
+            //    for (int i = 0; i < simulationTimesForCCTVSetByInt; i++)
+            //    {
+            //        sims[i] = new SimulationModel();
 
-                    sims[i].initNCctv(N_CctvByInt);
-                    sims[i].initNPed(N_PedByInt);
-                    sims[i].initNCar(N_CarByInt);
+            //        sims[i].initNCctv(N_CctvByInt);
+            //        sims[i].initNPed(N_PedByInt);
+            //        sims[i].initNCar(N_CarByInt);
 
-                    sims[i].initVariables();
+            //        sims[i].initVariables();
 
-                    sims[i].initTimer();
+            //        sims[i].initTimer();
 
-                    // sims[i].startTimer();
-                    sims[i].initMap(cctvArrangementModeByInt, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-                    sims[i].initialBuildingsToCSV(i);
-                    sims[i].initialPedsToCSV(i);
-                    sims[i].initialCarsToCSV(i);
-                    //pedestrianAtSim.Add(peds);
-                    //carAtSim.Add(cars);
-                    // sims[i].stopTimer();
-                }
+            //        // sims[i].startTimer();
+            //        sims[i].initMap(cctvArrangementModeByInt, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
+            //        sims[i].initialBuildingsToCSV(i);
+            //        sims[i].initialPedsToCSV(i);
+            //        sims[i].initialCarsToCSV(i);
+            //        //pedestrianAtSim.Add(peds);
+            //        //carAtSim.Add(cars);
+            //        // sims[i].stopTimer();
+            //    }
 
-                for (int i = 0; i < numberOfCCTVSetByInt; i++)
-                {
-                    double successRateForCCTVSet = 0.0;
-                    for (int j = 0; j < simulationTimesForCCTVSetByInt; j++)
-                    {
-                        sims[j].initPedsWithCSV(j);
-                        sims[j].initCarsWithCSV(j);
-                        sims[j].startTimer();
-                        if (j == 0)
-                        {
-                            if (i == 0 && numberOfCCTVSetByInt > 1)
-                            {
-                                road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
-                            }
-                            else
-                            {
-                                switch (cctvArrangementModeByInt)
-                                {
-                                    case 0:
-                                        road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
-                                        break;
-                                    case 1:
-                                        road.setCCTVbyRandomInDST(sims[j].getNCCTV());
-                                        break;
-                                    case 2:
-                                        road.setCCTVbyRandomInInt(sims[j].getNCCTV());
-                                        break;
-                                }
-                            }
-                            //cctvAtSim.Add(cctvs);
-                            cw.initialCctvsToCSV(i);
-                            //cctvPosAtSim.Add(road.cctvPos);
-                        }
-                        road.printAllPos();
+            //    for (int i = 0; i < numberOfCCTVSetByInt; i++)
+            //    {
+            //        double successRateForCCTVSet = 0.0;
+            //        for (int j = 0; j < simulationTimesForCCTVSetByInt; j++)
+            //        {
+            //            sims[j].initPedsWithCSV(j);
+            //            sims[j].initCarsWithCSV(j);
+            //            sims[j].startTimer();
+            //            if (j == 0)
+            //            {
+            //                if (i == 0 && numberOfCCTVSetByInt > 1)
+            //                {
+            //                    road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
+            //                }
+            //                else
+            //                {
+            //                    switch (cctvArrangementModeByInt)
+            //                    {
+            //                        case 0:
+            //                            road.setCCTV(sims[j].getNCCTV(), road.width, road.lane_num);
+            //                            break;
+            //                        case 1:
+            //                            road.setCCTVbyRandomInDST(sims[j].getNCCTV());
+            //                            break;
+            //                        case 2:
+            //                            road.setCCTVbyRandomInInt(sims[j].getNCCTV());
+            //                            break;
+            //                    }
+            //                }
+            //                //cctvAtSim.Add(cctvs);
+            //                cw.initialCctvsToCSV(i);
+            //                //cctvPosAtSim.Add(road.cctvPos);
+            //            }
+            //            road.printAllPos();
 
-                        Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
-                        sims[j].operateSim();
-                        sims[j].stopTimer();
-                        sims[j].TraceLogToCSV(i, j);
-                        double successRate = sims[j].printResultRate();
-                        successRateForCCTVSet += successRate;
-                        //sims[j].printDetectedResults();
-                        sims[j].DetectedResultsToCSV(i, j);
-                        sims[j].ShadowedLogToCSV(i, j);
+            //            Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
+            //            sims[j].operateSim();
+            //            sims[j].stopTimer();
+            //            sims[j].TraceLogToCSV(i, j);
+            //            double successRate = sims[j].printResultRate();
+            //            successRateForCCTVSet += successRate;
+            //            //sims[j].printDetectedResults();
+            //            sims[j].DetectedResultsToCSV(i, j);
+            //            sims[j].ShadowedLogToCSV(i, j);
 
-                        sims[j].resetTimer();
-                    }
-                    successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSetByInt);
-                }
+            //            sims[j].resetTimer();
+            //        }
+            //        successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSetByInt);
+            //    }
 
-                Console.WriteLine("\n\n====== Simulation Results ======");
-                Console.WriteLine("print index of CCTV set and Target detected Rate\n");
-                for (int i = 0; i < successRates.Count; i++)
-                {
-                    Console.WriteLine("CCTV set {0}\t{1:F2}%", i, successRates[i]);
-                    Console.WriteLine();
-                }
+            //    Console.WriteLine("\n\n====== Simulation Results ======");
+            //    Console.WriteLine("print index of CCTV set and Target detected Rate\n");
+            //    for (int i = 0; i < successRates.Count; i++)
+            //    {
+            //        Console.WriteLine("CCTV set {0}\t{1:F2}%", i, successRates[i]);
+            //        Console.WriteLine();
+            //    }
 
-                Console.WriteLine("\n\n====== Best CCTV set ======");
-                int bestCCTVIdx = successRates.IndexOf(successRates.Max());
+            //    Console.WriteLine("\n\n====== Best CCTV set ======");
+            //    int bestCCTVIdx = successRates.IndexOf(successRates.Max());
 
-                Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-                road.setCctvswithCSV(bestCCTVIdx);
-                road.printPos(road.cctvPos);
-            }
+            //    Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
+            //    road.setCctvswithCSV(bestCCTVIdx);
+            //    road.printPos(road.cctvPos);
+            //}
         }
     }
 }
