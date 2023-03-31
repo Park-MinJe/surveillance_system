@@ -1042,6 +1042,7 @@ namespace surveillance_system
                                     //detectedTargetInfo.setY(peds[j].Y);
                                     //detectedTargetInfo.setV(peds[j].Velocity);
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
+
                                     clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
@@ -1055,6 +1056,7 @@ namespace surveillance_system
                                     //detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
                                     int carIdx = j - N_Ped;
+                                    
                                     clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
