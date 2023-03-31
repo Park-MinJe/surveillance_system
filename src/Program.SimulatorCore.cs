@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -590,13 +591,6 @@ namespace surveillance_system
                 int[,] candidate_detected_target_h = new int[N_CCTV, N_Target];
                 int[,] candidate_detected_target_v = new int[N_CCTV, N_Target];
 
-                // 230331 박민제
-                // 병렬 루프 내 취소 토큰 - 필요없다고 함..
-                /*CancellationTokenSource cts = new CancellationTokenSource();
-                ParallelOptions po = new ParallelOptions();
-                po.CancellationToken = cts.Token;
-                po.MaxDegreeOfParallelism = System.Environment.ProcessorCount;*/
-
                 try
                 {
                     //for (int i = 0; i < N_CCTV; i++)
@@ -1056,7 +1050,7 @@ namespace surveillance_system
                                     //detectedTargetInfo.setV(cars[j - N_Ped].Velocity);
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
                                     int carIdx = j - N_Ped;
-                                    
+
                                     clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
@@ -1150,7 +1144,7 @@ namespace surveillance_system
                     // Console.WriteLine("---------------------------------");
 
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("Err while checkDetection func: " + e.Message);
                     Console.WriteLine(e.StackTrace);
@@ -1294,7 +1288,7 @@ namespace surveillance_system
                 }
             }
 
-            public double printResultRate()
+            public double printResultRate(StreamWriter sw, List<long> opTime, int cctvSetIdx, int simIdx)
             {
                 double totalSimCount = Sim_Time / aUnitTime * N_Target;
                 double outOfRangeRate = 100 * outOfRange.Sum() / totalSimCount;
@@ -1304,16 +1298,36 @@ namespace surveillance_system
                 double successRate = 100 * R_Surv_Time.Sum() / totalSimCount;
 
                 // 결과(탐지율)
-                Console.WriteLine("====== Surveillance Time Result ======");
+                Console.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
+                sw.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
+
                 Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}", N_CCTV, N_Ped, N_Car);
+                sw.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}", N_CCTV, N_Ped, N_Car);
+
                 Console.WriteLine("[Result]");
+                sw.WriteLine("[Result]");
+
+                opTime.Add(stopwatch.ElapsedMilliseconds);
                 Console.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
+                sw.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
+
                 Console.WriteLine("[Fail]");
+                sw.WriteLine("[Fail]");
+
                 Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
+                sw.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
+
                 Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
+                sw.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
+
                 Console.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedByBuilding.Sum(), totalSimCount);
+                sw.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedByBuilding.Sum(), totalSimCount);
+
                 Console.WriteLine("[Success]");
+                sw.WriteLine("[Success]");
+
                 Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
+                sw.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
 
                 return successRate;
             }

@@ -587,18 +587,15 @@ namespace surveillance_system
 
             public void addDetectedLog(int cctvIdx, string targetType, int targetIdx, double x, double y, double v, double t)
             {
-                Task.WaitAll(Task.Factory.StartNew(() =>
-                {
-                    this.detectedCctvIdx.Add(cctvIdx);
-                    this.detectedTargetType.Add(targetType);
-                    this.detectedTargetIdx.Add(targetIdx);
-                    this.detectedX.Add(x);
-                    this.detectedY.Add(y);
-                    this.detectedV.Add(v);
-                    this.detectedT.Add(t);
+                this.detectedCctvIdx.Add(cctvIdx);
+                this.detectedTargetType.Add(targetType);
+                this.detectedTargetIdx.Add(targetIdx);
+                this.detectedX.Add(x);
+                this.detectedY.Add(y);
+                this.detectedV.Add(v);
+                this.detectedT.Add(t);
 
-                    this.detectedLogSize++;
-                }));
+                this.detectedLogSize++;
             }
 
             public int getLogSize() { return this.detectedLogSize; }
@@ -640,48 +637,42 @@ namespace surveillance_system
 
             public void addShadowedLog(int cctvIdx, int buildingIdx, char shadowType, string targetType, int targetIdx, double x, double y, double v, double t)
             {
-                Task.WaitAll(Task.Factory.StartNew(() =>
-                {
-                    this.shadowedCctvIdx.Add(cctvIdx);
-                    this.shadowedBuildingIdx.Add(buildingIdx);
-                    this.shadowedType.Add(shadowType);
-                    this.shadowedTargetType.Add(targetType);
-                    this.shadowedTargetIdx.Add(targetIdx);
-                    this.shadowedX.Add(x);
-                    this.shadowedY.Add(y);
-                    this.shadowedV.Add(v);
-                    this.shadowedT.Add(t);
+                this.shadowedCctvIdx.Add(cctvIdx);
+                this.shadowedBuildingIdx.Add(buildingIdx);
+                this.shadowedType.Add(shadowType);
+                this.shadowedTargetType.Add(targetType);
+                this.shadowedTargetIdx.Add(targetIdx);
+                this.shadowedX.Add(x);
+                this.shadowedY.Add(y);
+                this.shadowedV.Add(v);
+                this.shadowedT.Add(t);
 
-                    this.shadowedLogSize++;
-                }));
+                this.shadowedLogSize++;
             }
 
             public void clearCctvLog()
             {
-                Task.WaitAll(Task.Factory.StartNew(() =>
-                {
-                    this.detectedLogSize = 0;
+                this.detectedLogSize = 0;
 
-                    this.detectedCctvIdx.Clear();
-                    this.detectedTargetType.Clear();
-                    this.detectedTargetIdx.Clear();
-                    this.detectedX.Clear();
-                    this.detectedY.Clear();
-                    this.detectedV.Clear();
-                    this.detectedT.Clear();
+                this.detectedCctvIdx.Clear();
+                this.detectedTargetType.Clear();
+                this.detectedTargetIdx.Clear();
+                this.detectedX.Clear();
+                this.detectedY.Clear();
+                this.detectedV.Clear();
+                this.detectedT.Clear();
 
-                    this.shadowedLogSize = 0;
+                this.shadowedLogSize = 0;
 
-                    this.shadowedCctvIdx.Clear();
-                    this.shadowedBuildingIdx.Clear();
-                    this.shadowedType.Clear();
-                    this.shadowedTargetType.Clear();
-                    this.shadowedTargetIdx.Clear();
-                    this.shadowedX.Clear();
-                    this.shadowedY.Clear();
-                    this.shadowedV.Clear();
-                    this.shadowedT.Clear();
-                }));
+                this.shadowedCctvIdx.Clear();
+                this.shadowedBuildingIdx.Clear();
+                this.shadowedType.Clear();
+                this.shadowedTargetType.Clear();
+                this.shadowedTargetIdx.Clear();
+                this.shadowedX.Clear();
+                this.shadowedY.Clear();
+                this.shadowedV.Clear();
+                this.shadowedT.Clear();
             }
 
             public void DetectedLogToCSV(int cctvSetIdx, int simIdx)
