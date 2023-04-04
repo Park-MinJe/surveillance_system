@@ -361,7 +361,8 @@ namespace surveillance_system
                 //sims[i].stopTimer();
             }
 
-            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");
+            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
+            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 
             for (int i = 0; i < numberOfCCTVSet; i++)
             {
