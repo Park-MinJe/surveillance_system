@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Threading.Tasks;
 using static surveillance_system.Program;
 
 namespace surveillance_system
@@ -562,37 +563,47 @@ namespace surveillance_system
         {
             // Detected Log
             private int detectedLogSize;
+            private int initialdetectedLogSizeMax;
 
-            private List<int> detectedCctvIdx;
-            private List<string> detectedTargetType;
-            private List<int> detectedTargetIdx;
-            private List<double> detectedX;
-            private List<double> detectedY;
-            private List<double> detectedV;
-            private List<double> detectedT;
+            //private List<int> detectedCctvIdx;
+            //private List<string> detectedTargetType;
+            //private List<int> detectedTargetIdx;
+            //private List<double> detectedX;
+            //private List<double> detectedY;
+            //private List<double> detectedV;
+            //private List<double> detectedT;
 
-            public void setDetectedLogCSVWriter()
+            private int[] detectedCctvIdx;
+            private string[] detectedTargetType;
+            private int[] detectedTargetIdx;
+            private double[] detectedX;
+            private double[] detectedY;
+            private double[] detectedV;
+            private double[] detectedT;
+
+            public void setDetectedLogCSVWriter(int maxLogSize)
             {
                 this.detectedLogSize = 0;
+                this.initialdetectedLogSizeMax = maxLogSize;
 
-                this.detectedCctvIdx = new List<int>();
-                this.detectedTargetType = new List<string>();
-                this.detectedTargetIdx = new List<int>();
-                this.detectedX = new List<double>();
-                this.detectedY = new List<double>();
-                this.detectedV = new List<double>();
-                this.detectedT = new List<double>();
+                this.detectedCctvIdx = new int[maxLogSize];
+                this.detectedTargetType = new string[maxLogSize];
+                this.detectedTargetIdx = new int[maxLogSize];
+                this.detectedX = new double[maxLogSize];
+                this.detectedY = new double[maxLogSize];
+                this.detectedV = new double[maxLogSize];
+                this.detectedT = new double[maxLogSize];
             }
 
             public void addDetectedLog(int cctvIdx, string targetType, int targetIdx, double x, double y, double v, double t)
             {
-                this.detectedCctvIdx.Add(cctvIdx);
-                this.detectedTargetType.Add(targetType);
-                this.detectedTargetIdx.Add(targetIdx);
-                this.detectedX.Add(x);
-                this.detectedY.Add(y);
-                this.detectedV.Add(v);
-                this.detectedT.Add(t);
+                this.detectedCctvIdx[this.detectedLogSize] = cctvIdx;
+                this.detectedTargetType[this.detectedLogSize] = targetType;
+                this.detectedTargetIdx[this.detectedLogSize] = targetIdx;
+                this.detectedX[this.detectedLogSize] = x;
+                this.detectedY[this.detectedLogSize] = y;
+                this.detectedV[this.detectedLogSize] = v;
+                this.detectedT[this.detectedLogSize] = t;
 
                 this.detectedLogSize++;
             }
@@ -608,43 +619,55 @@ namespace surveillance_system
 
             // Shadowed by Building Log
             private int shadowedLogSize;
+            private int initialshadowedLogSizeMax;
 
-            private List<int> shadowedCctvIdx;
-            private List<int> shadowedBuildingIdx;
-            private List<char> shadowedType;
-            private List<string> shadowedTargetType;
-            private List<int> shadowedTargetIdx;
-            private List<double> shadowedX;
-            private List<double> shadowedY;
-            private List<double> shadowedV;
-            private List<double> shadowedT;
+            //private List<int> shadowedCctvIdx;
+            //private List<int> shadowedBuildingIdx;
+            //private List<char> shadowedType;
+            //private List<string> shadowedTargetType;
+            //private List<int> shadowedTargetIdx;
+            //private List<double> shadowedX;
+            //private List<double> shadowedY;
+            //private List<double> shadowedV;
+            //private List<double> shadowedT;
 
-            public void setShadowedLogCSVWriter()
+            private int[] shadowedCctvIdx;
+            private int[] shadowedBuildingIdx;
+            private char[] shadowedType;
+            private string[] shadowedTargetType;
+            private int[] shadowedTargetIdx;
+            private double[] shadowedX;
+            private double[] shadowedY;
+            private double[] shadowedV;
+            private double[] shadowedT;
+
+            public void setShadowedLogCSVWriter(int maxLogSize)
             {
                 this.shadowedLogSize = 0;
+                this.initialshadowedLogSizeMax = maxLogSize;
 
-                this.shadowedCctvIdx = new List<int>();
-                this.shadowedBuildingIdx = new List<int>();
-                this.shadowedType = new List<char>();
-                this.shadowedTargetType = new List<string>();
-                this.shadowedTargetIdx = new List<int>();
-                this.shadowedX = new List<double>();
-                this.shadowedY = new List<double>();
-                this.shadowedV = new List<double>();
-                this.shadowedT = new List<double>();
+                this.shadowedCctvIdx = new int[maxLogSize];
+                this.shadowedBuildingIdx = new int[maxLogSize];
+                this.shadowedType = new char[maxLogSize];
+                this.shadowedTargetType = new string[maxLogSize];
+                this.shadowedTargetIdx = new int[maxLogSize];
+                this.shadowedX = new double[maxLogSize];
+                this.shadowedY = new double[maxLogSize];
+                this.shadowedV = new double[maxLogSize];
+                this.shadowedT = new double[maxLogSize];
             }
 
             public void addShadowedLog(int cctvIdx, int buildingIdx, char shadowType, string targetType, int targetIdx, double x, double y, double v, double t)
             {
-                this.shadowedCctvIdx.Add(cctvIdx);
-                this.shadowedBuildingIdx.Add(buildingIdx);
-                this.shadowedType.Add(shadowType);
-                this.shadowedTargetType.Add(targetType);
-                this.shadowedTargetIdx.Add(targetIdx);
-                this.shadowedX.Add(x);
-                this.shadowedY.Add(y);
-                this.shadowedV.Add(v);
-                this.shadowedT.Add(t);
+                this.shadowedCctvIdx[this.shadowedLogSize] = cctvIdx;
+                this.shadowedBuildingIdx[this.shadowedLogSize] = buildingIdx;
+                this.shadowedType[this.shadowedLogSize] = shadowType;
+                this.shadowedTargetType[this.shadowedLogSize] = targetType;
+                this.shadowedTargetIdx[this.shadowedLogSize] = targetIdx;
+                this.shadowedX[this.shadowedLogSize] = x;
+                this.shadowedY[this.shadowedLogSize] = y;
+                this.shadowedV[this.shadowedLogSize] = v;
+                this.shadowedT[this.shadowedLogSize] = t;
 
                 this.shadowedLogSize++;
             }
@@ -653,25 +676,43 @@ namespace surveillance_system
             {
                 this.detectedLogSize = 0;
 
-                this.detectedCctvIdx.Clear();
-                this.detectedTargetType.Clear();
-                this.detectedTargetIdx.Clear();
-                this.detectedX.Clear();
-                this.detectedY.Clear();
-                this.detectedV.Clear();
-                this.detectedT.Clear();
+                Array.Clear(this.detectedCctvIdx, 0, this.detectedCctvIdx.Length);
+                Array.Clear(this.detectedTargetType, 0, this.detectedTargetType.Length);
+                Array.Clear(this.detectedTargetIdx, 0, this.detectedTargetIdx.Length);
+                Array.Clear(this.detectedX, 0, this.detectedX.Length);
+                Array.Clear(this.detectedY, 0, this.detectedY.Length);
+                Array.Clear(this.detectedV, 0, this.detectedV.Length);
+                Array.Clear(this.detectedT, 0, this.detectedT.Length);
+
+                //this.detectedCctvIdx.Clear();
+                //this.detectedTargetType.Clear();
+                //this.detectedTargetIdx.Clear();
+                //this.detectedX.Clear();
+                //this.detectedY.Clear();
+                //this.detectedV.Clear();
+                //this.detectedT.Clear();
 
                 this.shadowedLogSize = 0;
 
-                this.shadowedCctvIdx.Clear();
-                this.shadowedBuildingIdx.Clear();
-                this.shadowedType.Clear();
-                this.shadowedTargetType.Clear();
-                this.shadowedTargetIdx.Clear();
-                this.shadowedX.Clear();
-                this.shadowedY.Clear();
-                this.shadowedV.Clear();
-                this.shadowedT.Clear();
+                Array.Clear(this.shadowedCctvIdx, 0, this.shadowedCctvIdx.Length);
+                Array.Clear(this.shadowedBuildingIdx, 0, this.shadowedBuildingIdx.Length);
+                Array.Clear(this.shadowedType, 0, this.shadowedType.Length);
+                Array.Clear(this.shadowedTargetType, 0, this.shadowedTargetType.Length);
+                Array.Clear(this.shadowedTargetIdx, 0, this.shadowedTargetIdx.Length);
+                Array.Clear(this.shadowedX, 0, this.shadowedX.Length);
+                Array.Clear(this.shadowedY, 0, this.shadowedY.Length);
+                Array.Clear(this.shadowedV, 0, this.shadowedV.Length);
+                Array.Clear(this.shadowedT, 0, this.shadowedT.Length);
+
+                //this.shadowedCctvIdx.Clear();
+                //this.shadowedBuildingIdx.Clear();
+                //this.shadowedType.Clear();
+                //this.shadowedTargetType.Clear();
+                //this.shadowedTargetIdx.Clear();
+                //this.shadowedX.Clear();
+                //this.shadowedY.Clear();
+                //this.shadowedV.Clear();
+                //this.shadowedT.Clear();
             }
 
             public void DetectedLogToCSV(int cctvSetIdx, int simIdx)
