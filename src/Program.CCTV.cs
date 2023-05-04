@@ -261,8 +261,8 @@ namespace surveillance_system
             {
                 Point p = calcMidpointOfPolygon(face);
                 // 이차원 상 거리
-                return Math.Sqrt(Math.Pow(Math.Abs(X - p.getX()), 2)
-                                + Math.Pow(Math.Abs(Y - p.getY()), 2));
+                return Math.Sqrt(Math.Pow(Math.Abs(X - p.x), 2)
+                                + Math.Pow(Math.Abs(Y - p.y), 2));
             }
             public void calcEffDistToPed(double height)  // 22-02-01, modified by 0BoO
             {

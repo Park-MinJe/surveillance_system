@@ -164,11 +164,11 @@ namespace surveillance_system
             tw.PedsToCSV("DigitalMappingResult.Peds");
             tw.CarsToCSV("DigitalMappingResult.Cars");
 
-            road.setCCTVbyRealWorldData(mappingModule.N_CCTV);
+            mappingModule.road.setCCTVbyRealWorldData(mappingModule.N_CCTV);
             cw.CctvsToCSV("DigitalMappingResult.CctvSet");
 
             //debug
-            road.printAllPos();
+            mappingModule.road.printAllPos();
         }
 
 

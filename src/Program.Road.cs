@@ -65,9 +65,9 @@ namespace surveillance_system
                 this.lowerCorner = TransformCoordinate(lowerCorner, 3857, 4326);
                 this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
 
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.getX(), this.lowerCorner.getY(), this.upperCorner.getX(), this.lowerCorner.getY());
+                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
                 //Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.getX(), this.lowerCorner.getY(), this.lowerCorner.getX(), this.upperCorner.getY());
+                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
                 //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
                 this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;

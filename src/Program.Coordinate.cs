@@ -66,11 +66,11 @@ namespace surveillance_system
             Point rt = new Point();
 
             double[] xy = new double[2];
-            xy[0] = p.getX();
-            xy[1] = p.getY();
+            xy[0] = p.x;
+            xy[1] = p.y;
 
             double[] z = new double[xy.Length / 2];
-            z[0] = p.getZ();
+            z[0] = p.z;
 
             // 원본 좌표계
             DotSpatial.Projections.ProjectionInfo src = new DotSpatial.Projections.ProjectionInfo();
@@ -118,9 +118,9 @@ namespace surveillance_system
             double[] z = new double[ps.Length];
             for (int i = 0; i < ps.Length; i++)
             {
-                xy[i * 2] = ps[i].getX();
-                xy[i * 2 + 1] = ps[i].getY();
-                z[i] = ps[i].getZ();
+                xy[i * 2] = ps[i].x;
+                xy[i * 2 + 1] = ps[i].y;
+                z[i] = ps[i].z;
             }
 
             // 원본 좌표계
@@ -171,11 +171,11 @@ namespace surveillance_system
             Point[] rt = new Point[ps.Length];
             for(int i = 0; i<ps.Length; i++)
             {
-                double x = ps[i].getX();
-                double y = ps[i].getY();
+                double x = ps[i].x;
+                double y = ps[i].y;
 
-                rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), y, x, y),
-                                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
+                rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.x, y, x, y),
+                                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.y, x, y),
                                     0d);
             }
 
@@ -187,11 +187,11 @@ namespace surveillance_system
         public static Point calcIndexOnProg(Point p, Point lowerCorner, Point upperCorner)
         {
             Point rt = new Point();
-            double x = p.getX();
-            double y = p.getY();
+            double x = p.x;
+            double y = p.y;
 
-            rt = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.getX(), y, x, y),
-                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.getY(), x, y),
+            rt = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.x, y, x, y),
+                    getDistanceBetweenPointsOfepsg4326(x, upperCorner.y, x, y),
                     0d);
 
             //debug

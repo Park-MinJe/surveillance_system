@@ -333,8 +333,8 @@ namespace surveillance_system
                 Console.WriteLine("Transformed Upper Corner");
                 transformedUpperCorner.printString();
 
-                Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedUpperCorner.getX(), transformedLowerCorner.getY()));
-                Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.getX(), transformedLowerCorner.getY(), transformedLowerCorner.getX(), transformedUpperCorner.getY()));
+                Console.WriteLine("가로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.x, transformedLowerCorner.y, transformedUpperCorner.x, transformedLowerCorner.y));
+                Console.WriteLine("세로 길이: {0}", getDistanceBetweenPointsOfepsg4326(transformedLowerCorner.x, transformedLowerCorner.y, transformedLowerCorner.x, transformedUpperCorner.y));
 
                 this.readFeatureMembers();
                 this.readPosLists();

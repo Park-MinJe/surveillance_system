@@ -9,17 +9,17 @@ namespace surveillance_system
 {
     public partial class Program
     {
-        public static Building[] buildings;
-        public static CCTV[] cctvs;
-        public static Pedestrian[] peds;
-        public static Car[] cars;
-
-        public static Road road = new Road();
+        
 
         public class DigitalMappingModule
         {
             /* -------------------------시뮬레이션 대상 객체-------------------------*/
-            
+            public Building[] buildings { get;  private set; }
+            public CCTV[] cctvs { get; private set; }
+            public Pedestrian[] peds { get; private set; }
+            public Car[] cars { get; private set; }
+
+            public Road road { get; private set; } = new Road();
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
