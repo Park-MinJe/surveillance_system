@@ -74,7 +74,11 @@ namespace surveillance_system
                 this.Pos_V2[1] = 0;
             }*/
 
-            public void clone(Building b)
+            // 230504 pmj
+            // initalizer used to clone
+            public Building() { }
+
+            public Building(Building b)
             {
                 this.X = b.X;
                 this.Y = b.Y;

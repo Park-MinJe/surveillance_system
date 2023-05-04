@@ -17,6 +17,14 @@ namespace surveillance_system
 
             public lVector() { }
 
+            // 230504 pmj
+            // initalizer used to clone
+            public lVector(lVector lv)
+            {
+                this.componet_x = lv.componet_x;
+                this.componet_y = lv.componet_y;
+            }
+
             public lVector(double x, double y)
             {
                 this.componet_x = x;
@@ -42,6 +50,8 @@ namespace surveillance_system
 
             public Point() { }
 
+            // 230504 pmj
+            // initalizer used to clone
             public Point(Point p)
             {
                 this.x = p.x;
@@ -78,6 +88,10 @@ namespace surveillance_system
             public Point p1 { get; private set; }
             public Point p2 { get; private set; }
 
+            public Segment() { }
+
+            // 230504 pmj
+            // initalizer used to clone
             public Segment(Segment s)
             {
                 this.p1 = new Point(s.p1);
@@ -103,6 +117,10 @@ namespace surveillance_system
         {
             public Segment[] segments { get; private set; }
 
+            public Polygon() { }
+
+            // 230504 pmj
+            // initalizer used to clone
             public Polygon(Polygon p)
             {
                 this.segments = new Segment[p.segments.Length];
