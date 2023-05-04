@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.NET.Vulkan;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -41,6 +42,45 @@ namespace surveillance_system
             public int N_Surv;  //number of surveillance camera viewing this target.
 
             public int TTL;     // Time To Live
+
+            public SurveillanceTarget() { }
+
+            // 230504 pmj
+            // initalizer used to clone
+            public SurveillanceTarget(SurveillanceTarget t)
+            {
+                this.X = t.X;
+                this.Y = t.Y;
+                
+                this.DST_X= t.DST_X;
+                this.DST_Y= t.DST_Y;
+
+                this.Direction = t.Direction;
+                this.Velocity = t.Velocity;
+                this.Unit_Travel_Dist= t.Unit_Travel_Dist;
+                
+                this.MAX_Dist_X= t.MAX_Dist_X;
+                this.MAX_Dist_Y = t.MAX_Dist_Y;
+
+                this.ground= t.ground;
+
+                this.W = t.W;
+                this.H = t.H;
+                this.D1= t.D1;
+                this.D2 = t.D2;
+                this.W2 = t.W2;
+
+                for(int i = 0; i < 2; i++)
+                {
+                    this.Pos_H1[i] = t.Pos_H1[i];
+                    this.Pos_H2[i] = t.Pos_H2[i];
+                    this.Pos_V1[i] = t.Pos_V1[i];
+                    this.Pos_V2[i] = t.Pos_V2[i];
+                }
+
+                this.N_Surv = t.N_Surv;
+                this.TTL = t.TTL;
+            }
 
             public void define_TARGET(
                 double Width,
