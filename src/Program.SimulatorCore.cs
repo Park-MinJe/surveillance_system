@@ -19,6 +19,14 @@ namespace surveillance_system
 
         public class SimulatorCore
         {
+            /* -------------------------시뮬레이션 대상 객체-------------------------*/
+            public Building[] buildings { get; private set; }
+            public CCTV[] cctvs { get; private set; }
+            public Pedestrian[] peds { get; private set; }
+            public Car[] cars { get; private set; }
+
+            public Road road { get; private set; } = new Road();
+
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
             public int N_CCTV { get; private set; } = 100;      // default 100
@@ -415,11 +423,73 @@ namespace surveillance_system
 
             /* ---------------------------시뮬레이션 환경----------------------------*/
 
-            public void initSimulatorCoreVariables()
+            // 230504 pmj
+            public void initSimuTargetObjs()
             {
-                N_Target = N_Ped + N_Car;
+                // just clone digital mapped objects.
+                this.buildings = new Building[this.N_Building];
+                this.cctvs = new CCTV[this.N_CCTV];
+                this.peds = new Pedestrian[this.N_Ped];
+                this.cars = new Car[this.N_Car];
+                this.road = new Road(mappingModule.road);
 
-                rand = new Random();
+                for(int i = 0; i < this.N_Building; i++)
+                {
+                    if (i < mappingModule.buildings.Length)
+                    {
+                        this.buildings[i] = new Building(mappingModule.buildings[i]);
+                    }
+                    else
+                    {
+                        //this.buildings[i] = new Building();
+                        Console.WriteLine("***You can't access here yet. Program need update to user generated buildings.***");
+                        Environment.Exit(0);
+                    }
+                }
+                for(int i = 0; i < this.N_CCTV; i++)
+                {
+                    if(i < mappingModule.cctvs.Length)
+                    {
+                        this.cctvs[i] = new CCTV(mappingModule.cctvs[i]);
+                    }
+                    else
+                    {
+                        this.cctvs[i] = mappingModule.cctvFactory();
+                        //Console.WriteLine("***You can't access here yet. Program need update to user generated CCTVs.***");
+                        //Environment.Exit(0);
+                    }
+                }
+                for (int i = 0; i < this.N_Ped; i++)
+                {
+                    if (i < mappingModule.peds.Length)
+                    {
+                        this.peds[i] = new SurveillanceTarget(mappingModule.peds[i]) as Pedestrian;
+                    }
+                    else
+                    {
+                        this.peds[i] = mappingModule.pedFactory();
+                        //Console.WriteLine("***You can't access here yet. Program need update to user generated Peds.***");
+                        //Environment.Exit(0);
+                    }
+                }
+                for(int i = 0; i < this.N_Car; i++)
+                {
+                    if(i < mappingModule.cars.Length)
+                    {
+                        this.cars[i] = new SurveillanceTarget(mappingModule.cars[i]) as Car;
+                    }
+                    else
+                    {
+                        this.cars[i] = mappingModule.carFactory();
+                        //Console.WriteLine("***You can't access here yet. Program need update to user generated Cars.***");
+                        //Environment.Exit(0);
+                    }
+                }
+            }
+
+            public void initSimulatorCoreVariables(int randomSeed)
+            {
+                rand = new Random(randomSeed);
 
                 /* ------------------------------CCTV 제원------------------------------*/
                 for (int i = 0; i < 25000; i++)
@@ -688,8 +758,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfBottom.getX() - cctvs[i].X;
-                                    B[1] = pointOfBottom.getY() - cctvs[i].Y;
+                                    B[0] = pointOfBottom.x - cctvs[i].X;
+                                    B[1] = pointOfBottom.y - cctvs[i].Y;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_h1[i, j] = (cosine_Building_h1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_h1[i, j];
@@ -727,8 +797,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfBottom.getX() - cctvs[i].X;
-                                    B[1] = pointOfBottom.getZ() - cctvs[i].Z;
+                                    B[0] = pointOfBottom.x - cctvs[i].X;
+                                    B[1] = pointOfBottom.z - cctvs[i].Z;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];
@@ -741,8 +811,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfTop.getX() - cctvs[i].X;
-                                    B[1] = pointOfTop.getZ() - cctvs[i].Z;
+                                    B[0] = pointOfTop.x - cctvs[i].X;
+                                    B[1] = pointOfTop.z - cctvs[i].Z;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];
@@ -1283,8 +1353,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfBottom.getX() - cctvs[i].X;
-                                    B[1] = pointOfBottom.getY() - cctvs[i].Y;
+                                    B[0] = pointOfBottom.x - cctvs[i].X;
+                                    B[1] = pointOfBottom.y - cctvs[i].Y;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_h1[i, j] = (cosine_Building_h1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_h1[i, j];
@@ -1322,8 +1392,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfBottom.getX() - cctvs[i].X;
-                                    B[1] = pointOfBottom.getZ() - cctvs[i].Z;
+                                    B[0] = pointOfBottom.x - cctvs[i].X;
+                                    B[1] = pointOfBottom.z - cctvs[i].Z;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];
@@ -1336,8 +1406,8 @@ namespace surveillance_system
                                     // debug
                                     //Console.WriteLine("\t\t\tThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
 
-                                    B[0] = pointOfTop.getX() - cctvs[i].X;
-                                    B[1] = pointOfTop.getZ() - cctvs[i].Z;
+                                    B[0] = pointOfTop.x - cctvs[i].X;
+                                    B[1] = pointOfTop.z - cctvs[i].Z;
 
                                     double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
                                     cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];

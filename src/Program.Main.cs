@@ -177,6 +177,8 @@ namespace surveillance_system
         // 디지털 매핑된 것을 기반으로 시뮬레이션 구현
         static void operateSimulation()
         {
+            Random randomForSeed = new Random();
+
             int nBuilding = 0, nCctv = 0, nPed = 0, nCar = 0,
                 cctvMode = 0,
                 numberOfCCTVSet = 1,
@@ -296,7 +298,7 @@ namespace surveillance_system
             }
             else
             {
-                nBuilding = buildings.Length;
+                nBuilding = mappingModule.buildings.Length;
             }
 
             if (inputNCctvOption == "Y" || inputNCctvOption == "y")
@@ -306,7 +308,7 @@ namespace surveillance_system
             }
             else
             {
-                nCctv = cctvs.Length;
+                nCctv = mappingModule.cctvs.Length;
             }
 
             if (inputNPedOption == "Y" || inputNPedOption == "y")
@@ -316,7 +318,7 @@ namespace surveillance_system
             }
             else
             {
-                nPed = peds.Length;
+                nPed = mappingModule.peds.Length;
             }
 
             if (inputNCarOption == "Y" || inputNCarOption == "y")
@@ -326,7 +328,7 @@ namespace surveillance_system
             }
             else
             {
-                nCar = cars.Length;
+                nCar = mappingModule.cars.Length;
             }
 
 
@@ -347,7 +349,7 @@ namespace surveillance_system
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
 
-                sims[i].initSimulatorCoreVariables();
+                sims[i].initSimulatorCoreVariables(randomForSeed.Next());
 
                 sims[i].initTimer();
 
@@ -369,8 +371,8 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    road.setPedswithCSV("Sim" + i + ".Peds");
-                    road.setCarswithCSV("Sim" + i + ".Cars");
+                    sims[j].road.setPedswithCSV("Sim" + i + ".Peds");
+                    sims[j].road.setCarswithCSV("Sim" + i + ".Cars");
                     sims[j].startTimer();
                     if (j == 0)
                     {
@@ -380,13 +382,13 @@ namespace surveillance_system
                             switch (cctvMode)
                             {
                                 case 0:
-                                    road.setCCTV(sims[j].N_CCTV, road.width, road.lane_num);
+                                    sims[j].road.setCCTV(sims[j].N_CCTV, sims[j].road.width, sims[j].road.lane_num);
                                     break;
                                 case 1:
-                                    road.setCCTVbyRandomInDST(sims[j].N_CCTV);
+                                    sims[j].road.setCCTVbyRandomInDST(sims[j].N_CCTV);
                                     break;
                                 case 2:
-                                    road.setCCTVbyRandomInInt(sims[j].N_CCTV);
+                                    sims[j].road.setCCTVbyRandomInInt(sims[j].N_CCTV);
                                     break;
                                 case 3:
                                     //road.setCCTVbyRealWorldData(sims[j].N_CCTV);
@@ -410,7 +412,7 @@ namespace surveillance_system
 
                         //cctvPosAtSim.Add(road.cctvPos);
                     }
-                    road.printAllPos();
+                    sims[j].road.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();

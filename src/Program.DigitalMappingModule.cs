@@ -13,7 +13,7 @@ namespace surveillance_system
 
         public class DigitalMappingModule
         {
-            /* -------------------------시뮬레이션 대상 객체-------------------------*/
+            /* -------------------------Digital Mapping 대상 객체-------------------------*/
             public Building[] buildings { get;  private set; }
             public CCTV[] cctvs { get; private set; }
             public Pedestrian[] peds { get; private set; }
@@ -209,10 +209,10 @@ namespace surveillance_system
                         this.initBuilding();
 
                         // ped init
-                        this.initPed();
+                        this.initPeds();
 
                         // car init
-                        this.initCar();
+                        this.initCars();
 
                         // cctv init
                         if (cctvMode == 3)
@@ -221,7 +221,7 @@ namespace surveillance_system
                         }
                         else
                         {
-                            this.initCCTV();
+                            this.initCCTVs();
                         }
                     }
                 }
@@ -304,7 +304,7 @@ namespace surveillance_system
                 Console.WriteLine("Building Setting Completed\n");
             }
 
-            public void initPed()
+            public void initPeds()
             {
                 try
                 {
@@ -358,7 +358,7 @@ namespace surveillance_system
                 Console.WriteLine("PED Setting Completed\n");
             }
 
-            public void initCar()
+            public void initCars()
             {
                 try
                 {
@@ -396,7 +396,7 @@ namespace surveillance_system
                 Console.WriteLine("CAR Setting Completed\n");
             }
 
-            public void initCCTV()
+            public void initCCTVs()
             {
                 try
                 {
@@ -529,6 +529,138 @@ namespace surveillance_system
                     Console.WriteLine(ex.Message);
                 }
                 Console.WriteLine("\nCCTV Setting Completed\n");
+            }
+
+            /* --------------------------------------
+             * Generate JUST ONE obj. Work as Object Factory
+            -------------------------------------- */
+
+            public Pedestrian pedFactory()
+            {
+                Pedestrian ped = new Pedestrian();
+                double minDist = 0.0;
+                //int idx_minDist = 0;
+                //double[] Dist_Map = new double[road.DST.GetLength(0)];
+
+                // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
+                double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
+                double dst_x = Math.Round(newPos[0, 0]);
+                double dst_y = Math.Round(newPos[0, 1]);
+
+                // Car object일경우 가까운 도착지 설정
+                // double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(ped.X, ped.Y), ped.X, ped.Y);
+                // double dst_x = Math.Round(newPos[0, 0]);
+                // double dst_y = Math.Round(newPos[0, 1]);
+
+                //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+
+                //double dst_x = road.DST[idx_minDist, 0];
+                //double dst_y = road.DST[idx_minDist, 1];
+
+                // 보행자~목적지 벡터
+                /*
+                double[] A = new double[2];
+                A[0] = dst_x - ped.X;
+                A[1] = dst_y - ped.Y;        
+
+                double[] B = { 0.001, 0 };
+                double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
+                if(ped.Y > dst_y)
+                {
+                    direction = Math.Round(2 * Math.PI - direction, 8); 
+                }
+                */
+                ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
+                ped.setDirection();
+                ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
+
+                //debug
+                //ped.printTargetInfo();
+
+                return ped;
+            }
+
+            public Car carFactory()
+            {
+                Car car = new Car();
+                double minDist = 0.0;
+
+                // Car object일경우 가까운 도착지 설정
+                double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
+                // debug
+                // Console.WriteLine("get destination Completed\n");
+                double dst_x = Math.Round(newPos[0, 0]);
+                double dst_y = Math.Round(newPos[0, 1]);
+
+                // debug
+                // Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+
+                car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
+                // debug
+                // Console.WriteLine("define_TARGET Completed\n");
+                car.setDirection();
+                // debug
+                // Console.WriteLine("setDirection Completed\n");
+                car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
+
+                //debug
+                //car.printTargetInfo();
+                
+                return car;
+            }
+
+            public CCTV cctvFactory()
+            {
+                CCTV cctv = new CCTV();
+
+                cctv.setZ((int)Math.Ceiling(rand.NextDouble() * (Height.Max() - 3000)) + 3000);
+                cctv.WD = WD;
+                cctv.HE = HE;
+                cctv.imW = (int)imW;
+                cctv.imH = (int)imH;
+                cctv.Focal_Length = Lens_FocalLength;
+                // 220104 초기 각도 설정
+                // cctvs[i].ViewAngleH = rand.NextDouble() * 360;
+                // cctvs[i].ViewAngleV = -35 - 20 * rand.NextDouble();
+
+                cctv.setViewAngleH(rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
+                // cctvs[i].setViewAngleH(rand.Next(4) * 90);
+                // cctvs[i].setViewAngleV(-35 - 20 * rand.NextDouble());
+                cctv.setViewAngleV(-45.0 * Math.PI / 180);   // (23-02-02) modified by 0BoO, deg -> rad
+
+
+                cctv.setFixMode(fixMode); // default (rotate)
+
+                cctv.H_AOV = 2 * Math.Atan(WD / (2 * Lens_FocalLength));
+                cctv.V_AOV = 2 * Math.Atan(HE / (2 * Lens_FocalLength));
+
+                // 기기 성능상의 최대 감시거리 (임시값)
+                cctv.Max_Dist = 50 * 100 * 10; // 50m (milimeter)
+                                                    // cctvs[i].Max_Dist = 500 * 100 * 100; // 500m (milimeter)
+
+                // Line 118~146
+                /*  여기부턴 Road_Builder 관련 정보가 없으면 의미가 없을거같아서 주석처리했어용..
+                    그리고 get_Sectoral_Coverage 이런함수도 지금은 구현해야할지 애매해서..?
+                */
+
+                cctv
+                    .get_PixelDensity(Dist,
+                    cctv.WD,
+                    cctv.HE,
+                    cctv.Focal_Length,
+                    cctv.imW,
+                    cctv.imH);
+
+                cctv.get_H_FOV(Dist, cctv.WD, cctv.Focal_Length, cctv.ViewAngleH, cctv.X, cctv.Y);
+                cctv.get_V_FOV(Dist, cctv.HE, cctv.Focal_Length, cctv.ViewAngleV, cctv.X, cctv.Z);
+
+                cctv.calcBlindToPed();          // (23-02-01) added by 0BoO
+                cctv.calcEffDistToPed(3000);     // (23-02-01) added by 0BoO, input value is 3000mm(3meter)
+
+                //debug
+                // cctvs[i].printCCTVInfo();
+
+                return cctv;
             }
 
             /* --------------------------------------

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using static surveillance_system.Program;
+using OpenTK.Windowing.Desktop;
 
 namespace surveillance_system
 {
@@ -47,6 +48,106 @@ namespace surveillance_system
             public int[,] pedPos;
             // Car 위치
             public int[,] carPos;
+
+            public Road() { }
+
+            // 230504 pmj
+            // initalizer used to clone
+            public Road(Road r)
+            {
+                this.lowerCorner = new Point(r.lowerCorner);
+                this.upperCorner = new Point(r.upperCorner);
+                
+                this.laneVector = new double[r.laneVector.Length];
+                for(int i = 0; i < r.laneVector.Length; i++)
+                {
+                    this.laneVector[i] = r.laneVector[i];
+                }
+
+                this.lane_h = new double[r.lane_h.GetUpperBound(0), r.lane_h.GetUpperBound(1)];
+                for(int i = 0; i < r.lane_h.GetUpperBound(0); i++)
+                {
+                    for(int j = 0; j < r.lane_h.GetUpperBound(1); i++)
+                    {
+                        this.lane_h[i, j] = r.lane_h[i, j];
+                    }
+                }
+                this.lane_v_left = new double[r.lane_v_left.GetUpperBound(0), r.lane_v_left.GetUpperBound(1)];
+                for (int i = 0; i < r.lane_v_left.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.lane_v_left.GetUpperBound(1); i++)
+                    {
+                        this.lane_v_left[i, j] = r.lane_v_left[i, j];
+                    }
+                }
+                this.lane_v_right = new double[r.lane_v_right.GetUpperBound(0), r.lane_v_right.GetUpperBound(1)];
+                for (int i = 0; i < r.lane_v_right.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.lane_v_right.GetUpperBound(1); i++)
+                    {
+                        this.lane_v_right[i, j] = r.lane_v_right[i, j];
+                    }
+                }
+
+                this.DST = new double[r.DST.GetUpperBound(0), r.DST.GetUpperBound(1)];
+                for (int i = 0; i < r.DST.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.DST.GetUpperBound(1); i++)
+                    {
+                        this.DST[i, j] = r.DST[i, j];
+                    }
+                }
+                this.intersectionArea = new double[r.intersectionArea.GetUpperBound(0), r.intersectionArea.GetUpperBound(1)];
+                for (int i = 0; i < r.intersectionArea.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.intersectionArea.GetUpperBound(1); i++)
+                    {
+                        this.intersectionArea[i, j] = r.intersectionArea[i, j];
+                    }
+                }
+
+                this.X_mapSize = r.X_mapSize;
+                this.Y_mapSize = r.Y_mapSize;
+                this.X_grid_num = r.X_grid_num;
+                this.Y_grid_num = r.Y_grid_num;
+                this.lane_num = r.lane_num;
+                this.X_interval = r.X_interval;
+                this.Y_interval = r.Y_interval;
+                this.width = r.width;
+
+                this.buildingPos = new int[r.buildingPos.GetUpperBound(0), r.buildingPos.GetUpperBound(1)];
+                for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.buildingPos.GetUpperBound(1); i++)
+                    {
+                        this.buildingPos[i, j] = r.buildingPos[i, j];
+                    }
+                }
+                this.cctvPos = new int[r.cctvPos.GetUpperBound(0), r.cctvPos.GetUpperBound(1)];
+                for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.cctvPos.GetUpperBound(1); i++)
+                    {
+                        this.cctvPos[i, j] = r.cctvPos[i, j];
+                    }
+                }
+                this.pedPos = new int[r.pedPos.GetUpperBound(0), r.pedPos.GetUpperBound(1)];
+                for (int i = 0; i < r.pedPos.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.pedPos.GetUpperBound(1); i++)
+                    {
+                        this.pedPos[i, j] = r.pedPos[i, j];
+                    }
+                }
+                this.carPos = new int[r.carPos.GetUpperBound(0), r.carPos.GetUpperBound(1)];
+                for (int i = 0; i < r.carPos.GetUpperBound(0); i++)
+                {
+                    for (int j = 0; j < r.carPos.GetUpperBound(1); i++)
+                    {
+                        this.carPos[i, j] = r.carPos[i, j];
+                    }
+                }
+            }
 
             public void roadBuilder(int wd, int intvl, int n_interval, Point upperCorner, Point lowerCorner)
             {
