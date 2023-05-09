@@ -164,7 +164,7 @@ namespace surveillance_system
             tw.PedsToCSV("DigitalMappingResult.Peds");
             tw.CarsToCSV("DigitalMappingResult.Cars");
 
-            mappingModule.road.setCCTVbyRealWorldData(mappingModule.N_CCTV);
+            mappingModule.road.setCCTVbyRealWorldData(mappingModule.cctvs);
             cw.CctvsToCSV("DigitalMappingResult.CctvSet");
 
             //debug
@@ -371,8 +371,8 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    sims[j].road.setPedswithCSV("Sim" + i + ".Peds");
-                    sims[j].road.setCarswithCSV("Sim" + i + ".Cars");
+                    sims[j].road.setPedswithCSV("Sim" + i + ".Peds", sims[j].peds);
+                    sims[j].road.setCarswithCSV("Sim" + i + ".Cars", sims[j].cars);
                     sims[j].startTimer();
                     if (j == 0)
                     {
@@ -382,13 +382,13 @@ namespace surveillance_system
                             switch (cctvMode)
                             {
                                 case 0:
-                                    sims[j].road.setCCTV(sims[j].N_CCTV, sims[j].road.width, sims[j].road.lane_num);
+                                    sims[j].road.setCCTV(sims[j].cctvs);
                                     break;
                                 case 1:
-                                    sims[j].road.setCCTVbyRandomInDST(sims[j].N_CCTV);
+                                    sims[j].road.setCCTVbyRandomInDST(sims[j].cctvs);
                                     break;
                                 case 2:
-                                    sims[j].road.setCCTVbyRandomInInt(sims[j].N_CCTV);
+                                    sims[j].road.setCCTVbyRandomInInt(sims[j].cctvs);
                                     break;
                                 case 3:
                                     //road.setCCTVbyRealWorldData(sims[j].N_CCTV);
@@ -452,7 +452,7 @@ namespace surveillance_system
             if (bestCCTVIdx == 0)
             {
                 Console.WriteLine("====== Real World CCTV set ======");
-                road.setCctvswithCSV("DigitalMappingResult.CctvSet");
+                mappingModule.road.setCctvswithCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
             }
             else
             {

@@ -250,7 +250,7 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects with csv
             -------------------------------------- */
-            public void setPedswithCSV(string filename)
+            public void setPedswithCSV(string filename, Pedestrian[] peds)
             {
                 tr.PedsFromCSV(filename);
 
@@ -268,7 +268,7 @@ namespace surveillance_system
                 }
             }
 
-            public void setCarswithCSV(string filename)
+            public void setCarswithCSV(string filename, Car[] cars)
             {
                 tr.CarsFromCSV(filename);
 
@@ -286,7 +286,7 @@ namespace surveillance_system
                 }
             }
 
-            public void setCctvswithCSV(string filename)
+            public void setCctvswithCSV(string filename, CCTV[] cctvs)
             {
                 cr.CctvsFromCSV(filename);
 
@@ -324,7 +324,7 @@ namespace surveillance_system
             -------------------------------------- */
 
             // set Architecture object
-            public void setBuilding(int n_building)
+            public void setBuilding(int n_building, Building[] buildings)
             {
                 buildingPos = new int[this.Y_grid_num, this.X_grid_num];
 
@@ -347,13 +347,13 @@ namespace surveillance_system
             }
 
 
-            public void setCCTV(int n_cctv, int wd, int n_interval)
+            public void setCCTV(CCTV[] cctvs)
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
                 double x_range = X_mapSize - width;
                 double y_range = Y_mapSize - width;
-                int rootN = (int)Math.Sqrt((double)n_cctv);
+                int rootN = (int)Math.Sqrt((double)cctvs.Length);
 
                 // x좌표가 int 형식이라 캐스팅해서 완벽한 그리드는 아닐 수 있음
                 int x_intvl = (int)x_range / (rootN-1);
@@ -393,14 +393,14 @@ namespace surveillance_system
             }
             // 교차로에만 설치하는 경우
             // 교차로 중 설치 위치는 랜덤
-            public void setCCTVbyRandomInDST(int n_cctv)
+            public void setCCTVbyRandomInDST(CCTV[] cctvs)
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
-                for (int i = 0; i < n_cctv; i++)
+                for (int i = 0; i < cctvs.Length; i++)
                 {
                     Random rand = new Random();
                     int intersectidx = rand.Next(lane_num * lane_num);
@@ -418,14 +418,14 @@ namespace surveillance_system
             }
 
             // 무작위 좌표에 cctv 배치
-            public void setCCTVbyRandomInInt(int n_cctv)
+            public void setCCTVbyRandomInInt(CCTV[] cctvs)
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random");
-                for (int i = 0; i < n_cctv; i++)
+                for (int i = 0; i < cctvs.Length; i++)
                 {
                     Random rand = new Random();
                     cctvs[i].X = rand.Next(Convert.ToInt32(Math.Truncate(this.X_mapSize)));
@@ -442,7 +442,7 @@ namespace surveillance_system
             }
 
             // 파일로부터 읽은 cctv 위치
-            public void setCCTVbyRealWorldData(int n_cctv)
+            public void setCCTVbyRealWorldData(CCTV[] cctvs)
             {
                 cctvPos = new int[this.Y_grid_num, this.X_grid_num];
 
@@ -457,8 +457,8 @@ namespace surveillance_system
                     int cctvNumAtPosition = Convert.ToInt32(cr.realWorldCctvData[i][2]);
                     for (int k = 0; k < cctvNumAtPosition; j++, k++)
                     {
-                        cctvs[j].X = Convert.ToInt32(cctvLocationOnSystem.getX());
-                        cctvs[j].Y = Convert.ToInt32(cctvLocationOnSystem.getY());
+                        cctvs[j].X = Convert.ToInt32(cctvLocationOnSystem.x);
+                        cctvs[j].Y = Convert.ToInt32(cctvLocationOnSystem.y);
 
                         //debug
                         //Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", j, cctvs[i].X, cctvs[i].Y);
@@ -474,10 +474,10 @@ namespace surveillance_system
             }
 
             // 보행자 위치 처음 설정
-            public void setPed(int n_ped)
+            public void setPed(Pedestrian[] peds)
             {
                 pedPos = new int[this.Y_grid_num, this.X_grid_num];
-                for (int i = 0; i < n_ped; i++)
+                for (int i = 0; i < peds.Length; i++)
                 {
                     Random rand = new Random();
                     // int intersectidx = rand.Next(9);
@@ -508,10 +508,10 @@ namespace surveillance_system
             }
 
             // set Car object
-            public void setCar(int n_car)
+            public void setCar(Car[] cars)
             {
                 carPos = new int[this.Y_grid_num, this.X_grid_num];
-                for (int i = 0; i < n_car; i++)
+                for (int i = 0; i < cars.Length; i++)
                 {
                     Random rand = new Random();
                     int intersectidx = rand.Next(lane_num * lane_num);
@@ -730,7 +730,7 @@ namespace surveillance_system
                 Console.WriteLine("\n========================================================================================\n");
             }
 
-            public void printCctvInfo()
+            public void printCctvInfo(CCTV[] cctvs)
             {
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
 
