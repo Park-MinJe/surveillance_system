@@ -107,52 +107,79 @@ namespace surveillance_system
             {
                 this.X = new Angle3D(fov.X);
 
-                this.X0 = new double[fov.X0.Length];
-                for(int i = 0; i < fov.X0.Length; i++)
+                if(fov.X0 != null)
                 {
-                    this.X0[i] = fov.X0[i];
+                    this.X0 = new double[fov.X0.Length];
+                    for (int i = 0; i < fov.X0.Length; i++)
+                    {
+                        this.X0[i] = fov.X0[i];
+                    }
                 }
-                this.X1 = new double[fov.X1.Length];
-                for (int i = 0; i < fov.X1.Length; i++)
+                if (fov.X1 != null)
                 {
-                    this.X1[i] = fov.X1[i];
+                    this.X1 = new double[fov.X1.Length];
+                    for (int i = 0; i < fov.X1.Length; i++)
+                    {
+                        this.X1[i] = fov.X1[i];
+                    }
                 }
-                this.X2 = new double[fov.X2.Length];
-                for (int i = 0; i < fov.X2.Length; i++)
+                if (fov.X2 != null)
                 {
-                    this.X2[i] = fov.X2[i];
-                }
-
-                this.Y0 = new double[fov.Y0.Length];
-                for (int i = 0; i < fov.Y0.Length; i++)
-                {
-                    this.Y0[i] = fov.Y0[i];
-                }
-                this.Y1 = new double[fov.Y1.Length];
-                for (int i = 0; i < fov.Y1.Length; i++)
-                {
-                    this.Y1[i] = fov.Y1[i];
-                }
-                this.Y2 = new double[fov.Y2.Length];
-                for (int i = 0; i < fov.Y2.Length; i++)
-                {
-                    this.Y2[i] = fov.Y2[i];
+                    this.X2 = new double[fov.X2.Length];
+                    for (int i = 0; i < fov.X2.Length; i++)
+                    {
+                        this.X2[i] = fov.X2[i];
+                    }
                 }
 
-                this.Z0 = new double[fov.Z0.Length];
-                for (int i = 0; i < fov.Z0.Length; i++)
+                if (fov.Y0 != null)
                 {
-                    this.Z0[i] = fov.Z0[i];
+                    this.Y0 = new double[fov.Y0.Length];
+                    for (int i = 0; i < fov.Y0.Length; i++)
+                    {
+                        this.Y0[i] = fov.Y0[i];
+                    }
                 }
-                this.Z1 = new double[fov.Z1.Length];
-                for (int i = 0; i < fov.Z1.Length; i++)
+                if (fov.Y1 != null)
                 {
-                    this.Z1[i] = fov.Z1[i];
+                    this.Y1 = new double[fov.Y1.Length];
+                    for (int i = 0; i < fov.Y1.Length; i++)
+                    {
+                        this.Y1[i] = fov.Y1[i];
+                    }
                 }
-                this.Z2 = new double[fov.Z2.Length];
-                for (int i = 0; i < fov.Z2.Length; i++)
+                if (fov.Y2 != null)
                 {
-                    this.Z2[i] = fov.Z2[i];
+                    this.Y2 = new double[fov.Y2.Length];
+                    for (int i = 0; i < fov.Y2.Length; i++)
+                    {
+                        this.Y2[i] = fov.Y2[i];
+                    }
+                }
+
+                if (fov.Z0 != null)
+                {
+                    this.Z0 = new double[fov.Z0.Length];
+                    for (int i = 0; i < fov.Z0.Length; i++)
+                    {
+                        this.Z0[i] = fov.Z0[i];
+                    }
+                }
+                if (fov.Z1 != null)
+                {
+                    this.Z1 = new double[fov.Z1.Length];
+                    for (int i = 0; i < fov.Z1.Length; i++)
+                    {
+                        this.Z1[i] = fov.Z1[i];
+                    }
+                }
+                if (fov.Z2 != null)
+                {
+                    this.Z2 = new double[fov.Z2.Length];
+                    for (int i = 0; i < fov.Z2.Length; i++)
+                    {
+                        this.Z2[i] = fov.Z2[i];
+                    }
                 }
             }
 

@@ -433,6 +433,8 @@ namespace surveillance_system
                 this.cars = new Car[this.N_Car];
                 this.road = new Road(mappingModule.road);
 
+                this.N_Target = this.N_Ped + this.N_Car;
+
                 for(int i = 0; i < this.N_Building; i++)
                 {
                     if (i < mappingModule.buildings.Length)
@@ -463,7 +465,7 @@ namespace surveillance_system
                 {
                     if (i < mappingModule.peds.Length)
                     {
-                        this.peds[i] = new SurveillanceTarget(mappingModule.peds[i]) as Pedestrian;
+                        this.peds[i] = new Pedestrian(mappingModule.peds[i]);
                     }
                     else
                     {
@@ -476,7 +478,7 @@ namespace surveillance_system
                 {
                     if(i < mappingModule.cars.Length)
                     {
-                        this.cars[i] = new SurveillanceTarget(mappingModule.cars[i]) as Car;
+                        this.cars[i] = new Car(mappingModule.cars[i]);
                     }
                     else
                     {
@@ -1860,7 +1862,7 @@ namespace surveillance_system
                             }
                         }
 
-                        peds[i].move();
+                        peds[i].move(this.road);
                     }
                     else
                     {
@@ -1893,7 +1895,7 @@ namespace surveillance_system
 
                         // debug
                         // Console.WriteLine("car[{0}]", i - pedLen);
-                        cars[i - pedLen].move();
+                        cars[i - pedLen].move(this.road);
                         // debug
                         // Console.WriteLine("car[{0}]", i - pedLen);
                     }

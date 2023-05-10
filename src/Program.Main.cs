@@ -36,7 +36,7 @@ namespace surveillance_system
         //public static GraphicManager_slik graphic_Silk = new GraphicManager_slik();
         //public static GraphicManager_OpneTK graphic = new GraphicManager_OpneTK();
 
-        public static DigitalMappingModule mappingModule;
+        public static DigitalMappingModule mappingModule = new DigitalMappingModule();
 
         static void Main(string[] args)
         {
@@ -156,16 +156,16 @@ namespace surveillance_system
 
             int cctvMode = 3;
 
-            mappingModule = new DigitalMappingModule();
+            //mappingModule = new DigitalMappingModule();
             mappingModule.initDigitalMappingVariables();
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            bw.BuildingsToCSV("DigitalMappingResult.Buildings");
+            bw.BuildingsToCSV("DigitalMappingResult.Buildings", mappingModule.buildings);
 
-            tw.PedsToCSV("DigitalMappingResult.Peds");
-            tw.CarsToCSV("DigitalMappingResult.Cars");
+            tw.PedsToCSV("DigitalMappingResult.Peds", mappingModule.peds);
+            tw.CarsToCSV("DigitalMappingResult.Cars", mappingModule.cars);
 
             mappingModule.road.setCCTVbyRealWorldData(mappingModule.cctvs);
-            cw.CctvsToCSV("DigitalMappingResult.CctvSet");
+            cw.CctvsToCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
 
             //debug
             mappingModule.road.printAllPos();
@@ -349,15 +349,16 @@ namespace surveillance_system
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
 
+                sims[i].initSimuTargetObjs();
                 sims[i].initSimulatorCoreVariables(randomForSeed.Next());
 
                 sims[i].initTimer();
 
                 // sims[i].startTimer();
                 //sims[i].initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-                bw.BuildingsToCSV("Sim" + i + ".Buildings");
-                tw.PedsToCSV("Sim" + i + ".Peds");
-                tw.CarsToCSV("Sim" + i + ".Cars");
+                bw.BuildingsToCSV("Sim" + i + ".Buildings", sims[i].buildings);
+                tw.PedsToCSV("Sim" + i + ".Peds", sims[i].peds);
+                tw.CarsToCSV("Sim" + i + ".Cars", sims[i].cars);
                 //pedestrianAtSim.Add(peds);
                 //carAtSim.Add(cars);
                 //sims[i].stopTimer();
@@ -396,12 +397,12 @@ namespace surveillance_system
                                     break;
                             }
                             cw.setCctvCSVWriter(sims[j].N_CCTV);
-                            cw.CctvsToCSV("CctvSet" + i);
+                            cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
                         }
                         else
                         {
                             cw.setCctvCSVWriter(sims[j].N_CCTV);
-                            cw.CctvsToCSV("DigitalMappingResult.CctvSet");
+                            cw.CctvsToCSV("DigitalMappingResult.CctvSet", sims[j].cctvs);
                         }
                         //cctvAtSim.Add(cctvs);
 
@@ -449,17 +450,24 @@ namespace surveillance_system
             int bestCCTVIdx = successRates.IndexOf(successRates.Max());
             Console.WriteLine(bestCCTVIdx);
 
+            Road realRoadClone = new Road(mappingModule.road);
+            CCTV[] bestCctvSet = new CCTV[mappingModule.cctvs.Length];
+            for(int i = 0; i < mappingModule.cctvs.Length; i++)
+            {
+                bestCctvSet[i] = new CCTV(mappingModule.cctvs[i]);
+            }
+
             if (bestCCTVIdx == 0)
             {
                 Console.WriteLine("====== Real World CCTV set ======");
-                mappingModule.road.setCctvswithCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
+                realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
             }
             else
             {
                 Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-                road.setCctvswithCSV("CctvSet" + bestCCTVIdx);
+                realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
             }
-            road.printPos(road.cctvPos);
+            realRoadClone.printPos(realRoadClone.cctvPos);
         }
     }
 }

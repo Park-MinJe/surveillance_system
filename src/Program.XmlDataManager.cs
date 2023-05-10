@@ -315,7 +315,7 @@ namespace surveillance_system
             }
 
             // debug
-            public void testGisBuildingService(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
+            /*public void testGisBuildingService(string methodName, string serviceKey, string bbox, string pnu, string typeName = "F171", string maxFeature = "10", string resultType = "results", string srsName = "EPSG:5174")
             {
                 this.setEndPointUrl(methodName, serviceKey, bbox, pnu, typeName, maxFeature, resultType, srsName);
 
@@ -367,7 +367,7 @@ namespace surveillance_system
                     buildings[i] = new Building();
                     buildings[i].define_Building(pls[i], hs[i]);
                 }
-            }
+            }*/
         }
 
         public class VworldService : InputFromApi

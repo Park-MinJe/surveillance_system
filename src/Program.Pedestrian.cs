@@ -160,9 +160,9 @@ namespace surveillance_system
                 Console.WriteLine("TTL : {0} \n", this.TTL);
             }
 
-            public Boolean outOfRange()
+            public Boolean outOfRange(double X_mapSize, double Y_mapSize)
             {
-                if (X < 0 || X > road.X_mapSize || Y < 0 || Y > road.Y_mapSize)
+                if (X < 0 || X > X_mapSize || Y < 0 || Y > Y_mapSize)
                 {
                     return true;
                 }
@@ -172,8 +172,8 @@ namespace surveillance_system
 
         interface Movable
         {
-            void move(); // 초당 이동
-            void updateDestination();
+            void move(Road road); // 초당 이동
+            void updateDestination(Road road);
             void upVelocity(); // 속도 증가
             void downVelocity(); // 속도 감소
         }
@@ -184,7 +184,43 @@ namespace surveillance_system
 
         public class Pedestrian : SurveillanceTarget, Person
         {
-            public void move()
+            public Pedestrian() { }
+            public Pedestrian(Pedestrian ped)
+            {
+                this.X = ped.X;
+                this.Y = ped.Y;
+
+                this.DST_X = ped.DST_X;
+                this.DST_Y = ped.DST_Y;
+
+                this.Direction = ped.Direction;
+                this.Velocity = ped.Velocity;
+                this.Unit_Travel_Dist = ped.Unit_Travel_Dist;
+
+                this.MAX_Dist_X = ped.MAX_Dist_X;
+                this.MAX_Dist_Y = ped.MAX_Dist_Y;
+
+                this.ground = ped.ground;
+
+                this.W = ped.W;
+                this.H = ped.H;
+                this.D1 = ped.D1;
+                this.D2 = ped.D2;
+                this.W2 = ped.W2;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    this.Pos_H1[i] = ped.Pos_H1[i];
+                    this.Pos_H2[i] = ped.Pos_H2[i];
+                    this.Pos_V1[i] = ped.Pos_V1[i];
+                    this.Pos_V2[i] = ped.Pos_V2[i];
+                }
+
+                this.N_Surv = ped.N_Surv;
+                this.TTL = ped.TTL;
+            }
+
+            public void move(Road road)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -201,19 +237,18 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived() || outOfRange())
+                if (isArrived() || outOfRange(road.X_mapSize, road.Y_mapSize))
                 {
                     // Index out of range
-                    updateDestination(); 
+                    updateDestination(road); 
                     setDirection();
                 }
             }
-            public void downVelocity()
+            public void updateDestination(Road road)
             {
-                if (this.Velocity > 0.01f && this.Velocity < 4000)
-                    this.Velocity -= 0.01f;
-                else
-                    Console.WriteLine("Out of Velocity range");
+                double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(X, Y));
+                DST_X = Math.Round(newPos[0, 0]);
+                DST_Y = Math.Round(newPos[0, 1]);
             }
             public void upVelocity()
             {
@@ -222,18 +257,55 @@ namespace surveillance_system
                 else
                     Console.WriteLine("Out of Velocity range");
             }
-            public  void  updateDestination()
-            {      
-                double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(X, Y));
-                DST_X = Math.Round(newPos[0, 0]);
-                DST_Y = Math.Round(newPos[0, 1]);
+            public void downVelocity()
+            {
+                if (this.Velocity > 0.01f && this.Velocity < 4000)
+                    this.Velocity -= 0.01f;
+                else
+                    Console.WriteLine("Out of Velocity range");
             }
 
         }
 
         public class Car: SurveillanceTarget, Vehicle
         {
-            public void move()
+            public Car() { }
+            public Car(Car car)
+            {
+                this.X = car.X;
+                this.Y = car.Y;
+
+                this.DST_X = car.DST_X;
+                this.DST_Y = car.DST_Y;
+
+                this.Direction = car.Direction;
+                this.Velocity = car.Velocity;
+                this.Unit_Travel_Dist = car.Unit_Travel_Dist;
+
+                this.MAX_Dist_X = car.MAX_Dist_X;
+                this.MAX_Dist_Y = car.MAX_Dist_Y;
+
+                this.ground = car.ground;
+
+                this.W = car.W;
+                this.H = car.H;
+                this.D1 = car.D1;
+                this.D2 = car.D2;
+                this.W2 = car.W2;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    this.Pos_H1[i] = car.Pos_H1[i];
+                    this.Pos_H2[i] = car.Pos_H2[i];
+                    this.Pos_V1[i] = car.Pos_V1[i];
+                    this.Pos_V2[i] = car.Pos_V2[i];
+                }
+
+                this.N_Surv = car.N_Surv;
+                this.TTL = car.TTL;
+            }
+
+            public void move(Road road)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -249,14 +321,14 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived() || outOfRange())
+                if (isArrived() || outOfRange(road.X_mapSize, road.Y_mapSize))
                 {
-                    updateDestination();
+                    updateDestination(road);
                     setDirection();
                 }
             }
 
-            public void updateDestination()
+            public void updateDestination(Road road)
             {
                 // Console.WriteLine("update destination1");
                 double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(X, Y), X, Y);
@@ -283,7 +355,7 @@ namespace surveillance_system
 
         public class ElectricScooter : SurveillanceTarget, Vehicle
         {
-            public void move()
+            public void move(Road road)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -301,11 +373,11 @@ namespace surveillance_system
                 // 목적지 도착 검사
                 if (isArrived())
                 {
-                    updateDestination();
+                    updateDestination(road);
                     setDirection();
                 }
             }
-            public void updateDestination()
+            public void updateDestination(Road road)
             {
 
             }

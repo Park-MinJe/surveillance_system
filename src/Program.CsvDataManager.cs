@@ -54,7 +54,7 @@ namespace surveillance_system
                 }
             }*/
 
-            public void BuildingsToCSV(string filename)
+            public void BuildingsToCSV(string filename, Building[] buildings)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.Buildings"
                 // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Buildings"
@@ -95,7 +95,7 @@ namespace surveillance_system
             /* --------------------------------------
              * Print CSV
             -------------------------------------- */
-            public void PedsToCSV(string filename)
+            public void PedsToCSV(string filename, Pedestrian[] peds)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.Peds"
                 // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Peds"
@@ -120,7 +120,7 @@ namespace surveillance_system
                 }
             }
 
-            public void CarsToCSV(string filename)
+            public void CarsToCSV(string filename, Car[] cars)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.Cars"
                 // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Cars"
@@ -148,7 +148,7 @@ namespace surveillance_system
 
         public class TargetCSVReader
         {
-            public void PedsFromCSV(string filename)
+            public void PedsFromCSV(string filename, Pedestrian[] peds)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.Peds"
                 // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Peds"
@@ -245,7 +245,7 @@ namespace surveillance_system
                 }
             }
 
-            public void CarsFromCSV(string filename)
+            public void CarsFromCSV(string filename, Car[] cars)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.Cars"
                 // 시뮬레이션 초기데이터의 파일명: "Sim" + simIdx + ".Cars"
@@ -358,7 +358,7 @@ namespace surveillance_system
                 //Console.WriteLine(this.N_Cctv);
             }
 
-            public void CctvsToCSV(string filename)
+            public void CctvsToCSV(string filename, CCTV[] cctvs)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"
                 // 시뮬레이션 초기데이터의 파일명: "CctvSet" + cctvSetIdx
@@ -389,7 +389,7 @@ namespace surveillance_system
             public int realWorldCctvNum { get; private set; }
 
             // csv 파일료 저장된 초기 cctv 객체 데이터를 읽어와 cctv 위치 데이터를 초기화해준다.
-            public void CctvsFromCSV(string filename)
+            public void CctvsFromCSV(string filename, CCTV[] cctvs)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"
                 // 시뮬레이션 초기데이터의 파일명: "CctvSet" + cctvSetIdx
@@ -428,7 +428,10 @@ namespace surveillance_system
                 }
             }
 
-            public void realWorldCctvFromCSV(string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv")
+            public void realWorldCctvFromCSV(
+                Road road,  
+                string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv"
+                )
             {
                 realWorldCctvData = new List<string[]>();
                 realWorldCctvNum = 0;
@@ -459,8 +462,8 @@ namespace surveillance_system
                                 //Console.WriteLine(values[7] + "," + values[8]);
                                 double y = Convert.ToDouble(values[7]);
                                 double x = Convert.ToDouble(values[8]);
-                                if ((y > road.lowerCorner.getY() && y < road.upperCorner.getY())
-                                    && (x > road.lowerCorner.getX() && x < road.upperCorner.getX()))
+                                if ((y > road.lowerCorner.y && y < road.upperCorner.y)
+                                    && (x > road.lowerCorner.x && x < road.upperCorner.x))
                                 {
                                     realWorldCctvNum += Convert.ToInt32(values[2]);
                                     realWorldCctvData.Add(values);

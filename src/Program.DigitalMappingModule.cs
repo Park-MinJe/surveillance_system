@@ -176,8 +176,8 @@ namespace surveillance_system
                         // 도로 정보 생성, 보행자 정보 생성
                         road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
                         //road.setBuilding(N_Building);
-                        road.setPed(N_Ped);
-                        road.setCar(N_Car);
+                        road.setPed(this.peds);
+                        road.setCar(this.cars);
 
                         /*
                         // debug 220428
@@ -294,7 +294,7 @@ namespace surveillance_system
                     //Debug
                     //Console.WriteLine("Err after defining building");
 
-                    road.setBuilding(this.N_Building);
+                    road.setBuilding(this.N_Building, this.buildings);
                 }
                 catch (Exception ex)
                 {
@@ -475,7 +475,7 @@ namespace surveillance_system
             {
                 try
                 {
-                    cr.realWorldCctvFromCSV();
+                    cr.realWorldCctvFromCSV(this.road);
                     this.N_CCTV = cr.realWorldCctvNum;
                     cctvs = new CCTV[N_CCTV];
                     for (int i = 0; i < N_CCTV; i++)
