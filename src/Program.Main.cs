@@ -111,6 +111,8 @@ namespace surveillance_system
         // 실제 데이터를 이용한 디지털 매핑
         static void operateMapping()
         {
+            Random rand = new Random();
+
             // 도로 정보
 
             // 230207 pmj
@@ -157,7 +159,7 @@ namespace surveillance_system
             int cctvMode = 3;
 
             //mappingModule = new DigitalMappingModule();
-            mappingModule.initDigitalMappingVariables();
+            mappingModule.initDigitalMappingVariables(rand.Next());
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
             bw.BuildingsToCSV("DigitalMappingResult.Buildings", mappingModule.buildings);
 
@@ -378,7 +380,7 @@ namespace surveillance_system
                     if (j == 0)
                     {
                         // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
-                        if (!(i == 0 && numberOfCCTVSet > 1))
+                        if (i != 0 && numberOfCCTVSet > 1)
                         {
                             switch (cctvMode)
                             {

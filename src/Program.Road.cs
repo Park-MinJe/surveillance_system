@@ -406,7 +406,7 @@ namespace surveillance_system
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random DST");
                 for (int i = 0; i < cctvs.Length; i++)
                 {
                     Random rand = new Random();
@@ -431,7 +431,7 @@ namespace surveillance_system
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random");
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random Int");
                 for (int i = 0; i < cctvs.Length; i++)
                 {
                     Random rand = new Random();

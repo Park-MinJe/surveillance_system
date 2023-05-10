@@ -28,7 +28,7 @@ namespace surveillance_system
             public int N_Car { get; private set; } = 5;         // default 5
             public int N_Target { get; private set; }
             
-            private Random rand = new Random();
+            private Random rand;
 
             /* ------------------------------CCTV 제원------------------------------*/
             private const double Lens_FocalLength = 2.8; // mm, [2.8 3.6 6 8 12 16 25]
@@ -97,8 +97,10 @@ namespace surveillance_system
              * 초기화 함수
             -------------------------------------- */
             /* ---------------------------시뮬레이션 환경----------------------------*/
-            public void initDigitalMappingVariables()
+            public void initDigitalMappingVariables(int randomSeed)
             {
+                rand = new Random(randomSeed);
+
                 /* ------------------------------CCTV 제원------------------------------*/
                 /* double D_AOV = RadToDeg(2 * Math.Atan(Diag / (2 * Lens_FocalLength)));
                 (mm)distance
