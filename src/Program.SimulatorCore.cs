@@ -459,6 +459,7 @@ namespace surveillance_system
                     else
                     {
                         this.cctvs[i] = mappingModule.cctvFactory();
+                        road.setCCTV
                         //Console.WriteLine("***You can't access here yet. Program need update to user generated CCTVs.***");
                         //Environment.Exit(0);
                     }
