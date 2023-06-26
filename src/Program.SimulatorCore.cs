@@ -56,8 +56,10 @@ namespace surveillance_system
             private double rotateTerm = 30.0; // sec
 
             /* ------------------------------MAP 제원------------------------------*/
-            private int road_min = 0;
-            private int road_max;
+            private double road_min_x = 0;
+            private double road_max_x;
+            private double road_min_y = 0;
+            private double road_max_y;
 
             /* ---------------------------시뮬레이션 결과----------------------------*/
             // Console.WriteLine(">>> Simulating . . . \n");
@@ -557,8 +559,11 @@ namespace surveillance_system
 
                 stCnt = 0;
 
-                //road_min = 0;
-                //road_max = road.mapSize;
+                road_min_x = 0;
+                road_max_x = road.X_mapSize;
+
+                road_min_y = 0;
+                road_max_y = road.Y_mapSize;
 
                 Now = 0;
 
@@ -573,8 +578,8 @@ namespace surveillance_system
                 {
                     Console.Write(".");
                     // 추적 검사
-                    //int[] res = this.checkDetectionWithParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 사용
-                    int[] res = this.checkDetectionWithoutParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 미사용
+                    int[] res = this.checkDetectionWithParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 사용
+                    //int[] res = this.checkDetectionWithoutParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 미사용
                     // debug
                     // Console.WriteLine("Checking Detection Completed\n");
                     // threading.. error
@@ -1837,7 +1842,7 @@ namespace surveillance_system
                         // Console.WriteLine("ped[{0}]", i);
                         if (createCSV)
                         {
-                            if (peds[i].X < road_min || peds[i].X > road_max)
+                            if (peds[i].X < road_min_x || peds[i].X > road_max_x)
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
@@ -1849,7 +1854,7 @@ namespace surveillance_system
                                 tlog.addTraffic_x(i, stCnt, Math.Round(peds[i].X, 2));
                             }
 
-                            if (peds[i].Y < road_min || peds[i].Y > road_max)
+                            if (peds[i].Y < road_min_y || peds[i].Y > road_max_y)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
@@ -1868,7 +1873,7 @@ namespace surveillance_system
                     {
                         if (createCSV)
                         {
-                            if (cars[i - pedLen].X < road_min || cars[i - pedLen].X > road_max)
+                            if (cars[i - pedLen].X < road_min_x || cars[i - pedLen].X > road_max_x)
                             {
                                 //traffic_x[i] += "Out of range,";
                                 //traffic_x[i, stCnt] = -1;
@@ -1880,7 +1885,7 @@ namespace surveillance_system
                                 tlog.addTraffic_x(i, stCnt, Math.Round(cars[i - pedLen].X, 2));
                             }
 
-                            if (cars[i - pedLen].Y < road_min || cars[i - pedLen].Y > road_max)
+                            if (cars[i - pedLen].Y < road_min_y || cars[i - pedLen].Y > road_max_y)
                             {
                                 //traffic_y[i] += "Out of range,";
                                 //traffic_y[i, stCnt] = -1;
