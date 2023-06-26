@@ -192,21 +192,6 @@ namespace surveillance_system
                         */
                         // road.printRoadInfo();
 
-                        /*
-
-                        //*  보행자, cctv 초기 설정
-                        for (int i = 0; i < N_Ped; i++)
-                        {
-                            Console.WriteLine("{0}번째 보행자 = ({1}, {2}) ", i + 1, peds[i].X, peds[i].Y);
-                        }
-                        Console.WriteLine("\n============================================================\n");
-                        for (int i = 0; i < N_CCTV; i++)
-                        {
-                            Console.WriteLine("{0}번째 cctv = ({1}, {2}) ", i + 1, cctvs[i].X, cctvs[i].Y);
-                        }
-                        */
-
-
                         // 건물 init
                         this.initBuilding();
 

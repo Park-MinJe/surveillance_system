@@ -161,12 +161,33 @@ namespace surveillance_system
             //mappingModule = new DigitalMappingModule();
             mappingModule.initDigitalMappingVariables(rand.Next());
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            bw.BuildingsToCSV("DigitalMappingResult.Buildings", mappingModule.buildings);
+            mappingModule.road.setCCTVbyRealWorldData(mappingModule.cctvs);
 
+            //*  보행자, 차량, cctv 초기 설정
+            Console.WriteLine("\n============================================================\n");
+            for (int i = 0; i < mappingModule.N_Ped; i++)
+            {
+                Console.WriteLine("{0}번째 보행자 = ({1}, {2}) ", i + 1, mappingModule.peds[i].X, mappingModule.peds[i].Y);
+            }
+            Console.WriteLine("\n============================================================\n");
+            for (int i = 0; i < mappingModule.N_Ped; i++)
+            {
+                Console.WriteLine("{0}번째 차량 = ({1}, {2}) ", i + 1, mappingModule.cars[i].X, mappingModule.cars[i].Y);
+            }
+            Console.WriteLine("\n============================================================\n");
+            for (int i = 0; i < mappingModule.cctvs.Length; i++)
+            {
+                Console.WriteLine("{0}번째 cctv = ({1}, {2}) ", i + 1, mappingModule.cctvs[i].X, mappingModule.cctvs[i].Y);
+            }
+            Console.WriteLine("\n============================================================\n");
+
+            bw.setBuildingCSVWriter(mappingModule.N_Building);
+            tw.setTargetCSVWriter(mappingModule.N_Ped, mappingModule.N_Car);
+            cw.setCctvCSVWriter(mappingModule.N_CCTV);
+
+            bw.BuildingsToCSV("DigitalMappingResult.Buildings", mappingModule.buildings);
             tw.PedsToCSV("DigitalMappingResult.Peds", mappingModule.peds);
             tw.CarsToCSV("DigitalMappingResult.Cars", mappingModule.cars);
-
-            mappingModule.road.setCCTVbyRealWorldData(mappingModule.cctvs);
             cw.CctvsToCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
 
             //debug
@@ -366,8 +387,8 @@ namespace surveillance_system
                 //sims[i].stopTimer();
             }
 
-            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
-            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
+            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
+            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 
             for (int i = 0; i < numberOfCCTVSet; i++)
             {

@@ -502,11 +502,11 @@ namespace surveillance_system
                 }
 
                 /* ---------------------------전역 변수 할당---------------------------*/
-                //aw.setBuildingCSVWriter(N_Building);
+                bw.setBuildingCSVWriter(N_Building);
 
                 tw.setTargetCSVWriter(N_Ped, N_Car);
 
-                //cw.setCctvCSVWriter(N_CCTV);
+                cw.setCctvCSVWriter(N_CCTV);
 
                 tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
@@ -671,8 +671,8 @@ namespace surveillance_system
 
                 try
                 {
-                    //for (int i = 0; i < N_CCTV; i++)
-                    Parallel.For(0, N_CCTV, (i) =>
+                    for (int i = 0; i < N_CCTV; i++)
+                    //Parallel.For(0, N_CCTV, (i) =>
                     {
                         //debug
                         //Console.WriteLine("ThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
@@ -896,7 +896,7 @@ namespace surveillance_system
                             // candidate_detected_ped_h[i, j] = 1;
                             // candidate_detected_ped_v[i, j] = 1;
                         }
-                    });
+                    }
 
                     // 각 CCTV의 감시대상 탐지횟수 계산
                     int[] cctv_detecting_cnt = new int[N_CCTV];
@@ -908,8 +908,8 @@ namespace surveillance_system
                     int[,] detected_map = new int[N_CCTV, N_Target];
 
                     // 각도 검사 
-                    //for (int i = 0; i < N_CCTV; i++)
-                    Parallel.For(0, N_CCTV, (i) =>
+                    for (int i = 0; i < N_CCTV; i++)
+                    //Parallel.For(0, N_CCTV, (i) =>
                     {
                         // debug
                         //Console.WriteLine("ThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
@@ -1166,7 +1166,7 @@ namespace surveillance_system
 
 
                         } // 탐지 여부 계산 완료
-                    });
+                    }
 
 
 
@@ -1266,8 +1266,8 @@ namespace surveillance_system
 
                 try
                 {
-                    for (int i = 0; i < N_CCTV; i++)
-                    //Parallel.For(0, N_CCTV, (i) =>
+                    //for (int i = 0; i < N_CCTV; i++)
+                    Parallel.For(0, N_CCTV, (i) =>
                     {
                         //debug
                         //Console.WriteLine("ThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
@@ -1491,7 +1491,7 @@ namespace surveillance_system
                             // candidate_detected_ped_h[i, j] = 1;
                             // candidate_detected_ped_v[i, j] = 1;
                         }
-                    }
+                    });
 
                     // 각 CCTV의 감시대상 탐지횟수 계산
                     int[] cctv_detecting_cnt = new int[N_CCTV];
@@ -1503,8 +1503,8 @@ namespace surveillance_system
                     int[,] detected_map = new int[N_CCTV, N_Target];
 
                     // 각도 검사 
-                    for (int i = 0; i < N_CCTV; i++)
-                    //Parallel.For(0, N_CCTV, (i) =>
+                    //for (int i = 0; i < N_CCTV; i++)
+                    Parallel.For(0, N_CCTV, (i) =>
                     {
                         // debug
                         //Console.WriteLine("ThreadId = {0}", Thread.CurrentThread.ManagedThreadId);
@@ -1761,7 +1761,7 @@ namespace surveillance_system
 
 
                         } // 탐지 여부 계산 완료
-                    }
+                    });
 
 
 
