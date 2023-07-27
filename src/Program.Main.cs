@@ -6,6 +6,7 @@ using System.Linq;
 using Tutorial;
 using System.IO;
 using System.Collections;
+using System.Xml;
 
 namespace surveillance_system
 {
@@ -75,7 +76,14 @@ namespace surveillance_system
             OsmReader osmReader = new OsmReader();
             osmReader.setOsmReader(osmLoc);
 
-            Console.WriteLine("Ways Count - " + Convert.ToString(osmReader.Ways.Count));
+            for(int i = 0; i < osmReader.NodeMap.Count; i++)
+            {
+                if (osmReader.NodeMap.ElementAt(i).Value.SurvInfoExist)
+                {
+                    Console.WriteLine("\nNodeId -> " + Convert.ToString(osmReader.NodeMap.ElementAt(i).Key));
+                    Console.WriteLine(osmReader.NodeMap.ElementAt(i).Value.ToString());
+                }
+            }
 
             for (int i = 0; i < osmReader.Ways.Count; i++)
             {

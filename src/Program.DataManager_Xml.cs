@@ -329,10 +329,6 @@ namespace surveillance_system
                         CurrentNode.SurvInfo = getSurveillance(tags);
 
                         SurveillancesMap.Add(CurrentNodeId, CurrentNode.SurvInfo);
-
-                        // Debug
-                        Console.WriteLine("\nNodeId -> " + Convert.ToString(CurrentNodeId));
-                        Console.WriteLine(CurrentNode.SurvInfo.ToString());
                     }
 
                     NodeMap.Add(CurrentNodeId, CurrentNode);
@@ -444,8 +440,8 @@ namespace surveillance_system
                     if (CurrentWayInfo.Ref == null) CurrentWayInfo.Ref = "NotDefined";
                     if(CurrentWayInfo.WayType == EOSMWayType.Building)
                     {
-                        if (CurrentWayInfo.Height > 0.0) CurrentWayInfo.Height = -1;
-                        if (CurrentWayInfo.BuildingLevels > 0) CurrentWayInfo.BuildingLevels = -1;
+                        if (CurrentWayInfo.Height >= 0.0) CurrentWayInfo.Height = -1;
+                        if (CurrentWayInfo.BuildingLevels >= 0) CurrentWayInfo.BuildingLevels = -1;
                     }
 
                     Ways.Add(CurrentWayInfo);
