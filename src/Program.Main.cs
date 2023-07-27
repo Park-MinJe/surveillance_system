@@ -41,6 +41,8 @@ namespace surveillance_system
 
         static void Main(string[] args)
         {
+            osmTest();
+
             int operatingMode;          // 0: 디지털 모델링   1: 시뮬레이션
 
             Console.WriteLine("\ninput Operating Mode: ");
@@ -63,6 +65,15 @@ namespace surveillance_system
                     operateSimulation();
                 }
             }
+        }
+
+        static void osmTest()
+        {
+            Console.Write("Input OSM file location -> ");
+            string osmLoc = Console.ReadLine();
+
+            OsmReader osmReader = new OsmReader();
+            osmReader.setOsmReader(osmLoc);
         }
 
         static void vworldTest()
