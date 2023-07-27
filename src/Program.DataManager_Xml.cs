@@ -181,8 +181,15 @@ namespace surveillance_system
 
                 // Index of the node in the way's array of nodes
                 public int NodeIndex { set; get; }
-            };
 
+                public override string ToString()
+                {
+                    string rt = "Way\n==========>\n" + Way.ToString();
+                    rt += "\nNodeIndex - " + Convert.ToString(NodeIndex);
+
+                    return rt;
+                }
+            }
 
             public class FOSMNodeInfo
             {
@@ -195,9 +202,27 @@ namespace surveillance_system
                 * SurvInfoExist: 감시 자원 태그의 존재 여부
                 */
                 public FOSMSurvInfo SurvInfo { set; get; }
-                public bool SurvInfoExist { set; get; }
-            };
+                public bool SurvInfoExist { set; get; } = false;
 
+                public FOSMNodeInfo()
+                {
+                    WayRefs = new List<FOSMWayRef>();
+                }
+
+                public override string ToString()
+                {
+                    string rt = "Latitude - " + Convert.ToString(Latitude);
+                    rt += "\nLongitude - " + Convert.ToString(Longitude);
+                    rt += "\nWayRefs Count - " + Convert.ToString(WayRefs.Count);
+                    if (SurvInfoExist)
+                    {
+                        rt += "\nSurvInfo\n==========>\n";
+                        rt += SurvInfo.ToString();
+                    }
+
+                    return rt;
+                }
+            }
 
             public class FOSMWayInfo
             {
@@ -209,21 +234,39 @@ namespace surveillance_system
                 public int BuildingLevels { set; get; }
 
                 // If true, way is only traversable in the order the nodes are listed in the Nodes list
-                public bool bIsOneWay { set; get; }
-            };
+                public bool bIsOneWay { set; get; } = false;
 
+                public FOSMWayInfo()
+                {
+                    Nodes = new List<FOSMNodeInfo>();
+                }
+
+                public override string ToString()
+                {
+                    string rt = "Way Name - " + Name;
+                    rt += "\nWay Ref - " + Ref;
+                    rt += "\nWay Nodes Count - " + Convert.ToString(Nodes.Count);
+                    if(WayType == EOSMWayType.Building)
+                    {
+                        rt += "\nHeight - " + Convert.ToString(Height);
+                        rt += "\nBuilding Levels - " + Convert.ToString(BuildingLevels);
+                    }
+
+                    return rt;
+                }
+            }
             // Average Latitude (roughly the center of the map)
             public double AverageLatitude { set; get; } = 0.0;
             public double AverageLongitude { set; get; } = 0.0;
 
             // All ways we've parsed
-            public List<FOSMWayInfo> Ways { set; get; }
+            public List<FOSMWayInfo> Ways { set; get; } = new List<FOSMWayInfo>();
 
             // Maps node IDs to info about each node
-            public Dictionary<long, FOSMNodeInfo> NodeMap { set; get; }
+            public Dictionary<long, FOSMNodeInfo> NodeMap { set; get; } = new Dictionary<long, FOSMNodeInfo>();
 
             // 230704 박민제 존재하는 감시 자원
-            public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; }
+            public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; } = new Dictionary<long, FOSMSurvInfo>();
 
             public void setOsmReader(string fileName)
             {
@@ -295,6 +338,9 @@ namespace surveillance_system
                     NodeMap.Add(CurrentNodeId, CurrentNode);
                 }
 
+                AverageLatitude /= nodes.Count;
+                AverageLongitude /= nodes.Count;
+
                 // parse ways from osm file
                 for(int i = 0; i < ways.Count; i++)
                 {
@@ -325,11 +371,19 @@ namespace surveillance_system
                         XmlNode tag = tags.Item(j);
                         string tag_k = tag.Attributes["k"].Value;
                         string tag_v = tag.Attributes["v"].Value;
-                        if (tag_k.Equals("name")) CurrentWayInfo.Name = tag_v;
-                        else if (tag_k.Equals("ref")) CurrentWayInfo.Ref = tag_v;
+                        if (tag_k.Equals("name"))
+                        {
+                            if (tag_v != null) CurrentWayInfo.Name = tag_v;
+                            else CurrentWayInfo.Name = "NotDefined";
+                        }
+                        else if (tag_k.Equals("ref"))
+                        {
+                            if (tag_v != null) CurrentWayInfo.Ref = tag_v;
+                            else CurrentWayInfo.Ref = "NotDefined";
+                        }
                         else if (tag_k.Equals("highway"))
                         {
-                            EOSMWayType WayType = EOSMWayType.Other;
+                            CurrentWayInfo.WayType = EOSMWayType.Other;
                             if (tag_v.Equals("motorway")) CurrentWayInfo.WayType = EOSMWayType.Motorway;
                             else if (tag_v.Equals("motorway_link")) CurrentWayInfo.WayType = EOSMWayType.Motorway_Link;
                             else if (tag_v.Equals("trunk")) CurrentWayInfo.WayType = EOSMWayType.Trunk;
@@ -359,7 +413,42 @@ namespace surveillance_system
                             else if (tag_v.Equals("proposed")) CurrentWayInfo.WayType = EOSMWayType.Proposed;
                             else if (tag_v.Equals("construction")) CurrentWayInfo.WayType = EOSMWayType.Construction;
                         }
+                        else if (tag_k.Equals("building"))
+                        {
+                            CurrentWayInfo.WayType = EOSMWayType.Building;
+
+                            if (tag_v.Equals("yes")) CurrentWayInfo.WayType = EOSMWayType.Building;
+                        }
+                        else if (tag_k.Equals("height"))
+                        {
+                            if (tag_v != null && Convert.ToDouble(tag_v) > 0.0)
+                                CurrentWayInfo.Height = Convert.ToDouble(tag_v);
+                            else CurrentWayInfo.Height = -1;
+                        }
+                        else if (tag_k.Equals("building:levels"))
+                        {
+                            if (tag_v != null && Convert.ToInt32(tag_v) > 0)
+                                CurrentWayInfo.BuildingLevels = Convert.ToInt32(tag_v);
+                            else CurrentWayInfo.BuildingLevels = -1;
+                        }
+                        else if (tag_k.Equals("oneway"))
+                        {
+                            if (tag_v.Equals("yes"))
+                                CurrentWayInfo.bIsOneWay = true;
+                            else
+                                CurrentWayInfo.bIsOneWay = false;
+                        }
                     }
+
+                    if (CurrentWayInfo.Name == null) CurrentWayInfo.Name = "NotDefined";
+                    if (CurrentWayInfo.Ref == null) CurrentWayInfo.Ref = "NotDefined";
+                    if(CurrentWayInfo.WayType == EOSMWayType.Building)
+                    {
+                        if (CurrentWayInfo.Height > 0.0) CurrentWayInfo.Height = -1;
+                        if (CurrentWayInfo.BuildingLevels > 0) CurrentWayInfo.BuildingLevels = -1;
+                    }
+
+                    Ways.Add(CurrentWayInfo);
                 }
             }
 

@@ -74,6 +74,14 @@ namespace surveillance_system
 
             OsmReader osmReader = new OsmReader();
             osmReader.setOsmReader(osmLoc);
+
+            Console.WriteLine("Ways Count - " + Convert.ToString(osmReader.Ways.Count));
+
+            for (int i = 0; i < osmReader.Ways.Count; i++)
+            {
+                Console.WriteLine(osmReader.Ways[i].ToString());
+                Console.WriteLine("");
+            }
         }
 
         static void vworldTest()
