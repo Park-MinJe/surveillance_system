@@ -389,6 +389,51 @@ namespace surveillance_system
             public int realWorldCctvNum { get; private set; }
 
             // csv 파일료 저장된 초기 cctv 객체 데이터를 읽어와 cctv 위치 데이터를 초기화해준다.
+            public CCTV[] CctvsFromCsvAsArray(string filename)
+            {
+                // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"
+                // 시뮬레이션 초기데이터의 파일명: "CctvSet" + cctvSetIdx
+                List<CCTV> cctvs = new List<CCTV>();
+                try
+                {
+                    string fn = "object\\cctv\\" + filename + ".csv";
+                    using (FileStream fs = new FileStream(@fn, FileMode.Open))
+                    {
+                        using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
+                        {
+                            string lines = null;
+                            //string[] keys = null;
+                            string[] values = null;
+
+                            while ((lines = sr.ReadLine()) != null)
+                            {
+                                if (string.IsNullOrEmpty(lines)) break;
+
+                                if (lines.Substring(0, 1).Equals("#"))  // 첫줄에 #이 있을 경우 Key로 처리
+                                {
+                                    continue;
+                                }
+
+                                values = lines.Split(',');  // 콤마로 분리
+
+                                int idx = Convert.ToInt32(values[0]);
+                                CCTV tmp = new CCTV();
+                                tmp.X = Convert.ToInt32(values[1]);
+                                tmp.Y = Convert.ToInt32(values[2]);
+                                cctvs.Add(tmp);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+
+                return cctvs.ToArray();
+            }
+
+            // csv 파일료 저장된 초기 cctv 객체 데이터를 읽어와 cctv 위치 데이터를 초기화해준다.
             public void CctvsFromCSV(string filename, CCTV[] cctvs)
             {
                 // 디지털 매핑 시 파일명: "DigitalMappingResult.CctvSet"

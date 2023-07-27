@@ -16,18 +16,24 @@ namespace surveillance_system
             /* -------------------------Digital Mapping 대상 객체-------------------------*/
             public Building[] buildings { get;  private set; }
             public CCTV[] cctvs { get; private set; }
-            public Pedestrian[] peds { get; private set; }
-            public Car[] cars { get; private set; }
+
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //public Pedestrian[] peds { get; private set; }
+            //public Car[] cars { get; private set; }
 
             public Road road { get; private set; } = new Road();
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
             public int N_CCTV { get; private set; } = 100;      // default 100
-            public int N_Ped { get; private set; } = 5;         // default 5
-            public int N_Car { get; private set; } = 5;         // default 5
-            public int N_Target { get; private set; }
-            
+
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //public int N_Ped { get; private set; } = 5;         // default 5
+            //public int N_Car { get; private set; } = 5;         // default 5
+            //public int N_Target { get; private set; }
+
             private Random rand;
 
             /* ------------------------------CCTV 제원------------------------------*/
@@ -156,7 +162,9 @@ namespace surveillance_system
                     cctvs[i] = new CCTV();
                 }*/
 
-                peds = new Pedestrian[N_Ped];
+                // 230627 박민제
+                // 디지털 매핑 시, 보행자, 차량 생성 안함
+                /*peds = new Pedestrian[N_Ped];
                 for (int i = 0; i < N_Ped; i++)
                 {
                     peds[i] = new Pedestrian();
@@ -165,7 +173,7 @@ namespace surveillance_system
                 for (int i = 0; i < N_Car; i++)
                 {
                     cars[i] = new Car();
-                }
+                }*/
             }
 
             public void initMap(int cctvMode, Point upperCorner, Point lowerCorner)
@@ -178,8 +186,11 @@ namespace surveillance_system
                         // 도로 정보 생성, 보행자 정보 생성
                         road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
                         //road.setBuilding(N_Building);
-                        road.setPed(this.peds);
-                        road.setCar(this.cars);
+
+                        // 230627 박민제
+                        // 디지털 매핑 시, 보행자, 차량 생성 안함
+                        //road.setPedsArrPos(this.peds);
+                        //road.setCarsArrPos(this.cars);
 
                         /*
                         // debug 220428
@@ -195,12 +206,6 @@ namespace surveillance_system
                         // 건물 init
                         this.initBuilding();
 
-                        // ped init
-                        this.initPeds();
-
-                        // car init
-                        this.initCars();
-
                         // cctv init
                         if (cctvMode == 3)
                         {
@@ -210,6 +215,14 @@ namespace surveillance_system
                         {
                             this.initCCTVs();
                         }
+
+                        // 230627 박민제
+                        // 디지털 매핑 시, 보행자, 차량 생성 안함
+                        // ped init
+                        //this.initPeds();
+
+                        // car init
+                        //this.initCars();
                     }
                 }
                 catch (Exception ex)
@@ -281,7 +294,7 @@ namespace surveillance_system
                     //Debug
                     //Console.WriteLine("Err after defining building");
 
-                    road.setBuilding(this.N_Building, this.buildings);
+                    road.setBuildingsArrPos(this.N_Building, this.buildings);
                 }
                 catch (Exception ex)
                 {
@@ -291,97 +304,101 @@ namespace surveillance_system
                 Console.WriteLine("Building Setting Completed\n");
             }
 
-            public void initPeds()
-            {
-                try
-                {
-                    foreach (Pedestrian ped in peds)
-                    {
-                        double minDist = 0.0;
-                        //int idx_minDist = 0;
-                        //double[] Dist_Map = new double[road.DST.GetLength(0)];
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //public void initPeds()
+            //{
+            //    try
+            //    {
+            //        foreach (Pedestrian ped in peds)
+            //        {
+            //            double minDist = 0.0;
+            //            //int idx_minDist = 0;
+            //            //double[] Dist_Map = new double[road.DST.GetLength(0)];
 
-                        // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
-                        double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
-                        double dst_x = Math.Round(newPos[0, 0]);
-                        double dst_y = Math.Round(newPos[0, 1]);
+            //            // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
+            //            double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
+            //            double dst_x = Math.Round(newPos[0, 0]);
+            //            double dst_y = Math.Round(newPos[0, 1]);
 
-                        // Car object일경우 가까운 도착지 설정
-                        // double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(ped.X, ped.Y), ped.X, ped.Y);
-                        // double dst_x = Math.Round(newPos[0, 0]);
-                        // double dst_y = Math.Round(newPos[0, 1]);
+            //            // Car object일경우 가까운 도착지 설정
+            //            // double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(ped.X, ped.Y), ped.X, ped.Y);
+            //            // double dst_x = Math.Round(newPos[0, 0]);
+            //            // double dst_y = Math.Round(newPos[0, 1]);
 
-                        //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+            //            //Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
 
-                        //double dst_x = road.DST[idx_minDist, 0];
-                        //double dst_y = road.DST[idx_minDist, 1];
+            //            //double dst_x = road.DST[idx_minDist, 0];
+            //            //double dst_y = road.DST[idx_minDist, 1];
 
-                        // 보행자~목적지 벡터
-                        /*
-                        double[] A = new double[2];
-                        A[0] = dst_x - ped.X;
-                        A[1] = dst_y - ped.Y;        
+            //            // 보행자~목적지 벡터
+            //            /*
+            //            double[] A = new double[2];
+            //            A[0] = dst_x - ped.X;
+            //            A[1] = dst_y - ped.Y;        
 
-                        double[] B = { 0.001, 0 };
-                        double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
-                        if(ped.Y > dst_y)
-                        {
-                            direction = Math.Round(2 * Math.PI - direction, 8); 
-                        }
-                        */
-                        ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
-                        ped.setDirection();
-                        ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
+            //            double[] B = { 0.001, 0 };
+            //            double direction = Math.Round(Math.Acos(InnerProduct(A, B) / (Norm(A) * Norm(B))),8);
+            //            if(ped.Y > dst_y)
+            //            {
+            //                direction = Math.Round(2 * Math.PI - direction, 8); 
+            //            }
+            //            */
+            //            ped.define_TARGET(Ped_Width, Ped_Height, dst_x, dst_y, Ped_Velocity);
+            //            ped.setDirection();
+            //            ped.TTL = (int)Math.Ceiling((minDist / ped.Velocity) / aUnitTime);
+
+            //            //debug
+            //            //ped.printTargetInfo();
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Err while initializing Pedestrians\n");
+            //        Console.WriteLine(ex.Message);
+            //    }
+            //    Console.WriteLine("PED Setting Completed\n");
+            //}
+
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //public void initCars()
+            //{
+            //    try
+            //    {
+            //        foreach (Car car in cars)
+            //        {
+            //            double minDist = 0.0;
+
+            //            // Car object일경우 가까운 도착지 설정
+            //            double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
+            //            // debug
+            //            // Console.WriteLine("get destination Completed\n");
+            //            double dst_x = Math.Round(newPos[0, 0]);
+            //            double dst_y = Math.Round(newPos[0, 1]);
+
+            //            // debug
+            //            // Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
+
+            //            car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
+            //            // debug
+            //            // Console.WriteLine("define_TARGET Completed\n");
+            //            car.setDirection();
+            //            // debug
+            //            // Console.WriteLine("setDirection Completed\n");
+            //            car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
                         
-                        //debug
-                        //ped.printTargetInfo();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Err while initializing Pedestrians\n");
-                    Console.WriteLine(ex.Message);
-                }
-                Console.WriteLine("PED Setting Completed\n");
-            }
-
-            public void initCars()
-            {
-                try
-                {
-                    foreach (Car car in cars)
-                    {
-                        double minDist = 0.0;
-
-                        // Car object일경우 가까운 도착지 설정
-                        double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
-                        // debug
-                        // Console.WriteLine("get destination Completed\n");
-                        double dst_x = Math.Round(newPos[0, 0]);
-                        double dst_y = Math.Round(newPos[0, 1]);
-
-                        // debug
-                        // Calc_Dist_and_get_MinDist(road.DST, ped.X, ped.Y, ref Dist_Map, ref minDist, ref idx_minDist);
-
-                        car.define_TARGET(Car_Width, Car_Height, dst_x, dst_y, Car_Velocity);
-                        // debug
-                        // Console.WriteLine("define_TARGET Completed\n");
-                        car.setDirection();
-                        // debug
-                        // Console.WriteLine("setDirection Completed\n");
-                        car.TTL = (int)Math.Ceiling((minDist / car.Velocity) / aUnitTime);
-                        
-                        //debug
-                        //car.printTargetInfo();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Err while initializing Cars\n");
-                    Console.WriteLine(ex.Message);
-                }
-                Console.WriteLine("CAR Setting Completed\n");
-            }
+            //            //debug
+            //            //car.printTargetInfo();
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Err while initializing Cars\n");
+            //        Console.WriteLine(ex.Message);
+            //    }
+            //    Console.WriteLine("CAR Setting Completed\n");
+            //}
 
             public void initCCTVs()
             {
@@ -522,9 +539,12 @@ namespace surveillance_system
              * Generate JUST ONE obj. Work as Object Factory
             -------------------------------------- */
 
-            public Pedestrian pedFactory()
+            public Pedestrian pedFactory(Road simRoad, int intersectidx)
             {
                 Pedestrian ped = new Pedestrian();
+
+                simRoad.setPedPos(ped, intersectidx);
+
                 double minDist = 0.0;
                 //int idx_minDist = 0;
                 //double[] Dist_Map = new double[road.DST.GetLength(0)];
@@ -567,9 +587,12 @@ namespace surveillance_system
                 return ped;
             }
 
-            public Car carFactory()
+            public Car carFactory(Road simRoad, int intersectidx, int carintersectidx)
             {
                 Car car = new Car();
+
+                simRoad.setCarPos(car, intersectidx, carintersectidx);
+
                 double minDist = 0.0;
 
                 // Car object일경우 가까운 도착지 설정
@@ -596,11 +619,13 @@ namespace surveillance_system
                 return car;
             }
 
-            public CCTV cctvFactory()
+            public CCTV cctvFactory(Road simRoad, int idx, int x, int y)
             {
                 CCTV cctv = new CCTV();
 
-                cctv.setZ((int)Math.Ceiling(rand.NextDouble() * (Height.Max() - 3000)) + 3000);
+                simRoad.setCCTVPosbyRandomInInt(idx, cctv, x, y);
+
+                cctv.setZ((int)Math.Ceiling(this.rand.NextDouble() * (Height.Max() - 3000)) + 3000);
                 cctv.WD = WD;
                 cctv.HE = HE;
                 cctv.imW = (int)imW;
@@ -610,7 +635,7 @@ namespace surveillance_system
                 // cctvs[i].ViewAngleH = rand.NextDouble() * 360;
                 // cctvs[i].ViewAngleV = -35 - 20 * rand.NextDouble();
 
-                cctv.setViewAngleH(rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
+                cctv.setViewAngleH(this.rand.NextDouble() * 360 * Math.PI / 180);  // (23-02-02) modified by 0BoO, deg -> rad
                 // cctvs[i].setViewAngleH(rand.Next(4) * 90);
                 // cctvs[i].setViewAngleV(-35 - 20 * rand.NextDouble());
                 cctv.setViewAngleV(-45.0 * Math.PI / 180);   // (23-02-02) modified by 0BoO, deg -> rad

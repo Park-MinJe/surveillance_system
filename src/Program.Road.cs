@@ -59,8 +59,14 @@ namespace surveillance_system
                 // Debug
                 //r.printRoadInfo();
 
-                this.lowerCorner = new Point(r.lowerCorner);
-                this.upperCorner = new Point(r.upperCorner);
+                if (r.lowerCorner != null)
+                {
+                    this.lowerCorner = new Point(r.lowerCorner);
+                }
+                if (r.upperCorner != null)
+                {
+                    this.upperCorner = new Point(r.upperCorner);
+                }
 
                 // 230206 쓰이지 않고 있음 _Minje
                 /*
@@ -71,45 +77,63 @@ namespace surveillance_system
                 }
                 */
 
-                this.lane_h = new double[r.lane_h.GetUpperBound(0) + 1, r.lane_h.GetUpperBound(1) + 1];
-                for(int i = 0; i < r.lane_h.GetUpperBound(0); i++)
+                if (r.lane_h != null)
                 {
-                    for(int j = 0; j < r.lane_h.GetUpperBound(1); j++)
+                    this.lane_h = new double[r.lane_h.GetUpperBound(0) + 1, r.lane_h.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.lane_h.GetUpperBound(0); i++)
                     {
-                        this.lane_h[i, j] = r.lane_h[i, j];
-                    }
-                }
-                this.lane_v_left = new double[r.lane_v_left.GetUpperBound(0) + 1, r.lane_v_left.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.lane_v_left.GetUpperBound(0); i++)
-                {
-                    for (int j = 0; j < r.lane_v_left.GetUpperBound(1); j++)
-                    {
-                        this.lane_v_left[i, j] = r.lane_v_left[i, j];
-                    }
-                }
-                this.lane_v_right = new double[r.lane_v_right.GetUpperBound(0) + 1, r.lane_v_right.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.lane_v_right.GetUpperBound(0); i++)
-                {
-                    for (int j = 0; j < r.lane_v_right.GetUpperBound(1); j++)
-                    {
-                        this.lane_v_right[i, j] = r.lane_v_right[i, j];
+                        for (int j = 0; j < r.lane_h.GetUpperBound(1); j++)
+                        {
+                            this.lane_h[i, j] = r.lane_h[i, j];
+                        }
                     }
                 }
 
-                this.DST = new double[r.DST.GetUpperBound(0) + 1, r.DST.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.DST.GetUpperBound(0); i++)
+                if (r.lane_v_left != null)
                 {
-                    for (int j = 0; j < r.DST.GetUpperBound(1); j++)
+                    this.lane_v_left = new double[r.lane_v_left.GetUpperBound(0) + 1, r.lane_v_left.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.lane_v_left.GetUpperBound(0); i++)
                     {
-                        this.DST[i, j] = r.DST[i, j];
+                        for (int j = 0; j < r.lane_v_left.GetUpperBound(1); j++)
+                        {
+                            this.lane_v_left[i, j] = r.lane_v_left[i, j];
+                        }
                     }
                 }
-                this.intersectionArea = new double[r.intersectionArea.GetUpperBound(0) + 1, r.intersectionArea.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.intersectionArea.GetUpperBound(0); i++)
+
+                if (r.lane_v_right != null)
                 {
-                    for (int j = 0; j < r.intersectionArea.GetUpperBound(1); j++)
+                    this.lane_v_right = new double[r.lane_v_right.GetUpperBound(0) + 1, r.lane_v_right.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.lane_v_right.GetUpperBound(0); i++)
                     {
-                        this.intersectionArea[i, j] = r.intersectionArea[i, j];
+                        for (int j = 0; j < r.lane_v_right.GetUpperBound(1); j++)
+                        {
+                            this.lane_v_right[i, j] = r.lane_v_right[i, j];
+                        }
+                    }
+                }
+
+                if (r.DST != null)
+                {
+                    this.DST = new double[r.DST.GetUpperBound(0) + 1, r.DST.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.DST.GetUpperBound(0); i++)
+                    {
+                        for (int j = 0; j < r.DST.GetUpperBound(1); j++)
+                        {
+                            this.DST[i, j] = r.DST[i, j];
+                        }
+                    }
+                }
+
+                if (r.intersectionArea != null)
+                {
+                    this.intersectionArea = new double[r.intersectionArea.GetUpperBound(0) + 1, r.intersectionArea.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.intersectionArea.GetUpperBound(0); i++)
+                    {
+                        for (int j = 0; j < r.intersectionArea.GetUpperBound(1); j++)
+                        {
+                            this.intersectionArea[i, j] = r.intersectionArea[i, j];
+                        }
                     }
                 }
 
@@ -122,37 +146,68 @@ namespace surveillance_system
                 this.Y_interval = r.Y_interval;
                 this.width = r.width;
 
-                this.buildingPos = new int[r.buildingPos.GetUpperBound(0) + 1, r.buildingPos.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
+                if (r.buildingPos != null)
                 {
-                    for (int j = 0; j < r.buildingPos.GetUpperBound(1); j++)
+                    this.buildingPos = new int[r.buildingPos.GetUpperBound(0) + 1, r.buildingPos.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
                     {
-                        this.buildingPos[i, j] = r.buildingPos[i, j];
+                        for (int j = 0; j < r.buildingPos.GetUpperBound(1); j++)
+                        {
+                            this.buildingPos[i, j] = r.buildingPos[i, j];
+                        }
                     }
                 }
-                this.cctvPos = new int[r.cctvPos.GetUpperBound(0) + 1, r.cctvPos.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
+                else
                 {
-                    for (int j = 0; j < r.cctvPos.GetUpperBound(1); j++)
+                    this.buildingPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+
+                if (r.cctvPos != null)
+                {
+                    this.cctvPos = new int[r.cctvPos.GetUpperBound(0) + 1, r.cctvPos.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.buildingPos.GetUpperBound(0); i++)
                     {
-                        this.cctvPos[i, j] = r.cctvPos[i, j];
+                        for (int j = 0; j < r.cctvPos.GetUpperBound(1); j++)
+                        {
+                            this.cctvPos[i, j] = r.cctvPos[i, j];
+                        }
                     }
                 }
-                this.pedPos = new int[r.pedPos.GetUpperBound(0) + 1, r.pedPos.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.pedPos.GetUpperBound(0); i++)
+                else
                 {
-                    for (int j = 0; j < r.pedPos.GetUpperBound(1); j++)
+                    this.cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+
+                if (r.pedPos != null)
+                {
+                    this.pedPos = new int[r.pedPos.GetUpperBound(0) + 1, r.pedPos.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.pedPos.GetUpperBound(0); i++)
                     {
-                        this.pedPos[i, j] = r.pedPos[i, j];
+                        for (int j = 0; j < r.pedPos.GetUpperBound(1); j++)
+                        {
+                            this.pedPos[i, j] = r.pedPos[i, j];
+                        }
                     }
                 }
-                this.carPos = new int[r.carPos.GetUpperBound(0) + 1, r.carPos.GetUpperBound(1) + 1];
-                for (int i = 0; i < r.carPos.GetUpperBound(0); i++)
+                else
                 {
-                    for (int j = 0; j < r.carPos.GetUpperBound(1); j++)
+                    this.pedPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+
+                if (r.carPos != null)
+                {
+                    this.carPos = new int[r.carPos.GetUpperBound(0) + 1, r.carPos.GetUpperBound(1) + 1];
+                    for (int i = 0; i < r.carPos.GetUpperBound(0); i++)
                     {
-                        this.carPos[i, j] = r.carPos[i, j];
+                        for (int j = 0; j < r.carPos.GetUpperBound(1); j++)
+                        {
+                            this.carPos[i, j] = r.carPos[i, j];
+                        }
                     }
+                }
+                else
+                {
+                    this.carPos = new int[this.Y_grid_num, this.X_grid_num];
                 }
             }
 
@@ -257,17 +312,25 @@ namespace surveillance_system
             /* --------------------------------------
              * set coordinate of objects with csv
             -------------------------------------- */
+            public void setPosZeros(int[,] pos, int y, int x)
+            {
+                for (int i = 0; i < y; i++)
+                {
+                    for (int j = 0; j < x; j++)
+                    {
+                        pos[i, j] = 0;
+                    }
+                }
+            }
+
+            /* --------------------------------------
+             * set coordinate of objects with csv
+            -------------------------------------- */
             public void setPedswithCSV(string filename, Pedestrian[] peds)
             {
                 tr.PedsFromCSV(filename, peds);
 
-                for (int i = 0; i < this.Y_grid_num; i++)
-                {
-                    for (int j = 0; j < this.X_grid_num; j++)
-                    {
-                        pedPos[i, j] = 0;
-                    }
-                }
+                this.setPosZeros(pedPos, this.Y_grid_num, this.X_grid_num);
 
                 for(int i = 0;i < peds.Length ; i++)
                 {
@@ -279,13 +342,7 @@ namespace surveillance_system
             {
                 tr.CarsFromCSV(filename, cars);
 
-                for (int i = 0; i < this.Y_grid_num; i++)
-                {
-                    for (int j = 0; j < this.X_grid_num; j++)
-                    {
-                        carPos[i, j] = 0;
-                    }
-                }
+                this.setPosZeros(carPos, this.Y_grid_num, this.X_grid_num);
 
                 for (int i = 0; i < cars.Length; i++)
                 {
@@ -297,13 +354,7 @@ namespace surveillance_system
             {
                 cr.CctvsFromCSV(filename, cctvs);
 
-                for (int i = 0; i < this.Y_grid_num; i++)
-                {
-                    for (int j = 0; j < this.X_grid_num; j++)
-                    {
-                        cctvPos[i, j] = 0;
-                    }
-                }
+                this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
 
                 for (int i = 0; i < cctvs.Length; i++)
                 {
@@ -330,15 +381,22 @@ namespace surveillance_system
              * set coordinate of objects
             -------------------------------------- */
 
-            // set Architecture object
-            public void setBuilding(int n_building, Building[] buildings)
+            // set Architecture object positions
+            public void setBuildingsArrPos(int n_building, Building[] buildings)
             {
-                buildingPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (buildingPos == null)
+                {
+                    buildingPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(buildingPos, this.Y_grid_num, this.X_grid_num);
+                }
 
                 for (int i = 0; i < n_building; i++)
                 {
-                    int grid_Y = Convert.ToInt32((buildings[i].Y) / 10000),
-                        grid_X = Convert.ToInt32((buildings[i].X / 10000));
+                    int grid_Y = Convert.ToInt32(buildings[i].Y / 10000),
+                        grid_X = Convert.ToInt32(buildings[i].X / 10000);
 
                     if(grid_Y > this.Y_grid_num)
                     {
@@ -353,10 +411,18 @@ namespace surveillance_system
                 }
             }
 
-
-            public void setCCTV(CCTV[] cctvs)
+            // set CCTV positions
+            // 일정한 간격으로 
+            public void setCCTVsArrPos(CCTV[] cctvs)
             {
-                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (cctvPos == null)
+                {
+                    cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
+                }
 
                 double x_range = X_mapSize - width;
                 double y_range = Y_mapSize - width;
@@ -365,7 +431,7 @@ namespace surveillance_system
                 // x좌표가 int 형식이라 캐스팅해서 완벽한 그리드는 아닐 수 있음
                 int x_intvl = (int)x_range / (rootN-1);
                 int y_intvl = (int)y_range / (rootN - 1);
-                Console.WriteLine("x_mapsize y_mapsize x_range y_range rootN x_intvl y_intvl {0} {1} {2} {3} ", 
+                Console.WriteLine("x_mapsize y_mapsize x_range y_range rootN x_intvl y_intvl {0} {1} {2} {3} {4} {5} {6}", 
                                     this.X_mapSize, this.Y_mapSize, x_range, y_range, rootN, x_intvl, y_intvl);
                 double startX = DST[0, 0];
                 double startY = DST[0, 1];
@@ -400,9 +466,16 @@ namespace surveillance_system
             }
             // 교차로에만 설치하는 경우
             // 교차로 중 설치 위치는 랜덤
-            public void setCCTVbyRandomInDST(CCTV[] cctvs)
+            public void setCCTVsArrPosbyRandomInDST(CCTV[] cctvs)
             {
-                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (cctvPos == null)
+                {
+                    cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
+                }
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
@@ -425,9 +498,16 @@ namespace surveillance_system
             }
 
             // 무작위 좌표에 cctv 배치
-            public void setCCTVbyRandomInInt(CCTV[] cctvs)
+            public void setCCTVsArrPosbyRandomInInt(CCTV[] cctvs)
             {
-                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (cctvPos == null)
+                {
+                    cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
+                }
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
@@ -447,11 +527,35 @@ namespace surveillance_system
 
                 // this.printCctvPos();
             }
+            public void setCCTVPosbyRandomInInt(int idx, CCTV cctv, int x, int y)
+            {
+                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position by Random Int");
+                //Random rand = new Random();
+                //cctv.X = rand.Next(Convert.ToInt32(Math.Truncate(this.X_mapSize)));
+                cctv.X = x;
+                //cctv.Y = rand.Next(Convert.ToInt32(Math.Truncate(this.Y_mapSize)));
+                cctv.Y = y;
+
+                Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", idx, cctv.X, cctv.Y);
+                Console.WriteLine();
+
+                //debug
+                cctvPos[(cctv.Y) / 10000, (cctv.X) / 10000] += 1;
+
+                // this.printCctvPos();
+            }
 
             // 파일로부터 읽은 cctv 위치
-            public void setCCTVbyRealWorldData(CCTV[] cctvs)
+            public void setCCTVsArrPosbyRealWorldData(CCTV[] cctvs)
             {
-                cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (cctvPos == null)
+                {
+                    cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
+                }
 
                 Console.WriteLine("x_mapsize y_mapsize {0} {1} ", this.X_mapSize, this.Y_mapSize);
 
@@ -481,12 +585,20 @@ namespace surveillance_system
             }
 
             // 보행자 위치 처음 설정
-            public void setPed(Pedestrian[] peds)
+            public void setPedsArrPos(Pedestrian[] peds, int randSeed)
             {
-                pedPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (pedPos == null)
+                {
+                    pedPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(pedPos, this.Y_grid_num, this.X_grid_num);
+                }
+
                 for (int i = 0; i < peds.Length; i++)
                 {
-                    Random rand = new Random();
+                    Random rand = new Random(randSeed);
                     // int intersectidx = rand.Next(9);
                     int intersectidx = rand.Next(lane_num * lane_num);
 
@@ -511,16 +623,51 @@ namespace surveillance_system
                 }
                 // for문 끝나고
 
-                // this.printPedPos();
+                this.printPedPos();
+            }
+            public void setPedPos(Pedestrian ped, int intersectidx)
+            {
+                //Random rand = new Random();
+                // int intersectidx = rand.Next(9);
+                //int intersectidx = rand.Next(lane_num * lane_num);
+
+                // Console.WriteLine(intersectidx);
+                double[,] newPos = getPointOfAdjacentRoad(intersectidx);
+                ped.X = Math.Round(newPos[0, 0]);
+                ped.Y = Math.Round(newPos[0, 1]);
+
+                /*Random rand = new Random();
+                double opt = rand.NextDouble();
+
+                if (opt > 0.5) {
+                    peds[i].X = Math.Round(laneVector.Max() * opt);
+                    peds[i].Y = lane_h[rand.Next(0, lane_h.GetLength(0)), 0];
+                }
+                else
+                {
+                    peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
+                    peds[i].Y = Math.Round(laneVector.Max() * opt);
+                }*/
+                pedPos[Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X / 10000))] += 1;
+
+                //this.printPedPos();
             }
 
             // set Car object
-            public void setCar(Car[] cars)
+            public void setCarsArrPos(Car[] cars, int randSeed)
             {
-                carPos = new int[this.Y_grid_num, this.X_grid_num];
+                if (carPos == null)
+                {
+                    carPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(carPos, this.Y_grid_num, this.X_grid_num);
+                }
+
                 for (int i = 0; i < cars.Length; i++)
                 {
-                    Random rand = new Random();
+                    Random rand = new Random(randSeed);
                     int intersectidx = rand.Next(lane_num * lane_num);
                     cars[i].X = DST[intersectidx, 0];
                     cars[i].Y = DST[intersectidx, 1];
@@ -550,7 +697,60 @@ namespace surveillance_system
                 }
                 // for문 끝나고
 
-                // this.printCarPos();
+                this.printCarPos();
+            }
+            public void setCarPos(Car car, int intersectidx, int carintersectidx)
+            {
+                //Random rand = new Random();
+                //int intersectidx = rand.Next(lane_num * lane_num);
+                car.X = DST[intersectidx, 0];
+                car.Y = DST[intersectidx, 1];
+
+                //int carintersectidx = rand.Next(4); // 0, 1, 2, 3
+                if (carintersectidx == 0)
+                {// down left
+                    car.X -= width / 4;
+                    car.Y += width / 4;
+                }
+                else if (carintersectidx == 1)
+                {// up left
+                    car.X += width / 4;
+                    car.Y += width / 4;
+                }
+                else if (carintersectidx == 2)
+                {// up right
+                    car.X += width / 4;
+                    car.Y -= width / 4;
+                }
+                else if (carintersectidx == 3)
+                {// down right
+                    car.X -= width / 4;
+                    car.Y -= width / 4;
+                }
+                carPos[Convert.ToInt32((car.Y) / 10000), Convert.ToInt32((car.X / 10000))] += 1;
+                
+
+                //this.printCarPos();
+            }
+
+            /* --------------------------------------
+             * get coordinate of objects
+            -------------------------------------- */
+            public void getPosOfCctvs(CCTV[] cctvs)
+            {
+                if (cctvPos == null)
+                {
+                    cctvPos = new int[this.Y_grid_num, this.X_grid_num];
+                }
+                else
+                {
+                    this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
+                }
+
+                for (int i = 0; i < cctvs.Length; i++)
+                {
+                    cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                }
             }
 
             /* --------------------------------------

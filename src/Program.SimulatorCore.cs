@@ -425,19 +425,12 @@ namespace surveillance_system
 
             /* ---------------------------시뮬레이션 환경----------------------------*/
 
-            // 230504 pmj
-            public void initSimuTargetObjs()
+            // 230627 박민제
+            // 건물 초기화
+            public void initSimBuildings()
             {
-                // just clone digital mapped objects.
                 this.buildings = new Building[this.N_Building];
-                this.cctvs = new CCTV[this.N_CCTV];
-                this.peds = new Pedestrian[this.N_Ped];
-                this.cars = new Car[this.N_Car];
-                this.road = new Road(mappingModule.road);
-
-                this.N_Target = this.N_Ped + this.N_Car;
-
-                for(int i = 0; i < this.N_Building; i++)
+                for (int i = 0; i < this.N_Building; i++)
                 {
                     if (i < mappingModule.buildings.Length)
                     {
@@ -450,45 +443,77 @@ namespace surveillance_system
                         Environment.Exit(0);
                     }
                 }
-                for(int i = 0; i < this.N_CCTV; i++)
+            }
+
+            // 230627 박민제
+            // cctv 초기화
+            public void initSimCctvs(int cctvRandomSeed)
+            {
+                this.cctvs = new CCTV[this.N_CCTV];
+                Random randForCctvsPos = new Random(cctvRandomSeed);
+
+                for (int i = 0; i < this.N_CCTV; i++)
                 {
-                    if(i < mappingModule.cctvs.Length)
+                    if (i < mappingModule.cctvs.Length)
                     {
                         this.cctvs[i] = new CCTV(mappingModule.cctvs[i]);
                     }
                     else
                     {
-                        this.cctvs[i] = mappingModule.cctvFactory();
-                        road.setCCTV
+                        this.cctvs[i] = mappingModule.cctvFactory(this.road, i, 
+                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.road.X_mapSize))),
+                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.road.Y_mapSize))));
                         //Console.WriteLine("***You can't access here yet. Program need update to user generated CCTVs.***");
                         //Environment.Exit(0);
                     }
                 }
+            }
+
+            // 230504 pmj
+            public void initSimTargetObjs(int pedRandomSeed, int carRandomSeed)
+            {
+                // just clone digital mapped objects.
+                this.peds = new Pedestrian[this.N_Ped];
+                this.cars = new Car[this.N_Car];
+                this.road = new Road(mappingModule.road);
+
+                this.N_Target = this.N_Ped + this.N_Car;
+
+                Random randForPedsPos = new Random(pedRandomSeed);
+                Random randForCarsPos = new Random(carRandomSeed);
+
                 for (int i = 0; i < this.N_Ped; i++)
                 {
-                    if (i < mappingModule.peds.Length)
-                    {
-                        this.peds[i] = new Pedestrian(mappingModule.peds[i]);
-                    }
-                    else
-                    {
-                        this.peds[i] = mappingModule.pedFactory();
-                        //Console.WriteLine("***You can't access here yet. Program need update to user generated Peds.***");
-                        //Environment.Exit(0);
-                    }
+                    // 230627 박민제
+                    // 디지털 매핑 시, 보행자, 차량 생성 안함
+                    //if (i < mappingModule.peds.Length)
+                    //{
+                    //    this.peds[i] = new Pedestrian(mappingModule.peds[i]);
+                    //}
+                    //else
+                    //{
+                    //    this.peds[i] = mappingModule.pedFactory(this.road);
+                    //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Peds.***");
+                    //    //Environment.Exit(0);
+                    //}
+                    this.peds[i] = mappingModule.pedFactory(this.road, randForPedsPos.Next(this.road.lane_num * this.road.lane_num));
                 }
                 for(int i = 0; i < this.N_Car; i++)
                 {
-                    if(i < mappingModule.cars.Length)
-                    {
-                        this.cars[i] = new Car(mappingModule.cars[i]);
-                    }
-                    else
-                    {
-                        this.cars[i] = mappingModule.carFactory();
-                        //Console.WriteLine("***You can't access here yet. Program need update to user generated Cars.***");
-                        //Environment.Exit(0);
-                    }
+                    // 230627 박민제
+                    // 디지털 매핑 시, 보행자, 차량 생성 안함
+                    //if(i < mappingModule.cars.Length)
+                    //{
+                    //    this.cars[i] = new Car(mappingModule.cars[i]);
+                    //}
+                    //else
+                    //{
+                    //    this.cars[i] = mappingModule.carFactory(this.road);
+                    //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Cars.***");
+                    //    //Environment.Exit(0);
+                    //}
+                    this.cars[i] = mappingModule.carFactory(this.road, randForCarsPos.Next(this.road.lane_num * this.road.lane_num),
+                        randForCarsPos.Next(4));
                 }
             }
 
@@ -512,6 +537,8 @@ namespace surveillance_system
                 tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
                 clog.setDetectedLogCSVWriter(N_CCTV * N_Target * ((int)(Sim_Time / aUnitTime) +1));
+
+                Console.WriteLine("%d", N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
                 clog.setShadowedLogCSVWriter(N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
             }
 
@@ -638,7 +665,7 @@ namespace surveillance_system
              * 추적 여부 검사 함수
             -------------------------------------- */
             // Parallelism 적용 대상
-            public int[] checkDetectionWithParallel(double nowTime, int N_Building, int N_CCTV, int N_Ped, int N_Car)
+            public int[] checkDetectionWithoutParallel(double nowTime, int N_Building, int N_CCTV, int N_Ped, int N_Car)
             {
 
                 int N_Target = N_Ped + N_Car;
@@ -1233,7 +1260,7 @@ namespace surveillance_system
                 return returnArr;
             }
 
-            public int[] checkDetectionWithoutParallel(double nowTime, int N_Building, int N_CCTV, int N_Ped, int N_Car)
+            public int[] checkDetectionWithParallel(double nowTime, int N_Building, int N_CCTV, int N_Ped, int N_Car)
             {
 
                 int N_Target = N_Ped + N_Car;

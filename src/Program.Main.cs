@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Tutorial;
 using System.IO;
+using System.Collections;
 
 namespace surveillance_system
 {
@@ -161,16 +162,16 @@ namespace surveillance_system
             //mappingModule = new DigitalMappingModule();
             mappingModule.initDigitalMappingVariables(rand.Next());
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            mappingModule.road.setCCTVbyRealWorldData(mappingModule.cctvs);
+            mappingModule.road.setCCTVsArrPosbyRealWorldData(mappingModule.cctvs);
 
             //*  보행자, 차량, cctv 초기 설정
-            Console.WriteLine("\n============================================================\n");
+            /*Console.WriteLine("\n============================================================\n");
             for (int i = 0; i < mappingModule.N_Ped; i++)
             {
                 Console.WriteLine("{0}번째 보행자 = ({1}, {2}) ", i + 1, mappingModule.peds[i].X, mappingModule.peds[i].Y);
             }
             Console.WriteLine("\n============================================================\n");
-            for (int i = 0; i < mappingModule.N_Ped; i++)
+            for (int i = 0; i < mappingModule.N_Car; i++)
             {
                 Console.WriteLine("{0}번째 차량 = ({1}, {2}) ", i + 1, mappingModule.cars[i].X, mappingModule.cars[i].Y);
             }
@@ -179,19 +180,24 @@ namespace surveillance_system
             {
                 Console.WriteLine("{0}번째 cctv = ({1}, {2}) ", i + 1, mappingModule.cctvs[i].X, mappingModule.cctvs[i].Y);
             }
-            Console.WriteLine("\n============================================================\n");
+            Console.WriteLine("\n============================================================\n");*/
 
             bw.setBuildingCSVWriter(mappingModule.N_Building);
-            tw.setTargetCSVWriter(mappingModule.N_Ped, mappingModule.N_Car);
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //tw.setTargetCSVWriter(mappingModule.N_Ped, mappingModule.N_Car);
             cw.setCctvCSVWriter(mappingModule.N_CCTV);
 
             bw.BuildingsToCSV("DigitalMappingResult.Buildings", mappingModule.buildings);
-            tw.PedsToCSV("DigitalMappingResult.Peds", mappingModule.peds);
-            tw.CarsToCSV("DigitalMappingResult.Cars", mappingModule.cars);
+            // 230627 박민제
+            // 디지털 매핑 시, 보행자, 차량 생성 안함
+            //tw.PedsToCSV("DigitalMappingResult.Peds", mappingModule.peds);
+            //tw.CarsToCSV("DigitalMappingResult.Cars", mappingModule.cars);
             cw.CctvsToCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
 
             //debug
-            mappingModule.road.printAllPos();
+            mappingModule.road.printBuildingPos();
+            mappingModule.road.printCctvPos();
         }
 
 
@@ -341,7 +347,7 @@ namespace surveillance_system
             }
             else
             {
-                nPed = mappingModule.peds.Length;
+                nPed = 5;   // default 5
             }
 
             if (inputNCarOption == "Y" || inputNCarOption == "y")
@@ -351,14 +357,20 @@ namespace surveillance_system
             }
             else
             {
-                nCar = mappingModule.cars.Length;
+                nCar = 5;   // default 5
             }
 
 
             SimulatorCore[] sims = new SimulatorCore[simulationTimesForCCTVSet];
-            // s.simulateAll(cctvMode);
+            int[] cctvRandomSeeds = new int[numberOfCCTVSet];
+            int[] pedRandomSeeds = new int[simulationTimesForCCTVSet];
+            int[] carRandomSeeds = new int[simulationTimesForCCTVSet];
             for (int i = 0; i < simulationTimesForCCTVSet; i++)
             {
+                cctvRandomSeeds[i] = randomForSeed.Next();
+                pedRandomSeeds[i] = randomForSeed.Next();
+                carRandomSeeds[i] = randomForSeed.Next();
+
                 sims[i] = new SimulatorCore();
                 sims[i].setcreateCSV(InputcreateCSV);
                 sims[i].setCctvFixMode(inputCctvRotate);
@@ -367,12 +379,12 @@ namespace surveillance_system
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
 
-                sims[i].initNBuilding(nBuilding);
-                sims[i].initNCctv(nCctv);
+                sims[i].initNBuilding(mappingModule.N_Building);
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
 
-                sims[i].initSimuTargetObjs();
+                sims[i].initSimBuildings();
+                sims[i].initSimTargetObjs(pedRandomSeeds[i], carRandomSeeds[i]);
                 sims[i].initSimulatorCoreVariables(randomForSeed.Next());
 
                 sims[i].initTimer();
@@ -387,8 +399,8 @@ namespace surveillance_system
                 //sims[i].stopTimer();
             }
 
-            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
-            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
+            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
+            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 
             for (int i = 0; i < numberOfCCTVSet; i++)
             {
@@ -397,45 +409,59 @@ namespace surveillance_system
                 {
                     sims[j].road.setPedswithCSV("Sim" + i + ".Peds", sims[j].peds);
                     sims[j].road.setCarswithCSV("Sim" + i + ".Cars", sims[j].cars);
+                    //sims[j].road.setPedsArrPos(sims[j].peds, pedRandomSeeds[j]);
+                    //sims[j].road.setCarsArrPos(sims[j].cars, carRandomSeeds[j]);
+
                     sims[j].startTimer();
-                    if (j == 0)
+                    // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
+                    if (i > 1 && numberOfCCTVSet > 2)
                     {
-                        // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
-                        if (i != 0 && numberOfCCTVSet > 1)
+                        sims[j].initNCctv(nCctv);
+                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+
+                        switch (cctvMode)
                         {
-                            switch (cctvMode)
-                            {
-                                case 0:
-                                    sims[j].road.setCCTV(sims[j].cctvs);
-                                    break;
-                                case 1:
-                                    sims[j].road.setCCTVbyRandomInDST(sims[j].cctvs);
-                                    break;
-                                case 2:
-                                    sims[j].road.setCCTVbyRandomInInt(sims[j].cctvs);
-                                    break;
-                                case 3:
-                                    //road.setCCTVbyRealWorldData(sims[j].N_CCTV);
+                            case 0:
+                                sims[j].road.setCCTVsArrPos(sims[j].cctvs);
+                                break;
+                            case 1:
+                                sims[j].road.setCCTVsArrPosbyRandomInDST(sims[j].cctvs);
+                                break;
+                            case 2:
+                                sims[j].road.setCCTVsArrPosbyRandomInInt(sims[j].cctvs);
+                                break;
+                            case 3:
+                                //road.setCCTVbyRealWorldData(sims[j].N_CCTV);
 
-                                    break;
-                            }
-                            cw.setCctvCSVWriter(sims[j].N_CCTV);
-                            cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
+                                break;
                         }
-                        else
-                        {
-                            cw.setCctvCSVWriter(sims[j].N_CCTV);
-                            cw.CctvsToCSV("DigitalMappingResult.CctvSet", sims[j].cctvs);
-                        }
-                        //cctvAtSim.Add(cctvs);
-
-                        // 230317 박민제
-                        //cw.setCctvCSVWriter(sims[j].N_CCTV);
-                        //cw.CctvsToCSV("CctvSet" + i);
-
-
-                        //cctvPosAtSim.Add(road.cctvPos);
+                        cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
                     }
+                    else if (i == 1 && numberOfCCTVSet > 1)
+                    {
+                        sims[j].initNCctv(nCctv);
+                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+
+                        cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
+                    }
+                    else
+                    {
+                        sims[j].initNCctv(mappingModule.N_CCTV);
+                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+
+                        cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        cw.CctvsToCSV("DigitalMappingResult.CctvSet", sims[j].cctvs);
+                    }
+                    //cctvAtSim.Add(cctvs);
+
+                    // 230317 박민제
+                    //cw.setCctvCSVWriter(sims[j].N_CCTV);
+                    //cw.CctvsToCSV("CctvSet" + i);
+
+
+                    //cctvPosAtSim.Add(road.cctvPos);
                     sims[j].road.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
@@ -473,22 +499,27 @@ namespace surveillance_system
             int bestCCTVIdx = successRates.IndexOf(successRates.Max());
             Console.WriteLine(bestCCTVIdx);
 
-            Road realRoadClone = new Road(mappingModule.road);
-            CCTV[] bestCctvSet = new CCTV[mappingModule.cctvs.Length];
+            //Road realRoadClone = new Road(mappingModule.road);
+            Road realRoadClone;
+            /*CCTV[] bestCctvSet = new CCTV[mappingModule.cctvs.Length];
             for(int i = 0; i < mappingModule.cctvs.Length; i++)
             {
                 bestCctvSet[i] = new CCTV(mappingModule.cctvs[i]);
-            }
+            }*/
 
             if (bestCCTVIdx == 0)
             {
                 Console.WriteLine("====== Real World CCTV set ======");
-                realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
+                realRoadClone = new Road(mappingModule.road);
+                //realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
+                realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("DigitalMappingResult.CctvSet"));
             }
             else
             {
                 Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-                realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
+                realRoadClone = new Road(sims[bestCCTVIdx].road);
+                //realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
+                realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("CctvSet" + bestCCTVIdx));
             }
             realRoadClone.printPos(realRoadClone.cctvPos);
         }
