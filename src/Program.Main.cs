@@ -87,6 +87,7 @@ namespace surveillance_system
 
             for (int i = 0; i < osmReader.Ways.Count; i++)
             {
+                Console.WriteLine(osmReader.EOSMWayTypeName[Convert.ToInt32(osmReader.Ways[i].WayType)]);
                 Console.WriteLine(osmReader.Ways[i].ToString());
                 Console.WriteLine("");
             }
