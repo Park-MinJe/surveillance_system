@@ -188,7 +188,6 @@ namespace surveillance_system
                          * 기존 road builder
                          */
                         map.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
-                        Console.WriteLine("(X_mapsize, Y_mapsize) = (0, 1)", map.X_mapSize, map.Y_mapSize);
                         /** 230731 박민제
                          * osm data에서 road builder
                          */
@@ -254,8 +253,8 @@ namespace surveillance_system
                     List<double> hs = new List<double>();
 
                     //debug
-                    int hs_cnt = 0;
-                    Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
+                    //int hs_cnt = 0;
+                    //Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
 
                     for (int i = 0; i < buildingfromApi.getFeatureMembersCnt(); i++)
                     {
@@ -270,11 +269,11 @@ namespace surveillance_system
                             Point[] plOnSystem = calcIndexOnProg(transformedPl, map.lowerCorner, map.upperCorner);
 
                             //debug
-                            for (int j = 0; j < plOnSystem.Length; j++)
-                            {
-                                plOnSystem[j].printString();
-                            }
-                            Console.WriteLine();
+                            //for (int j = 0; j < plOnSystem.Length; j++)
+                            //{
+                            //    plOnSystem[j].printString();
+                            //}
+                            //Console.WriteLine();
 
                             //bool pointInsideMapBoundary = false;
                             //foreach(Point pOnSys in plOnSystem){
@@ -288,7 +287,7 @@ namespace surveillance_system
                             //    pls.Add(plOnSystem);
                             //}
 
-                            hs_cnt++;
+                            //hs_cnt++;
                             hs.Add(h);
                             pls.Add(plOnSystem);
                         }
@@ -296,10 +295,10 @@ namespace surveillance_system
 
                     this.N_Building = pls.Count;
                     //debug
-                    Console.WriteLine("N_Building = {0}", this.N_Building);
-                    Console.WriteLine("pls count = {0}", pls.Count);
-                    Console.WriteLine("hs count = {0}", hs.Count);
-                    Console.WriteLine("hs_cnt = {0}", hs_cnt);
+                    //Console.WriteLine("N_Building = {0}", this.N_Building);
+                    //Console.WriteLine("pls count = {0}", pls.Count);
+                    //Console.WriteLine("hs count = {0}", hs.Count);
+                    //Console.WriteLine("hs_cnt = {0}", hs_cnt);
 
                     buildings = new Building[this.N_Building];
                     bw.setBuildingCSVWriter(this.N_Building);

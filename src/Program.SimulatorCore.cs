@@ -63,6 +63,9 @@ namespace surveillance_system
 
             /* ---------------------------시뮬레이션 결과----------------------------*/
             // Console.WriteLine(">>> Simulating . . . \n");
+            int cctvSetIdx = 0,
+                simIdx = 0;
+
             private int[] R_Surv_Time;      // 탐지 
             private int[] directionError;   // 방향 미스
             private int[] outOfRange;       // 거리 범위 밖
@@ -536,10 +539,10 @@ namespace surveillance_system
 
                 tlog.setTargetLogCSVWriter(N_Ped, N_Car, (int)(Sim_Time / aUnitTime));
 
-                clog.setDetectedLogCSVWriter(N_CCTV * N_Target * ((int)(Sim_Time / aUnitTime) +1));
+                //clog.setDetectedLogCSVWriter(N_CCTV * N_Target * ((int)(Sim_Time / aUnitTime) +1));
 
-                Console.WriteLine("%d", N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
-                clog.setShadowedLogCSVWriter(N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
+                //Console.WriteLine("%d", N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
+                //clog.setShadowedLogCSVWriter(N_CCTV * N_Building * N_Target * ((int)(Sim_Time / aUnitTime) + 1));
             }
 
             /* --------------------------------------
@@ -572,8 +575,11 @@ namespace surveillance_system
             /* --------------------------------------
              * 시뮬레이션 수행 함수
             -------------------------------------- */
-            public void operateSim()
+            public void operateSim(int cctvSetIdx, int simIdx)
             {
+                this.cctvSetIdx = cctvSetIdx;
+                this.simIdx = simIdx;
+
                 R_Surv_Time = new int[N_Target]; // 탐지 
                 directionError = new int[N_Target]; // 방향 미스
                 outOfRange = new int[N_Target]; // 거리 범위 밖
@@ -1014,11 +1020,13 @@ namespace surveillance_system
                                                 h_detected = -2;
                                                 if (j < N_Ped)
                                                 {
-                                                    clog.addShadowedLog(i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                                 else
                                                 {
-                                                    clog.addShadowedLog(i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                             }
                                         }
@@ -1094,11 +1102,13 @@ namespace surveillance_system
                                                 v_detected = -2;
                                                 if (j < N_Ped)
                                                 {
-                                                    clog.addShadowedLog(i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                                 else
                                                 {
-                                                    clog.addShadowedLog(i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                             }
                                         }
@@ -1143,7 +1153,8 @@ namespace surveillance_system
                                     //detectedTargetInfo.setV(peds[j].Velocity);
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
 
-                                    clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
                                     peds[j].upVelocity();
@@ -1157,7 +1168,8 @@ namespace surveillance_system
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
                                     int carIdx = j - N_Ped;
 
-                                    clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
                                     cars[j - N_Ped].upVelocity();
@@ -1609,11 +1621,13 @@ namespace surveillance_system
                                                 h_detected = -2;
                                                 if (j < N_Ped)
                                                 {
-                                                    clog.addShadowedLog(i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'h', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                                 else
                                                 {
-                                                    clog.addShadowedLog(i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'h', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                             }
                                         }
@@ -1689,11 +1703,13 @@ namespace surveillance_system
                                                 v_detected = -2;
                                                 if (j < N_Ped)
                                                 {
-                                                    clog.addShadowedLog(i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'v', "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                                 else
                                                 {
-                                                    clog.addShadowedLog(i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.addShadowedLog(i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
+                                                    //clog.ShadowedByBuildingLogToCSV(this.cctvSetIdx, this.simIdx, i, k, 'v', "Car", j - N_Ped, Math.Round(cars[j - N_Ped].X, 2), Math.Round(cars[j - N_Ped].Y, 2), Math.Round(cars[j - N_Ped].Velocity, 2), Math.Round(nowTime, 2));
                                                 }
                                             }
                                         }
@@ -1738,7 +1754,8 @@ namespace surveillance_system
                                     //detectedTargetInfo.setV(peds[j].Velocity);
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
 
-                                    clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.addDetectedLog(i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
                                     peds[j].upVelocity();
@@ -1752,7 +1769,8 @@ namespace surveillance_system
                                     //cctvs[i].detectedTargets.Add(detectedTargetInfo);
                                     int carIdx = j - N_Ped;
 
-                                    clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.addDetectedLog(i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
+                                    //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
                                     cars[j - N_Ped].upVelocity();
@@ -1977,7 +1995,7 @@ namespace surveillance_system
             {
                 if (createCSV)
                 {
-                    clog.DetectedLogToCSV(cctvSetIdx, simIdx);
+                    //clog.DetectedLogToCSV(cctvSetIdx, simIdx);
                 }
             }
 
@@ -1985,7 +2003,7 @@ namespace surveillance_system
             {
                 if (createCSV)
                 {
-                    clog.ShadowedByBuildingLogToCSV(cctvSetIdx, simIdx);
+                    //clog.ShadowedByBuildingLogToCSV(cctvSetIdx, simIdx);
                 }
             }
 
@@ -2046,10 +2064,10 @@ namespace surveillance_system
                         Console.WriteLine("print index of CCTV and detected Target\n");
                         Console.WriteLine("{0, 8}\t{1, 4}\t{2, 11}\t{3, 5}\t{4, 18}\t{5, 18}\t{6, 18}\t{7}", "CNT", "CCTV", "TYPE", "TARGET", "X", "Y", "V", "Time");
                         int cnt = 1;
-                        for (int i = 0; i < clog.getLogSize(); i++)
-                        {
-                            Console.WriteLine("{0, 8}\t{1, 4}\t{2, 11}\t{3, 5}\t{4, 18}\t{5, 18}\t{6, 18}\t{7}", i, clog.getCctvIdx(i), clog.getTargetType(i), clog.getTargetIdx(i), clog.getX(i), clog.getY(i), clog.getV(i), clog.getT(i));
-                        }
+                        //for (int i = 0; i < clog.getLogSize(); i++)
+                        //{
+                        //    Console.WriteLine("{0, 8}\t{1, 4}\t{2, 11}\t{3, 5}\t{4, 18}\t{5, 18}\t{6, 18}\t{7}", i, clog.getCctvIdx(i), clog.getTargetType(i), clog.getTargetIdx(i), clog.getX(i), clog.getY(i), clog.getV(i), clog.getT(i));
+                        //}
                         break;
                     }
                     else if (printDetectionList == "N" || printDetectionList == "n")

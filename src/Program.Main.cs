@@ -533,7 +533,7 @@ namespace surveillance_system
                     sims[j].map.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
-                    sims[j].operateSim();
+                    sims[j].operateSim(i, j);
                     sims[j].stopTimer();
                     sims[j].TraceLogToCSV(i, j);
                     double successRate = sims[j].printResultRate(sw, opTime, i, j);

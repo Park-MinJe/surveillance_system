@@ -256,14 +256,14 @@ namespace surveillance_system
                 this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
 
                 this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
-                Console.WriteLine("x map size: {0}", this.X_mapSize);
+                //Console.WriteLine("x map size: {0}", this.X_mapSize);
                 this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
-                Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
                 this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
-                Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
                 this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
-                Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
                 this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
                 this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
@@ -438,8 +438,6 @@ namespace surveillance_system
                 if (buildingPos == null)
                 {
                     //debug
-                    Console.WriteLine("(Y map size, X map size) = (0, 1)", this.Y_mapSize, this.X_mapSize);
-                    Console.WriteLine("(Y_grid_num, X_grid_num) = (0, 1)", this.Y_grid_num, this.X_grid_num);
                     buildingPos = new int[this.Y_grid_num, this.X_grid_num];
                 }
                 else
@@ -452,19 +450,28 @@ namespace surveillance_system
                     int grid_Y = Convert.ToInt32(buildings[i].Y / 10000),
                         grid_X = Convert.ToInt32(buildings[i].X / 10000);
 
-                    if (grid_Y > this.Y_grid_num)
+                    if (grid_Y >= this.Y_grid_num)
                     {
                         grid_Y = this.Y_grid_num - 1;
                     }
-                    if(grid_X > this.X_grid_num)
+                    if(grid_X >= this.X_grid_num)
                     {
                         grid_X = this.X_grid_num - 1;
                     }
+                    if(grid_Y < 0)
+                    {
+                        grid_Y = 0;
+                    }
+                    if(grid_X < 0)
+                    {
+                        grid_X = 0;
+                    }
 
                     // debug
-                    Console.WriteLine("Attempting init grid(0, 1)", grid_Y, grid_X);
+                    //Console.WriteLine("Attempting add on grid({0}, {1})", grid_Y, grid_X);
+                    //Console.WriteLine("- (grid_Y_Size, grid_X_Size) = ({0}, {1})", this.Y_grid_num, this.X_grid_num);
                     buildingPos[grid_Y, grid_X] += 1;
-                    Console.WriteLine("Sucess init grid");
+                    //Console.WriteLine("Sucess init grid");
                 }
             }
 
