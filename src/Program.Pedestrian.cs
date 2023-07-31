@@ -172,8 +172,8 @@ namespace surveillance_system
 
         interface Movable
         {
-            void move(Road road); // 초당 이동
-            void updateDestination(Road road);
+            void move(Map map); // 초당 이동
+            void updateDestination(Map map);
             void upVelocity(); // 속도 증가
             void downVelocity(); // 속도 감소
         }
@@ -220,7 +220,7 @@ namespace surveillance_system
                 this.TTL = ped.TTL;
             }
 
-            public void move(Road road)
+            public void move(Map map)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -237,16 +237,16 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived() || outOfRange(road.X_mapSize, road.Y_mapSize))
+                if (isArrived() || outOfRange(map.X_mapSize, map.Y_mapSize))
                 {
                     // Index out of range
-                    updateDestination(road); 
+                    updateDestination(map); 
                     setDirection();
                 }
             }
-            public void updateDestination(Road road)
+            public void updateDestination(Map map)
             {
-                double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(X, Y));
+                double[,] newPos = map.getPointOfAdjacentRoad(map.getIdxOfIntersection(X, Y));
                 DST_X = Math.Round(newPos[0, 0]);
                 DST_Y = Math.Round(newPos[0, 1]);
             }
@@ -305,7 +305,7 @@ namespace surveillance_system
                 this.TTL = car.TTL;
             }
 
-            public void move(Road road)
+            public void move(Map map)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -321,17 +321,17 @@ namespace surveillance_system
                 Pos_V2[0] += Unit_Travel_Dist * Math.Cos(Direction);
 
                 // 목적지 도착 검사
-                if (isArrived() || outOfRange(road.X_mapSize, road.Y_mapSize))
+                if (isArrived() || outOfRange(map.X_mapSize, map.Y_mapSize))
                 {
-                    updateDestination(road);
+                    updateDestination(map);
                     setDirection();
                 }
             }
 
-            public void updateDestination(Road road)
+            public void updateDestination(Map map)
             {
                 // Console.WriteLine("update destination1");
-                double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(X, Y), X, Y);
+                double[,] newPos = map.getPointOfAdjacentIntersection(map.getIdxOfIntersection(X, Y), X, Y);
                 // Console.WriteLine("update destination2");
                 DST_X = Math.Round(newPos[0, 0]);
                 DST_Y = Math.Round(newPos[0, 1]);
@@ -355,7 +355,7 @@ namespace surveillance_system
 
         public class ElectricScooter : SurveillanceTarget, Vehicle
         {
-            public void move(Road road)
+            public void move(Map map)
             {
                 // 이동
                 X += Unit_Travel_Dist * Math.Cos(Direction);
@@ -373,11 +373,11 @@ namespace surveillance_system
                 // 목적지 도착 검사
                 if (isArrived())
                 {
-                    updateDestination(road);
+                    updateDestination(map);
                     setDirection();
                 }
             }
-            public void updateDestination(Road road)
+            public void updateDestination(Map map)
             {
 
             }

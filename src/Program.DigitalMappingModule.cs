@@ -22,7 +22,7 @@ namespace surveillance_system
             //public Pedestrian[] peds { get; private set; }
             //public Car[] cars { get; private set; }
 
-            public Road road { get; private set; } = new Road();
+            public Map map { get; private set; } = new Map();
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
@@ -184,7 +184,16 @@ namespace surveillance_system
                     if (On_Road_Builder)
                     {
                         // 도로 정보 생성, 보행자 정보 생성
-                        road.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
+                        /** 230731 박민제
+                         * 기존 road builder
+                         */
+                        map.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
+                        Console.WriteLine("(X_mapsize, Y_mapsize) = (0, 1)", map.X_mapSize, map.Y_mapSize);
+                        /** 230731 박민제
+                         * osm data에서 road builder
+                         */
+                        //map.roadBuilderWithOsm(upperCorner, lowerCorner);
+
                         //road.setBuilding(N_Building);
 
                         // 230627 박민제
@@ -245,41 +254,52 @@ namespace surveillance_system
                     List<double> hs = new List<double>();
 
                     //debug
-                    //int hs_cnt = 0;
-                    //Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
+                    int hs_cnt = 0;
+                    Console.WriteLine("Feature Member cnt = {0}", buildingfromApi.getFeatureMembersCnt());
 
                     for (int i = 0; i < buildingfromApi.getFeatureMembersCnt(); i++)
                     {
                         double h = buildingfromApi.getBuildingHByIdx(i);
                         if (h > 0)
                         {
-                            hs.Add(h);
-
                             Point[] pl = buildingfromApi.getPosListByIdx(i);
                             Point[] transformedPl = TransformCoordinate(pl, 3857, 4326);
 
                             // 프로그램상의 좌표계로 변환
                             // 지도 범위의 왼쪽 위를 기준으로 한다.
-                            Point[] plOnSystem = calcIndexOnProg(transformedPl, road.lowerCorner, road.upperCorner);
+                            Point[] plOnSystem = calcIndexOnProg(transformedPl, map.lowerCorner, map.upperCorner);
 
                             //debug
-                            //hs_cnt++;
-                            //for (int j = 0; j < plOnSystem.Length; j++)
-                            //{
-                            //    plOnSystem[j].printString();
-                            //}
-                            //Console.WriteLine();
+                            for (int j = 0; j < plOnSystem.Length; j++)
+                            {
+                                plOnSystem[j].printString();
+                            }
+                            Console.WriteLine();
 
+                            //bool pointInsideMapBoundary = false;
+                            //foreach(Point pOnSys in plOnSystem){
+                            //    if (pOnSys.x >= 0 && pOnSys.y >= 0)
+                            //        pointInsideMapBoundary = true;
+                            //}
+                            //if (pointInsideMapBoundary)
+                            //{
+                            //    hs_cnt++;
+                            //    hs.Add(h);
+                            //    pls.Add(plOnSystem);
+                            //}
+
+                            hs_cnt++;
+                            hs.Add(h);
                             pls.Add(plOnSystem);
                         }
                     }
 
                     this.N_Building = pls.Count;
                     //debug
-                    //Console.WriteLine("N_Building = {0}", this.N_Building);
-                    //Console.WriteLine("pls count = {0}", pls.Count);
-                    //Console.WriteLine("hs count = {0}", hs.Count);
-                    //Console.WriteLine("hs_cnt = {0}", hs_cnt);
+                    Console.WriteLine("N_Building = {0}", this.N_Building);
+                    Console.WriteLine("pls count = {0}", pls.Count);
+                    Console.WriteLine("hs count = {0}", hs.Count);
+                    Console.WriteLine("hs_cnt = {0}", hs_cnt);
 
                     buildings = new Building[this.N_Building];
                     bw.setBuildingCSVWriter(this.N_Building);
@@ -294,7 +314,7 @@ namespace surveillance_system
                     //Debug
                     //Console.WriteLine("Err after defining building");
 
-                    road.setBuildingsArrPos(this.N_Building, this.buildings);
+                    map.setBuildingsArrPos(this.N_Building, this.buildings);
                 }
                 catch (Exception ex)
                 {
@@ -479,7 +499,7 @@ namespace surveillance_system
             {
                 try
                 {
-                    cr.realWorldCctvFromCSV(this.road);
+                    cr.realWorldCctvFromCSV(this.map);
                     this.N_CCTV = cr.realWorldCctvNum;
                     cctvs = new CCTV[N_CCTV];
                     for (int i = 0; i < N_CCTV; i++)
@@ -539,7 +559,7 @@ namespace surveillance_system
              * Generate JUST ONE obj. Work as Object Factory
             -------------------------------------- */
 
-            public Pedestrian pedFactory(Road simRoad, int intersectidx)
+            public Pedestrian pedFactory(Map simRoad, int intersectidx)
             {
                 Pedestrian ped = new Pedestrian();
 
@@ -550,7 +570,7 @@ namespace surveillance_system
                 //double[] Dist_Map = new double[road.DST.GetLength(0)];
 
                 // 맨처음 위치에서 가장 가까운 도착지를 설정 (보행자 맨처음 위치는 setPed()로 설정)
-                double[,] newPos = road.getPointOfAdjacentRoad(road.getIdxOfIntersection(ped.X, ped.Y));
+                double[,] newPos = map.getPointOfAdjacentRoad(map.getIdxOfIntersection(ped.X, ped.Y));
                 double dst_x = Math.Round(newPos[0, 0]);
                 double dst_y = Math.Round(newPos[0, 1]);
 
@@ -587,7 +607,7 @@ namespace surveillance_system
                 return ped;
             }
 
-            public Car carFactory(Road simRoad, int intersectidx, int carintersectidx)
+            public Car carFactory(Map simRoad, int intersectidx, int carintersectidx)
             {
                 Car car = new Car();
 
@@ -596,7 +616,7 @@ namespace surveillance_system
                 double minDist = 0.0;
 
                 // Car object일경우 가까운 도착지 설정
-                double[,] newPos = road.getPointOfAdjacentIntersection(road.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
+                double[,] newPos = map.getPointOfAdjacentIntersection(map.getIdxOfIntersection(car.X, car.Y), car.X, car.Y);
                 // debug
                 // Console.WriteLine("get destination Completed\n");
                 double dst_x = Math.Round(newPos[0, 0]);
@@ -619,7 +639,7 @@ namespace surveillance_system
                 return car;
             }
 
-            public CCTV cctvFactory(Road simRoad, int idx, int x, int y)
+            public CCTV cctvFactory(Map simRoad, int idx, int x, int y)
             {
                 CCTV cctv = new CCTV();
 

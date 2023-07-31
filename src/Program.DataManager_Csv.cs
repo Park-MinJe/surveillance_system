@@ -474,7 +474,7 @@ namespace surveillance_system
             }
 
             public void realWorldCctvFromCSV(
-                Road road,  
+                Map map,  
                 string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv"
                 )
             {
@@ -507,8 +507,8 @@ namespace surveillance_system
                                 //Console.WriteLine(values[7] + "," + values[8]);
                                 double y = Convert.ToDouble(values[7]);
                                 double x = Convert.ToDouble(values[8]);
-                                if ((y > road.lowerCorner.y && y < road.upperCorner.y)
-                                    && (x > road.lowerCorner.x && x < road.upperCorner.x))
+                                if ((y > map.lowerCorner.y && y < map.upperCorner.y)
+                                    && (x > map.lowerCorner.x && x < map.upperCorner.x))
                                 {
                                     realWorldCctvNum += Convert.ToInt32(values[2]);
                                     realWorldCctvData.Add(values);

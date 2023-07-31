@@ -30,6 +30,9 @@ namespace surveillance_system
 
             public double H;
 
+            public Point upperCorner;
+            public Point lowerCorner;
+
             // Polygon
             public Point[] pointsOfBottom;
 
@@ -136,10 +139,22 @@ namespace surveillance_system
 
                 this.pointsOfBottom = new Point[dotCnt];
                 this.pointsOfTop = new Point[dotCnt];
+                this.lowerCorner = new Point(p[0].x, p[0].y, 0);
+                this.upperCorner = new Point(p[0].x, p[0].y, 0);
                 for (int i = 0; i < dotCnt; i++)
                 {
                     this.pointsOfBottom[i] = new Point(p[i].x, p[i].y, 0);
                     this.pointsOfTop[i] = new Point(p[i].x, p[i].y, this.H);
+
+                    if (this.lowerCorner.x > p[i].x)
+                        this.lowerCorner.setX(p[i].x);
+                    if (this.lowerCorner.y > p[i].y)
+                        this.lowerCorner.setY(p[i].y);
+
+                    if (this.upperCorner.x < p[i].x)
+                        this.upperCorner.setX(p[i].x);
+                    if (this.upperCorner.x < p[i].y)
+                        this.upperCorner.setY(p[i].y);
                 }
 
                 this.facesOfBuilding = new Polygon[dotCnt + 1];

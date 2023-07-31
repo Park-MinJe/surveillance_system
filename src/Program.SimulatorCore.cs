@@ -25,7 +25,7 @@ namespace surveillance_system
             public Pedestrian[] peds { get; private set; }
             public Car[] cars { get; private set; }
 
-            public Road road { get; private set; } = new Road();
+            public Map map { get; private set; } = new Map();
 
             /* ---------------------------시뮬레이션 조건----------------------------*/
             public int N_Building { get; private set; }         // 실제 데이터에서 받아와 initBuilding method에서 초기화
@@ -460,9 +460,9 @@ namespace surveillance_system
                     }
                     else
                     {
-                        this.cctvs[i] = mappingModule.cctvFactory(this.road, i, 
-                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.road.X_mapSize))),
-                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.road.Y_mapSize))));
+                        this.cctvs[i] = mappingModule.cctvFactory(this.map, i, 
+                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.map.X_mapSize))),
+                            randForCctvsPos.Next(Convert.ToInt32(Math.Truncate(this.map.Y_mapSize))));
                         //Console.WriteLine("***You can't access here yet. Program need update to user generated CCTVs.***");
                         //Environment.Exit(0);
                     }
@@ -475,7 +475,7 @@ namespace surveillance_system
                 // just clone digital mapped objects.
                 this.peds = new Pedestrian[this.N_Ped];
                 this.cars = new Car[this.N_Car];
-                this.road = new Road(mappingModule.road);
+                this.map = new Map(mappingModule.map);
 
                 this.N_Target = this.N_Ped + this.N_Car;
 
@@ -496,7 +496,7 @@ namespace surveillance_system
                     //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Peds.***");
                     //    //Environment.Exit(0);
                     //}
-                    this.peds[i] = mappingModule.pedFactory(this.road, randForPedsPos.Next(this.road.lane_num * this.road.lane_num));
+                    this.peds[i] = mappingModule.pedFactory(this.map, randForPedsPos.Next(this.map.lane_num * this.map.lane_num));
                 }
                 for(int i = 0; i < this.N_Car; i++)
                 {
@@ -512,7 +512,7 @@ namespace surveillance_system
                     //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Cars.***");
                     //    //Environment.Exit(0);
                     //}
-                    this.cars[i] = mappingModule.carFactory(this.road, randForCarsPos.Next(this.road.lane_num * this.road.lane_num),
+                    this.cars[i] = mappingModule.carFactory(this.map, randForCarsPos.Next(this.map.lane_num * this.map.lane_num),
                         randForCarsPos.Next(4));
                 }
             }
@@ -588,10 +588,10 @@ namespace surveillance_system
                 stCnt = 0;
 
                 road_min_x = 0;
-                road_max_x = road.X_mapSize;
+                road_max_x = map.X_mapSize;
 
                 road_min_y = 0;
-                road_max_y = road.Y_mapSize;
+                road_max_y = map.Y_mapSize;
 
                 Now = 0;
 
@@ -1895,7 +1895,7 @@ namespace surveillance_system
                             }
                         }
 
-                        peds[i].move(this.road);
+                        peds[i].move(this.map);
                     }
                     else
                     {
@@ -1928,7 +1928,7 @@ namespace surveillance_system
 
                         // debug
                         // Console.WriteLine("car[{0}]", i - pedLen);
-                        cars[i - pedLen].move(this.road);
+                        cars[i - pedLen].move(this.map);
                         // debug
                         // Console.WriteLine("car[{0}]", i - pedLen);
                     }

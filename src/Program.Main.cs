@@ -33,6 +33,9 @@ namespace surveillance_system
 
         public static InputFromApi buildingfromApi = new VworldService();
 
+        // osm data
+        public static OsmReader osmReader = new OsmReader();
+
         public static GuiManager gm = new GuiManager();
 
         //public static GraphicManager_slik graphic_Silk = new GraphicManager_slik();
@@ -42,28 +45,31 @@ namespace surveillance_system
 
         static void Main(string[] args)
         {
-            osmTest();
-
             int operatingMode;          // 0: 디지털 모델링   1: 시뮬레이션
 
             Console.WriteLine("\ninput Operating Mode: ");
             while (true)
             {
-                Console.Write("(0: 디지털 모델링   1: 시뮬레이션   -1: 종료)? ");
+                Console.Write("(0: 디지털 모델링    1: 시뮬레이션    2: osm test    3: vworld test    -1: 종료)? ");
                 operatingMode = Convert.ToInt32(Console.ReadLine());
 
                 if (operatingMode == -1) { break; }
-
-                if (!(operatingMode == 0 || operatingMode == 1)) { continue; }
-
-                if (operatingMode == 0)
+                switch (operatingMode)
                 {
-                    operateMapping();
-                }
-
-                else if (operatingMode == 1)
-                {
-                    operateSimulation();
+                    case 0:
+                        operateMapping();
+                        break;
+                    case 1:
+                        operateSimulation();
+                        break;
+                    case 2:
+                        osmTest();
+                        break;
+                    case 3:
+                        vworldTest();
+                        break;
+                    default:
+                        continue;
                 }
             }
         }
@@ -73,23 +79,47 @@ namespace surveillance_system
             Console.Write("Input OSM file location -> ");
             string osmLoc = Console.ReadLine();
 
-            OsmReader osmReader = new OsmReader();
             osmReader.setOsmReader(osmLoc);
 
-            for(int i = 0; i < osmReader.NodeMap.Count; i++)
+            Point lower = osmReader.getMapLowerCorner();
+            lower.printString();
+
+            Point upper = osmReader.getMapUpperCorner();
+            upper.printString();
+
+            calcIndexOnProg(lower, lower, upper).printString();
+            calcIndexOnProg(upper, lower, upper).printString();
+
+            Console.WriteLine("Press 'Enter' to continue...");
+            Console.ReadLine();
+
+            for (int i = 0; i < osmReader.NodeMap.Count; i++)
             {
                 if (osmReader.NodeMap.ElementAt(i).Value.SurvInfoExist)
                 {
                     Console.WriteLine("\nNodeId -> " + Convert.ToString(osmReader.NodeMap.ElementAt(i).Key));
-                    Console.WriteLine(osmReader.NodeMap.ElementAt(i).Value.ToString());
+                    OsmReader.FOSMNodeInfo tmpNodeInfo = osmReader.NodeMap.ElementAt(i).Value;
+                    Point tmpNodeOnProg = new Point(tmpNodeInfo.Longitude, tmpNodeInfo.Latitude, 0);
+                    tmpNodeOnProg = calcIndexOnProg(tmpNodeOnProg, lower, upper);
+                    tmpNodeOnProg.printString();
+
+                    Console.WriteLine(tmpNodeInfo.ToString());
                 }
             }
 
+            Console.WriteLine("Press 'Enter' to continue...");
+            Console.ReadLine();
+
             for (int i = 0; i < osmReader.Ways.Count; i++)
             {
-                Console.WriteLine(osmReader.EOSMWayTypeName[Convert.ToInt32(osmReader.Ways[i].WayType)]);
-                Console.WriteLine(osmReader.Ways[i].ToString());
-                Console.WriteLine("");
+                /*if (osmReader.Ways[i].WayType != OsmReader.EOSMWayType.Building
+                    && osmReader.Ways[i].WayType != OsmReader.EOSMWayType.Other)*/
+                if (osmReader.Ways[i].WayType == OsmReader.EOSMWayType.Primary)
+                {
+                    Console.WriteLine(osmReader.EOSMWayTypeName[Convert.ToInt32(osmReader.Ways[i].WayType)]);
+                    Console.WriteLine(osmReader.Ways[i].ToString());
+                    Console.WriteLine("");
+                }
             }
         }
 
@@ -100,9 +130,9 @@ namespace surveillance_system
             if (buildingfromApi is VworldService)
             {
                 buildingfromApi.setRequest("GetFeature");
-                buildingfromApi.setServiceKey("9A183823-9348-31F4-9B73-C38E3C014311");
+                buildingfromApi.setServiceKey("29F9EBAE-41BB-3873-B83E-7E059A0CB564");
                 buildingfromApi.setTypename("lt_c_bldginfo");
-                buildingfromApi.setBbox("14135114.246047439,4517725.3072321005,14135687.864251547,4518285.658803624");
+                buildingfromApi.setBbox("14145605.918811569,4525871.524209193,14146051.196774742,4526433.703997406");
                 buildingfromApi.setSrsname("EPSG:3857");
                 buildingfromApi.setEndPointUrl();
 
@@ -117,19 +147,26 @@ namespace surveillance_system
                 Point upper = TransformCoordinate(buildingfromApi.getMapUpperCorner(), 3857, 4326);
                 upper.printString();
 
+                calcIndexOnProg(lower, lower, upper).printString();
+                calcIndexOnProg(upper, lower, upper).printString();
+
                 int building_cnt = buildingfromApi.getFeatureMembersCnt();
                 Console.WriteLine("building_cnt: {0}", building_cnt);
                 for (int i = 0; i < building_cnt; i++)
                 {
-                    if (buildingfromApi.getBuildingHByIdx(i) == 53)
+                    if (buildingfromApi.getBuildingHByIdx(i) == 10)
                     {
-                        Console.WriteLine("H: {0}", buildingfromApi.getBuildingHByIdx(i));
-
                         Point[] tmp = TransformCoordinate(buildingfromApi.getPosListByIdx(i), 3857, 4326);
-                        foreach (Point p in tmp)
+                        Point[] tmpOnProg = calcIndexOnProg(tmp, lower, upper);
+                        for(int j = 0; j < tmp.Length; j++)
                         {
-                            p.printString();
-                            Console.WriteLine();
+                            if (tmp[j].x < lower.x || tmp[j].x > upper.x || tmp[j].y < lower.y || tmp[j].y > upper.y)
+                            {
+                                Console.WriteLine("H: {0}", buildingfromApi.getBuildingHByIdx(i));
+                                tmp[j].printString();
+                                tmpOnProg[j].printString();
+                                Console.WriteLine();
+                            }
                         }
                     }
                 }
@@ -189,8 +226,11 @@ namespace surveillance_system
 
             //mappingModule = new DigitalMappingModule();
             mappingModule.initDigitalMappingVariables(rand.Next());
+            /** 230731 박민제
+             * get upper/lower corner from osm data
+             */
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-            mappingModule.road.setCCTVsArrPosbyRealWorldData(mappingModule.cctvs);
+            mappingModule.map.setCCTVsArrPosbyRealWorldData(mappingModule.cctvs);
 
             //*  보행자, 차량, cctv 초기 설정
             /*Console.WriteLine("\n============================================================\n");
@@ -224,8 +264,8 @@ namespace surveillance_system
             cw.CctvsToCSV("DigitalMappingResult.CctvSet", mappingModule.cctvs);
 
             //debug
-            mappingModule.road.printBuildingPos();
-            mappingModule.road.printCctvPos();
+            mappingModule.map.printBuildingPos();
+            mappingModule.map.printCctvPos();
         }
 
 
@@ -435,8 +475,8 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    sims[j].road.setPedswithCSV("Sim" + i + ".Peds", sims[j].peds);
-                    sims[j].road.setCarswithCSV("Sim" + i + ".Cars", sims[j].cars);
+                    sims[j].map.setPedswithCSV("Sim" + i + ".Peds", sims[j].peds);
+                    sims[j].map.setCarswithCSV("Sim" + i + ".Cars", sims[j].cars);
                     //sims[j].road.setPedsArrPos(sims[j].peds, pedRandomSeeds[j]);
                     //sims[j].road.setCarsArrPos(sims[j].cars, carRandomSeeds[j]);
 
@@ -450,13 +490,13 @@ namespace surveillance_system
                         switch (cctvMode)
                         {
                             case 0:
-                                sims[j].road.setCCTVsArrPos(sims[j].cctvs);
+                                sims[j].map.setCCTVsArrPos(sims[j].cctvs);
                                 break;
                             case 1:
-                                sims[j].road.setCCTVsArrPosbyRandomInDST(sims[j].cctvs);
+                                sims[j].map.setCCTVsArrPosbyRandomInDST(sims[j].cctvs);
                                 break;
                             case 2:
-                                sims[j].road.setCCTVsArrPosbyRandomInInt(sims[j].cctvs);
+                                sims[j].map.setCCTVsArrPosbyRandomInInt(sims[j].cctvs);
                                 break;
                             case 3:
                                 //road.setCCTVbyRealWorldData(sims[j].N_CCTV);
@@ -490,7 +530,7 @@ namespace surveillance_system
 
 
                     //cctvPosAtSim.Add(road.cctvPos);
-                    sims[j].road.printAllPos();
+                    sims[j].map.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
                     sims[j].operateSim();
@@ -528,7 +568,7 @@ namespace surveillance_system
             Console.WriteLine(bestCCTVIdx);
 
             //Road realRoadClone = new Road(mappingModule.road);
-            Road realRoadClone;
+            Map realRoadClone;
             /*CCTV[] bestCctvSet = new CCTV[mappingModule.cctvs.Length];
             for(int i = 0; i < mappingModule.cctvs.Length; i++)
             {
@@ -538,14 +578,14 @@ namespace surveillance_system
             if (bestCCTVIdx == 0)
             {
                 Console.WriteLine("====== Real World CCTV set ======");
-                realRoadClone = new Road(mappingModule.road);
+                realRoadClone = new Map(mappingModule.map);
                 //realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
                 realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("DigitalMappingResult.CctvSet"));
             }
             else
             {
                 Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-                realRoadClone = new Road(sims[bestCCTVIdx].road);
+                realRoadClone = new Map(sims[bestCCTVIdx].map);
                 //realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
                 realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("CctvSet" + bestCCTVIdx));
             }

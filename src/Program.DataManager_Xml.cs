@@ -643,6 +643,15 @@ namespace surveillance_system
             public double getMaxlat() { return maxlat; }
             public double getMaxlon() { return maxlon; }
 
+            public Point getMapUpperCorner()
+            {
+                return new Point(this.minlon, this.minlat, 0);
+            }
+            public Point getMapLowerCorner()
+            {
+                return new Point(this.maxlon, this.maxlat, 0);
+            }
+
             // checking OsmReader
             public void printNodesHead()
             {

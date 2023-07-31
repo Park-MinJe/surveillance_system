@@ -177,6 +177,15 @@ namespace surveillance_system
                 rt[i] = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.x, y, x, y),
                                     getDistanceBetweenPointsOfepsg4326(x, upperCorner.y, x, y),
                                     0d);
+
+                if (x < lowerCorner.x)
+                {
+                    rt[i].setX(rt[i].x * (-1));
+                }
+                if(y > upperCorner.y)
+                {
+                    rt[i].setY(rt[i].y * (-1));
+                }
             }
 
             return rt;
@@ -193,6 +202,15 @@ namespace surveillance_system
             rt = new Point(getDistanceBetweenPointsOfepsg4326(lowerCorner.x, y, x, y),
                     getDistanceBetweenPointsOfepsg4326(x, upperCorner.y, x, y),
                     0d);
+
+            if (x < lowerCorner.x)
+            {
+                rt.setX(rt.x * (-1));
+            }
+            if (y > upperCorner.y)
+            {
+                rt.setY(rt.y * (-1));
+            }
 
             //debug
             //rt.printString();

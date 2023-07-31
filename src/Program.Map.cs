@@ -9,7 +9,34 @@ namespace surveillance_system
 {
    public partial class Program
     {
-        public class Road
+        public enum RoadType
+        {
+            /** Small road or residential street */
+            Street,
+
+            /** Major road or minor state highway */
+            MajorRoad,
+
+            /** Highway */
+            Highway,
+
+            /** Other (path, bus route, etc) */
+            Other,
+        };
+        public string[] RoadTypeName =
+        {
+            "Street",
+            "MajorRoad",
+            "Highway",
+            "Other"
+        };
+
+        public class Node
+        {
+
+        }
+
+        public class Map
         {
             // Map의 실제 범위
             public Point lowerCorner;
@@ -50,11 +77,11 @@ namespace surveillance_system
             // Car 위치
             public int[,] carPos;
 
-            public Road() { }
+            public Map() { }
 
             // 230504 pmj
             // initalizer used to clone
-            public Road(Road r)
+            public Map(Map r)
             {
                 // Debug
                 //r.printRoadInfo();
@@ -229,14 +256,14 @@ namespace surveillance_system
                 this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
 
                 this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
-                //Console.WriteLine("x map size: {0}", this.X_mapSize);
+                Console.WriteLine("x map size: {0}", this.X_mapSize);
                 this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
-                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
                 this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
-                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                Console.WriteLine("x grid num: {0}", this.X_grid_num);
                 this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
-                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+                Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
                 this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
                 this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
@@ -307,6 +334,30 @@ namespace surveillance_system
 
                 //setPed(n_ped);
                 //setCar(n_car);
+            }
+            public void roadBuilderWithOsm(Point upperCorner, Point lowerCorner)
+            {
+
+            }
+
+            /* --------------------------------------
+             * update map size
+            -------------------------------------- */
+            public void updateMapMinSize_X(double x)
+            {
+
+            }
+            public void updateMapMaxSize_X(double x)
+            {
+
+            }
+            public void updateMapMinSize_Y(double y)
+            {
+
+            }
+            public void updateMapMaxSize_Y(double y)
+            {
+
             }
 
             /* --------------------------------------
@@ -386,6 +437,9 @@ namespace surveillance_system
             {
                 if (buildingPos == null)
                 {
+                    //debug
+                    Console.WriteLine("(Y map size, X map size) = (0, 1)", this.Y_mapSize, this.X_mapSize);
+                    Console.WriteLine("(Y_grid_num, X_grid_num) = (0, 1)", this.Y_grid_num, this.X_grid_num);
                     buildingPos = new int[this.Y_grid_num, this.X_grid_num];
                 }
                 else
@@ -398,7 +452,7 @@ namespace surveillance_system
                     int grid_Y = Convert.ToInt32(buildings[i].Y / 10000),
                         grid_X = Convert.ToInt32(buildings[i].X / 10000);
 
-                    if(grid_Y > this.Y_grid_num)
+                    if (grid_Y > this.Y_grid_num)
                     {
                         grid_Y = this.Y_grid_num - 1;
                     }
@@ -407,7 +461,10 @@ namespace surveillance_system
                         grid_X = this.X_grid_num - 1;
                     }
 
+                    // debug
+                    Console.WriteLine("Attempting init grid(0, 1)", grid_Y, grid_X);
                     buildingPos[grid_Y, grid_X] += 1;
+                    Console.WriteLine("Sucess init grid");
                 }
             }
 
