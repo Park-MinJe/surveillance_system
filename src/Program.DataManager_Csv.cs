@@ -474,8 +474,9 @@ namespace surveillance_system
             }
 
             public void realWorldCctvFromCSV(
-                Map map,  
-                string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv"
+                Map map,
+                //string filename = "C:\\Users\\rprpr\\OneDrive - dgu.ac.kr\\Lab\\지능 융합 보안 서비스 개발을 위한 오픈소스 시뮬레이터\\cctv\\12_04_08_E_CCTV정보.csv"
+                string filename = "..\\..\\..\\resource\\cctv\\12_04_08_E_CCTV정보.csv"
                 )
             {
                 realWorldCctvData = new List<string[]>();

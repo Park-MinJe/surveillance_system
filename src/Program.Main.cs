@@ -227,7 +227,7 @@ namespace surveillance_system
             //mappingModule = new DigitalMappingModule();
             mappingModule.initDigitalMappingVariables(rand.Next());
             /** 230731 박민제
-             * get upper/lower corner from osm data
+             * TODO: get upper/lower corner from osm data
              */
             mappingModule.initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
             mappingModule.map.setCCTVsArrPosbyRealWorldData(mappingModule.cctvs);
