@@ -98,7 +98,7 @@ namespace surveillance_system
                 if (osmReader.NodeMap.ElementAt(i).Value.SurvInfoExist)
                 {
                     Console.WriteLine("\nNodeId -> " + Convert.ToString(osmReader.NodeMap.ElementAt(i).Key));
-                    OsmReader.FOSMNodeInfo tmpNodeInfo = osmReader.NodeMap.ElementAt(i).Value;
+                    FOSMNodeInfo tmpNodeInfo = osmReader.NodeMap.ElementAt(i).Value;
                     Point tmpNodeOnProg = new Point(tmpNodeInfo.Longitude, tmpNodeInfo.Latitude, 0);
                     tmpNodeOnProg = calcIndexOnProg(tmpNodeOnProg, lower, upper);
                     tmpNodeOnProg.printString();
@@ -114,9 +114,9 @@ namespace surveillance_system
             {
                 /*if (osmReader.Ways[i].WayType != OsmReader.EOSMWayType.Building
                     && osmReader.Ways[i].WayType != OsmReader.EOSMWayType.Other)*/
-                if (osmReader.Ways[i].WayType == OsmReader.EOSMWayType.Primary)
+                if (osmReader.Ways[i].WayType == EOSMWayType.Primary)
                 {
-                    Console.WriteLine(osmReader.EOSMWayTypeName[Convert.ToInt32(osmReader.Ways[i].WayType)]);
+                    Console.WriteLine(EOSMWayTypeName[Convert.ToInt32(osmReader.Ways[i].WayType)]);
                     Console.WriteLine(osmReader.Ways[i].ToString());
                     Console.WriteLine("");
                 }
@@ -180,6 +180,7 @@ namespace surveillance_system
             Random rand = new Random();
 
             // 도로 정보
+            osmTest();
 
             // 230207 pmj
             // Open Api를 이용해 건물 정보 받아오기 test

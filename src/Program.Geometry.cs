@@ -72,10 +72,24 @@ namespace surveillance_system
                 this.y = y;
                 this.z = z;
             }
+            
+            public void setPoint(Point p)
+            {
+                this.x = p.x;
+                this.y = p.y;
+                this.z = p.z;
+            }
 
             public void setX(double x) { this.x = x; }
             public void setY(double y) { this.y = y; }
             public void setZ(double z) { this.z = z; }
+
+            public override bool Equals(object obj)
+            {
+                return (this.x == (obj as Point).x)
+                    && (this.y == (obj as Point).y)
+                    && (this.z == (obj as Point).z);
+            }
 
             public void printString()
             {
@@ -111,6 +125,11 @@ namespace surveillance_system
 
             public void setP1(Point p1) { this.p1 = p1; }
             public void setP2(Point p2) { this.p2 = p2; }
+
+            public override string ToString()
+            {
+                return String.Format("x: {0}\ty: {1}\tz: {2}", p1.x, p1.y, p1.z) + "//" + String.Format("x: {0}\ty: {1}\tz: {2}", p2.x, p2.y, p2.z);
+            }
         }
 
         public class Polygon

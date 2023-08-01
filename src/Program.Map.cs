@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using static surveillance_system.Program;
 using OpenTK.Windowing.Desktop;
+using static surveillance_system.Program.OsmReader;
 
 namespace surveillance_system
 {
@@ -23,17 +24,116 @@ namespace surveillance_system
             /** Other (path, bus route, etc) */
             Other,
         };
-        public string[] RoadTypeName =
+        static public string[] RoadTypeName =
         {
             "Street",
             "MajorRoad",
             "Highway",
             "Other"
         };
-
-        public class Node
+        // 도로 폭
+        static public double[] RoadWidth =
         {
+            // mm
+            // Street
+            8000.0,
+            // MajorRoad
+            10000.0,
+            // Highway
+            14000.0
+        };
+        
+        // 도로를 이루는 node
+        public class Node : Point
+        {
+            // x: lon, y: lat
+            public Node(double x, double y, double z)
+            {
+                this.setPoint(x, y, z);
+            }
 
+            public Node(Point p)
+            {
+                this.setPoint(p);
+            }
+
+            public override string ToString()
+            {
+                return String.Format("x: {0}\ty: {1}\tz: {2}", this.x, this.y, this.z);
+            }
+        }
+
+        public class PartOfRoad
+        {
+            public Segment NodeToNode { set; get; }
+            public Segment UpperSeg { set; get; }
+            public Segment LowerSeg { set; get; }
+        }
+
+        // node로 이루어진 도로
+        public class Road
+        {
+            public string RoadName { set; get; }
+            public string RoadRef { set; get; }
+            /** 230801 박민제
+             * 도로 폭
+             * Street: 
+             */
+            public double Width { set; get; }
+            // 도로를 구성하는 점
+            public List<int> NodeIndices { set; get; }
+            // 점과 점사이 부분
+            public List<PartOfRoad> Parts { set; get; }
+            // 도로 왼쪽 라인
+            public List<Point> LeftLine { set; get; }
+            // 도로 오른쪽 라인
+            public List<Point> RightLine { set; get; }
+            public RoadType RoadType { set; get; }
+            public bool bIsOneWay { set; get; } = false;
+
+            public Road()
+            {
+                NodeIndices = new List<int>();
+                Parts = new List<PartOfRoad>();
+                LeftLine = new List<Point>();
+                RightLine = new List<Point>();
+            }
+
+            public override string ToString()
+            {
+                string rt = "Road Name - " + RoadName;
+                rt += "\nRoad Ref - " + RoadRef;
+                rt += "\nRoad Type - " + RoadTypeName[Convert.ToInt32(RoadType)];
+                rt += "\nWidth - " + Width;
+                rt += "\nNode Indices\n=====>\n";
+                foreach(int idx in NodeIndices)
+                {
+                    rt += idx + "/";
+                }
+                return rt;
+            }
+        }
+
+        // 교차로 정보
+        public class RoadRef
+        {
+            public int DSTNodeIndex { set; get; }
+            public List<int> roadIndices { set; get; }
+            public List<Point> intersectionArea { set; get; }
+            
+            public RoadRef()
+            {
+                roadIndices = new List<int>();
+                intersectionArea = new List<Point>();
+            }
+
+            public override string ToString()
+            {
+                string rt = "\nDST Node Index - " + DSTNodeIndex;
+                rt += "\nRelated Roads' Indices\n";
+                foreach(int idx in roadIndices) { rt += idx + "/"; }
+                return rt;
+            }
         }
 
         public class Map
@@ -42,6 +142,13 @@ namespace surveillance_system
             public Point lowerCorner;
             public Point upperCorner;
 
+            // 지도 위의 점
+            public List<Node> nodes;
+            // node로 이루어진 도로
+            public List<Road> roads;
+            // 교차로
+            public List<RoadRef> roadsRefs;
+
             // 230206 쓰이지 않고 있음 _Minje
             //public double[] laneVector;
 
@@ -49,7 +156,7 @@ namespace surveillance_system
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = y 값
             public double[,] lane_h; // 가로 - 중앙선 y 값 
             public double[,] lane_h_upper; // 가로 - 중앙선 위 라인 y값 
-            public  double[,] lane_h_lower; // 가로 - 중앙선 아래 라인 y값 
+            public double[,] lane_h_lower; // 가로 - 중앙선 아래 라인 y값 
 
             // 세로 도로 좌표
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = x 값
@@ -77,7 +184,11 @@ namespace surveillance_system
             // Car 위치
             public int[,] carPos;
 
-            public Map() { }
+            public Map() {
+                nodes = new List<Node>();
+                roads = new List<Road>();
+                roadsRefs = new List<RoadRef>();
+            }
 
             // 230504 pmj
             // initalizer used to clone
@@ -94,6 +205,15 @@ namespace surveillance_system
                 {
                     this.upperCorner = new Point(r.upperCorner);
                 }
+
+                if(nodes == null) this.nodes = new List<Node> ();
+                foreach (Node nd in r.nodes) this.nodes.Add(nd);
+
+                if(roads == null) this.roads = new List<Road>();
+                foreach (Road rd in r.roads) this.roads.Add(rd);
+
+                if (roadsRefs == null) this.roadsRefs = new List<RoadRef>();
+                foreach (RoadRef rRefs in r.roadsRefs) this.roadsRefs.Add(rRefs);
 
                 // 230206 쓰이지 않고 있음 _Minje
                 /*
@@ -337,6 +457,208 @@ namespace surveillance_system
             }
             public void roadBuilderWithOsm(Point upperCorner, Point lowerCorner)
             {
+                // Coordination of osm file is epsg4326
+                this.lowerCorner = TransformCoordinate(lowerCorner, 3857, 4326);
+                //this.lowerCorner.printString();
+                this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
+                //this.upperCorner.printString();
+
+                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
+                //Console.WriteLine("x map size: {0}", this.X_mapSize);
+                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
+                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
+
+                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
+                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
+                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+
+                foreach (FOSMWayInfo wayFromOsm in osmReader.Ways)
+                {
+                    if (wayFromOsm.WayType != EOSMWayType.Other && wayFromOsm.WayType != EOSMWayType.Building
+                        && wayFromOsm.Nodes.Count > 1)
+                    {
+                        Road newRoad = new Road();
+                        newRoad.RoadName = wayFromOsm.Name;
+                        newRoad.RoadRef = wayFromOsm.Ref;
+                        newRoad.bIsOneWay = wayFromOsm.bIsOneWay;
+
+                        // define Road Type and Width
+                        {
+                            if (wayFromOsm.WayType == EOSMWayType.Motorway
+                                || wayFromOsm.WayType == EOSMWayType.Motorway_Link
+                                || wayFromOsm.WayType == EOSMWayType.Trunk
+                                || wayFromOsm.WayType == EOSMWayType.Trunk_Link
+                                || wayFromOsm.WayType == EOSMWayType.Primary
+                                || wayFromOsm.WayType == EOSMWayType.Primary_Link)
+                            {
+                                newRoad.RoadType = RoadType.Highway;
+                                newRoad.Width = RoadWidth[Convert.ToInt32(newRoad.RoadType)];
+                            }
+                            else if (wayFromOsm.WayType == EOSMWayType.Secondary
+                                || wayFromOsm.WayType == EOSMWayType.Secondary_Link
+                                || wayFromOsm.WayType == EOSMWayType.Tertiary
+                                || wayFromOsm.WayType == EOSMWayType.Tertiary_Link)
+                            {
+                                newRoad.RoadType = RoadType.MajorRoad;
+                                newRoad.Width = RoadWidth[Convert.ToInt32(newRoad.RoadType)];
+                            }
+                            else if (wayFromOsm.WayType == EOSMWayType.Residential
+                                || wayFromOsm.WayType == EOSMWayType.Service
+                                || wayFromOsm.WayType == EOSMWayType.Unclassified
+                                || wayFromOsm.WayType == EOSMWayType.Road)
+                            {
+                                newRoad.RoadType = RoadType.Street;
+                                newRoad.Width = RoadWidth[Convert.ToInt32(newRoad.RoadType)];
+                            }
+                        }
+                        
+                        // 도로를 이루는 node 탐색
+                        foreach(FOSMNodeInfo nodeFromOsm in wayFromOsm.Nodes)
+                        {
+                            Node newNode = new Node(nodeFromOsm.Longitude, nodeFromOsm.Latitude, 0.0);
+                            //debug
+                            //Console.WriteLine(newNode.ToString());
+                            //Console.WriteLine(newNode.x <= this.upperCorner.x && newNode.x >= this.lowerCorner.x
+                            //    && newNode.y <= this.upperCorner.y && newNode.x >= this.lowerCorner.y);
+                            //Console.ReadLine();
+
+                            // 지도 영역 안에 있는 Node만 취급
+                            if(newNode.x <= this.upperCorner.x && newNode.x >= this.lowerCorner.x
+                                && newNode.y <= this.upperCorner.y && newNode.x >= this.lowerCorner.y)
+                            {
+                                newNode = new Node(calcIndexOnProg(newNode, this.lowerCorner, this.upperCorner));
+
+                                bool isNodeExist = false;
+                                int indexOfExistingNode = 0;
+                                for (int i = 0; i < this.nodes.Count; i++)
+                                {
+                                    if (this.nodes[i].Equals(newNode))
+                                    {
+                                        isNodeExist = true;
+                                        indexOfExistingNode = i;
+                                        break;
+                                    }
+                                }
+
+                                if (!isNodeExist)
+                                {
+                                    this.nodes.Add(newNode);
+                                    newRoad.NodeIndices.Add(this.nodes.Count - 1);
+                                }
+                                else
+                                {
+                                    newRoad.NodeIndices.Add(indexOfExistingNode);
+                                }
+                            }
+                        }
+
+                        roads.Add(newRoad);
+                    }
+                }
+
+                // Road class의 Parts, LeftLinek, RightLine 정의
+                foreach (Road road in roads)
+                {
+                    if (road.Width == 0.0) road.Width = 8000.0;
+
+                    for(int i = 0; i < road.NodeIndices.Count - 1; i++)
+                    {
+                        PartOfRoad newPart = new PartOfRoad();
+
+                        Point p1 = nodes[road.NodeIndices[i]];
+                        Point p2 = nodes[road.NodeIndices[i + 1]];
+
+                        newPart.NodeToNode = new Segment(p1, p2);
+
+                        lVector p1p2Vector = new lVector(p2.x - p1.x, p2.y - p1.y);
+
+                        lVector verticalVector = new lVector(-p1p2Vector.componet_y, p1p2Vector.componet_x);
+
+                        lVector XunitVector = new lVector(0.001, 0);
+                        double angle = Math.Round(Math.Acos(InnerProduct(verticalVector, XunitVector) / (Norm(verticalVector) * Norm(XunitVector))), 8);
+                        if (verticalVector.componet_y < 0)
+                        {
+                            angle = Math.Round(2 * Math.PI - angle, 8);
+                        }
+
+                        Point p1_left = new Point(p1.x + (road.Width) / 2 * Math.Cos(angle), p1.y + (road.Width) / 2 * Math.Sin(angle), 0.0);
+                        Point p1_right = new Point(p1.x - (road.Width) / 2 * Math.Cos(angle), p1.y - (road.Width) / 2 * Math.Sin(angle), 0.0);
+                        newPart.LowerSeg = new Segment(p1_left, p1_right);
+
+                        Point p2_left = new Point(p2.x + (road.Width) / 2 * Math.Cos(angle), p2.y + (road.Width) / 2 * Math.Sin(angle), 0.0);
+                        Point p2_right = new Point(p2.x - (road.Width) / 2 * Math.Cos(angle), p2.y - (road.Width) / 2 * Math.Sin(angle), 0.0);
+                        newPart.UpperSeg = new Segment(p2_left, p2_right);
+
+                        //debug
+                        Console.Write("p1 -> ");
+                        p1.printString();
+                        Console.Write("p2 -> ");
+                        p2.printString();
+                        Console.WriteLine("* Lower Segment - " + newPart.LowerSeg.ToString());
+                        Console.WriteLine("* Upper Segment - " + newPart.UpperSeg.ToString());
+                        Console.WriteLine();
+                    }
+                }
+
+                //debug roads
+                //foreach (Road road in roads)
+                //{
+                //    //if (road.Width == 0)
+                //    {
+                //        Console.WriteLine(road.ToString());
+                //        Console.WriteLine();
+                //    }
+                //}
+
+                // 교차로 정보 roadsRefs에 저장
+                for (int i = 0; i < roads.Count; i++)
+                {
+                    for (int j = i + 1; j < roads.Count; j++)
+                    {
+                        foreach (int nodeIdx in roads[i].NodeIndices)
+                        {
+                            if (roads[j].NodeIndices.Contains(nodeIdx))
+                            {
+                                int dstIdx = nodeIdx;
+                                bool isDstExist = false;
+                                foreach(RoadRef dstRef in roadsRefs)
+                                {
+                                    if(dstRef.DSTNodeIndex == dstIdx)
+                                    {
+                                        isDstExist = true;
+                                        if (!dstRef.roadIndices.Contains(i)) dstRef.roadIndices.Add(i);
+                                        if (!dstRef.roadIndices.Contains(j)) dstRef.roadIndices.Add(j);
+                                    }
+                                }
+                                if (!isDstExist)
+                                {
+                                    RoadRef newRef = new RoadRef();
+                                    newRef.DSTNodeIndex = dstIdx;
+                                    newRef.roadIndices.Add(i);
+                                    newRef.roadIndices.Add(j);
+                                    roadsRefs.Add(newRef);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //debug
+                //foreach (RoadRef dst in roadsRefs)
+                //{
+                //    //Console.WriteLine(dst.ToString());
+
+                //    if (dst.roadIndices.Count > 1)
+                //    {
+                //        Console.WriteLine(dst.ToString());
+                //        for (int i = 0; i < dst.roadIndices.Count; i++)
+                //        {
+                //            Console.WriteLine(roads[dst.roadIndices[i]].ToString());
+                //        }
+                //    }
+                //    Console.WriteLine();
+                //}
 
             }
 
