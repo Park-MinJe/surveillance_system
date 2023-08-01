@@ -188,7 +188,7 @@ namespace surveillance_system
                          * 기존 road builder
                          */
                         map.roadBuilderWithOsm(upperCorner, lowerCorner);
-                        map.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
+                        //map.roadBuilder(Road_Width, Road_Interval, Road_N_Interval, upperCorner, lowerCorner);
                         /** 230731 박민제
                          * osm data에서 road builder
                          */

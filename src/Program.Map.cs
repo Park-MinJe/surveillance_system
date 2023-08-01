@@ -84,10 +84,6 @@ namespace surveillance_system
             public List<int> NodeIndices { set; get; }
             // 점과 점사이 부분
             public List<PartOfRoad> Parts { set; get; }
-            // 도로 왼쪽 라인
-            public List<Point> LeftLine { set; get; }
-            // 도로 오른쪽 라인
-            public List<Point> RightLine { set; get; }
             public RoadType RoadType { set; get; }
             public bool bIsOneWay { set; get; } = false;
 
@@ -95,8 +91,6 @@ namespace surveillance_system
             {
                 NodeIndices = new List<int>();
                 Parts = new List<PartOfRoad>();
-                LeftLine = new List<Point>();
-                RightLine = new List<Point>();
             }
 
             public override string ToString()
@@ -120,6 +114,9 @@ namespace surveillance_system
             public int DSTNodeIndex { set; get; }
             public List<int> roadIndices { set; get; }
             public List<Point> intersectionArea { set; get; }
+
+            public double minWidth { set; get; }
+            public double maxWidth { set; get; }
             
             public RoadRef()
             {
@@ -154,26 +151,26 @@ namespace surveillance_system
 
             // 가로 도로 좌표
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = y 값
-            public double[,] lane_h; // 가로 - 중앙선 y 값 
-            public double[,] lane_h_upper; // 가로 - 중앙선 위 라인 y값 
-            public double[,] lane_h_lower; // 가로 - 중앙선 아래 라인 y값 
+            //public double[,] lane_h; // 가로 - 중앙선 y 값 
+            //public double[,] lane_h_upper; // 가로 - 중앙선 위 라인 y값 
+            //public double[,] lane_h_lower; // 가로 - 중앙선 아래 라인 y값 
 
             // 세로 도로 좌표
             // 첫번째 인덱스 = 도로 번호,  두번째 인덱스 = x 값
-            public double[,] lane_v; // 세로 - 중앙선 x값
-            public double[,] lane_v_left; // 세로- 중앙선 왼쪽 라인 x값
-            public double[,] lane_v_right; // 세로 중앙선 오른쪽 라인 x값
+            //public double[,] lane_v; // 세로 - 중앙선 x값
+            //public double[,] lane_v_left; // 세로- 중앙선 왼쪽 라인 x값
+            //public double[,] lane_v_right; // 세로 중앙선 오른쪽 라인 x값
 
-            public double[,] DST; // 도로 교차점
-            public double[,] intersectionArea; // 도로 교차구간
+            //public double[,] DST; // 도로 교차점
+            //public double[,] intersectionArea; // 도로 교차구간
             public double X_mapSize;
             public double Y_mapSize;
             public int X_grid_num;
             public int Y_grid_num;
-            public int lane_num;
-            public double X_interval;
-            public double Y_interval;
-            public int width;
+            //public int lane_num;
+            //public double X_interval;
+            //public double Y_interval;
+            //public int width;
 
             // 건물 위치
             public int[,] buildingPos;
@@ -224,74 +221,74 @@ namespace surveillance_system
                 }
                 */
 
-                if (r.lane_h != null)
-                {
-                    this.lane_h = new double[r.lane_h.GetUpperBound(0) + 1, r.lane_h.GetUpperBound(1) + 1];
-                    for (int i = 0; i < r.lane_h.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j < r.lane_h.GetUpperBound(1); j++)
-                        {
-                            this.lane_h[i, j] = r.lane_h[i, j];
-                        }
-                    }
-                }
+                //if (r.lane_h != null)
+                //{
+                //    this.lane_h = new double[r.lane_h.GetUpperBound(0) + 1, r.lane_h.GetUpperBound(1) + 1];
+                //    for (int i = 0; i < r.lane_h.GetUpperBound(0); i++)
+                //    {
+                //        for (int j = 0; j < r.lane_h.GetUpperBound(1); j++)
+                //        {
+                //            this.lane_h[i, j] = r.lane_h[i, j];
+                //        }
+                //    }
+                //}
 
-                if (r.lane_v_left != null)
-                {
-                    this.lane_v_left = new double[r.lane_v_left.GetUpperBound(0) + 1, r.lane_v_left.GetUpperBound(1) + 1];
-                    for (int i = 0; i < r.lane_v_left.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j < r.lane_v_left.GetUpperBound(1); j++)
-                        {
-                            this.lane_v_left[i, j] = r.lane_v_left[i, j];
-                        }
-                    }
-                }
+                //if (r.lane_v_left != null)
+                //{
+                //    this.lane_v_left = new double[r.lane_v_left.GetUpperBound(0) + 1, r.lane_v_left.GetUpperBound(1) + 1];
+                //    for (int i = 0; i < r.lane_v_left.GetUpperBound(0); i++)
+                //    {
+                //        for (int j = 0; j < r.lane_v_left.GetUpperBound(1); j++)
+                //        {
+                //            this.lane_v_left[i, j] = r.lane_v_left[i, j];
+                //        }
+                //    }
+                //}
 
-                if (r.lane_v_right != null)
-                {
-                    this.lane_v_right = new double[r.lane_v_right.GetUpperBound(0) + 1, r.lane_v_right.GetUpperBound(1) + 1];
-                    for (int i = 0; i < r.lane_v_right.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j < r.lane_v_right.GetUpperBound(1); j++)
-                        {
-                            this.lane_v_right[i, j] = r.lane_v_right[i, j];
-                        }
-                    }
-                }
+                //if (r.lane_v_right != null)
+                //{
+                //    this.lane_v_right = new double[r.lane_v_right.GetUpperBound(0) + 1, r.lane_v_right.GetUpperBound(1) + 1];
+                //    for (int i = 0; i < r.lane_v_right.GetUpperBound(0); i++)
+                //    {
+                //        for (int j = 0; j < r.lane_v_right.GetUpperBound(1); j++)
+                //        {
+                //            this.lane_v_right[i, j] = r.lane_v_right[i, j];
+                //        }
+                //    }
+                //}
 
-                if (r.DST != null)
-                {
-                    this.DST = new double[r.DST.GetUpperBound(0) + 1, r.DST.GetUpperBound(1) + 1];
-                    for (int i = 0; i < r.DST.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j < r.DST.GetUpperBound(1); j++)
-                        {
-                            this.DST[i, j] = r.DST[i, j];
-                        }
-                    }
-                }
+                //if (r.DST != null)
+                //{
+                //    this.DST = new double[r.DST.GetUpperBound(0) + 1, r.DST.GetUpperBound(1) + 1];
+                //    for (int i = 0; i < r.DST.GetUpperBound(0); i++)
+                //    {
+                //        for (int j = 0; j < r.DST.GetUpperBound(1); j++)
+                //        {
+                //            this.DST[i, j] = r.DST[i, j];
+                //        }
+                //    }
+                //}
 
-                if (r.intersectionArea != null)
-                {
-                    this.intersectionArea = new double[r.intersectionArea.GetUpperBound(0) + 1, r.intersectionArea.GetUpperBound(1) + 1];
-                    for (int i = 0; i < r.intersectionArea.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j < r.intersectionArea.GetUpperBound(1); j++)
-                        {
-                            this.intersectionArea[i, j] = r.intersectionArea[i, j];
-                        }
-                    }
-                }
+                //if (r.intersectionArea != null)
+                //{
+                //    this.intersectionArea = new double[r.intersectionArea.GetUpperBound(0) + 1, r.intersectionArea.GetUpperBound(1) + 1];
+                //    for (int i = 0; i < r.intersectionArea.GetUpperBound(0); i++)
+                //    {
+                //        for (int j = 0; j < r.intersectionArea.GetUpperBound(1); j++)
+                //        {
+                //            this.intersectionArea[i, j] = r.intersectionArea[i, j];
+                //        }
+                //    }
+                //}
 
                 this.X_mapSize = r.X_mapSize;
                 this.Y_mapSize = r.Y_mapSize;
                 this.X_grid_num = r.X_grid_num;
                 this.Y_grid_num = r.Y_grid_num;
-                this.lane_num = r.lane_num;
-                this.X_interval = r.X_interval;
-                this.Y_interval = r.Y_interval;
-                this.width = r.width;
+                //this.lane_num = r.lane_num;
+                //this.X_interval = r.X_interval;
+                //this.Y_interval = r.Y_interval;
+                //this.width = r.width;
 
                 if (r.buildingPos != null)
                 {
@@ -360,100 +357,100 @@ namespace surveillance_system
 
             public void roadBuilder(int wd, int intvl, int n_interval, Point upperCorner, Point lowerCorner)
             {
-                this.lane_num = n_interval + 1;
-                DST = new double[lane_num * lane_num, 2];
-                intersectionArea = new double[lane_num * lane_num, 4];
-                //this.interval = intvl;
-                this.width = wd;
+                //this.lane_num = n_interval + 1;
+                //DST = new double[lane_num * lane_num, 2];
+                //intersectionArea = new double[lane_num * lane_num, 4];
+                ////this.interval = intvl;
+                //this.width = wd;
 
-                //this.mapSize = n_interval * intvl + wd * lane_num;
-                //this.grid_num = this.mapSize / 10000 + 2;
-                // 실제 데이터로부터의 mapSize
-                //lowerCorner = buildingfromApi.getMapLowerCorner();
-                //upperCorner = buildingfromApi.getMapUpperCorner();
+                ////this.mapSize = n_interval * intvl + wd * lane_num;
+                ////this.grid_num = this.mapSize / 10000 + 2;
+                //// 실제 데이터로부터의 mapSize
+                ////lowerCorner = buildingfromApi.getMapLowerCorner();
+                ////upperCorner = buildingfromApi.getMapUpperCorner();
 
-                this.lowerCorner = TransformCoordinate(lowerCorner, 3857, 4326);
-                this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
+                //this.lowerCorner = TransformCoordinate(lowerCorner, 3857, 4326);
+                //this.upperCorner = TransformCoordinate(upperCorner, 3857, 4326);
 
-                this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
-                //Console.WriteLine("x map size: {0}", this.X_mapSize);
-                this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
-                //Console.WriteLine("y map size: {0}", this.Y_mapSize);
+                //this.X_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.upperCorner.x, this.lowerCorner.y);
+                ////Console.WriteLine("x map size: {0}", this.X_mapSize);
+                //this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
+                ////Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
-                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
-                //Console.WriteLine("x grid num: {0}", this.X_grid_num);
-                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
-                //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
+                //this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
+                ////Console.WriteLine("x grid num: {0}", this.X_grid_num);
+                //this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
+                ////Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
-                this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
-                this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
+                //this.X_interval = (this.X_mapSize - lane_num * this.width) / n_interval;
+                //this.Y_interval = (this.Y_mapSize - lane_num * this.width) / n_interval;
 
-                // 교차점, 교차구간 설정
-                int idx = 0;
-                for (int i = 0; i < lane_num; i++)
-                {
-                    for (int j = 0; j < lane_num; j++)
-                    {
-                        DST[idx, 0] = (this.X_interval + wd) * i + (wd / 2);
-                        DST[idx, 1] = (this.Y_interval + wd) * j + (wd / 2);
+                //// 교차점, 교차구간 설정
+                //int idx = 0;
+                //for (int i = 0; i < lane_num; i++)
+                //{
+                //    for (int j = 0; j < lane_num; j++)
+                //    {
+                //        DST[idx, 0] = (this.X_interval + wd) * i + (wd / 2);
+                //        DST[idx, 1] = (this.Y_interval + wd) * j + (wd / 2);
 
-                        intersectionArea[idx, 0] = DST[idx, 0] - (wd / 2); // x_min
-                        intersectionArea[idx, 1] = DST[idx, 0] + (wd / 2); // x_max
-                        intersectionArea[idx, 2] = DST[idx, 1] - (wd / 2); // y_min
-                        intersectionArea[idx, 3] = DST[idx, 1] + (wd / 2); // y_max
-                        idx++;
-                    }
-                }
+                //        intersectionArea[idx, 0] = DST[idx, 0] - (wd / 2); // x_min
+                //        intersectionArea[idx, 1] = DST[idx, 0] + (wd / 2); // x_max
+                //        intersectionArea[idx, 2] = DST[idx, 1] - (wd / 2); // y_min
+                //        intersectionArea[idx, 3] = DST[idx, 1] + (wd / 2); // y_max
+                //        idx++;
+                //    }
+                //}
 
-                // 230206 쓰이지 않고 있음 _Minje
-                // 도로 벡터 초기화
-                /*double incr = 100;
-                int laneVectorSize = (int)((intvl + wd) * (n_interval) / incr);
-                //Console.WriteLine("laneSize = {0}", laneSize);
-                laneVector = new double[laneVectorSize];
+                //// 230206 쓰이지 않고 있음 _Minje
+                //// 도로 벡터 초기화
+                ///*double incr = 100;
+                //int laneVectorSize = (int)((intvl + wd) * (n_interval) / incr);
+                ////Console.WriteLine("laneSize = {0}", laneSize);
+                //laneVector = new double[laneVectorSize];
 
-                for (int i = 0; i < laneVectorSize; i++)
-                {
-                    laneVector[i] = i * incr;
-                }*/
+                //for (int i = 0; i < laneVectorSize; i++)
+                //{
+                //    laneVector[i] = i * incr;
+                //}*/
 
-                // 가로 도로 좌표 설정
-                lane_h = new double[lane_num, 1];
-                lane_h_upper = new double[lane_num, 1];
-                lane_h_lower = new double[lane_num, 1];
+                //// 가로 도로 좌표 설정
+                //lane_h = new double[lane_num, 1];
+                //lane_h_upper = new double[lane_num, 1];
+                //lane_h_lower = new double[lane_num, 1];
 
-                for (int i = 0; i < lane_num; i++)
-                {
-                    lane_h[i, 0] = i * (intvl + wd) + (wd / 2);
-                    lane_h_upper[i, 0] = lane_h[i, 0] + wd / 2;
-                    lane_h_lower[i, 0] = lane_h[i, 0] - wd / 2;
-                }
+                //for (int i = 0; i < lane_num; i++)
+                //{
+                //    lane_h[i, 0] = i * (intvl + wd) + (wd / 2);
+                //    lane_h_upper[i, 0] = lane_h[i, 0] + wd / 2;
+                //    lane_h_lower[i, 0] = lane_h[i, 0] - wd / 2;
+                //}
 
-                // 세로 도로 좌표 설정
-                lane_v = new double[lane_num, 1];
-                lane_v_left = new double[lane_num, 1];
-                lane_v_right = new double[lane_num, 1];
-                for (int i = 0; i < lane_num; i++)
-                {
-                    lane_v[i, 0] = i * (intvl + wd) + (wd / 2);
-                    lane_v_left[i, 0] = lane_h[i, 0] - wd / 2;
-                    lane_v_right[i, 0] = lane_h[i, 0] + wd / 2;
-                }
+                //// 세로 도로 좌표 설정
+                //lane_v = new double[lane_num, 1];
+                //lane_v_left = new double[lane_num, 1];
+                //lane_v_right = new double[lane_num, 1];
+                //for (int i = 0; i < lane_num; i++)
+                //{
+                //    lane_v[i, 0] = i * (intvl + wd) + (wd / 2);
+                //    lane_v_left[i, 0] = lane_h[i, 0] - wd / 2;
+                //    lane_v_right[i, 0] = lane_h[i, 0] + wd / 2;
+                //}
 
-                // mode 0: pos cctv as grid    1: pos cctv as random    2: use prepared as random cctv set
-                /* switch (cctvMode)
-                {
-                    case 0:
-                        setCCTV(n_cctv, wd, lane_num); break;
-                    case 1:
-                        setCCTVForBrute(n_cctv); break;
-                    case 2:
-                        break;
+                //// mode 0: pos cctv as grid    1: pos cctv as random    2: use prepared as random cctv set
+                ///* switch (cctvMode)
+                //{
+                //    case 0:
+                //        setCCTV(n_cctv, wd, lane_num); break;
+                //    case 1:
+                //        setCCTVForBrute(n_cctv); break;
+                //    case 2:
+                //        break;
 
-                }*/
+                //}*/
 
-                //setPed(n_ped);
-                //setCar(n_car);
+                ////setPed(n_ped);
+                ////setCar(n_car);
             }
             public void roadBuilderWithOsm(Point upperCorner, Point lowerCorner)
             {
@@ -518,14 +515,16 @@ namespace surveillance_system
                         {
                             Node newNode = new Node(nodeFromOsm.Longitude, nodeFromOsm.Latitude, 0.0);
                             //debug
-                            //Console.WriteLine(newNode.ToString());
-                            //Console.WriteLine(newNode.x <= this.upperCorner.x && newNode.x >= this.lowerCorner.x
-                            //    && newNode.y <= this.upperCorner.y && newNode.x >= this.lowerCorner.y);
-                            //Console.ReadLine();
+                            {
+                                //Console.WriteLine(newNode.ToString());
+                                //Console.WriteLine(newNode.x <= this.upperCorner.x && newNode.x >= this.lowerCorner.x
+                                //    && newNode.y <= this.upperCorner.y && newNode.x >= this.lowerCorner.y);
+                                //Console.ReadLine();
+                            }
 
                             // 지도 영역 안에 있는 Node만 취급
-                            if(newNode.x <= this.upperCorner.x && newNode.x >= this.lowerCorner.x
-                                && newNode.y <= this.upperCorner.y && newNode.x >= this.lowerCorner.y)
+                            if (newNode.x < this.upperCorner.x && newNode.x > this.lowerCorner.x
+                                && newNode.y < this.upperCorner.y && newNode.x > this.lowerCorner.y)
                             {
                                 newNode = new Node(calcIndexOnProg(newNode, this.lowerCorner, this.upperCorner));
 
@@ -591,25 +590,29 @@ namespace surveillance_system
                         newPart.UpperSeg = new Segment(p2_left, p2_right);
 
                         //debug
-                        Console.Write("p1 -> ");
-                        p1.printString();
-                        Console.Write("p2 -> ");
-                        p2.printString();
-                        Console.WriteLine("* Lower Segment - " + newPart.LowerSeg.ToString());
-                        Console.WriteLine("* Upper Segment - " + newPart.UpperSeg.ToString());
-                        Console.WriteLine();
+                        {
+                            //Console.Write("p1 -> ");
+                            //p1.printString();
+                            //Console.Write("p2 -> ");
+                            //p2.printString();
+                            //Console.WriteLine("* Lower Segment - " + newPart.LowerSeg.ToString());
+                            //Console.WriteLine("* Upper Segment - " + newPart.UpperSeg.ToString());
+                            //Console.WriteLine();
+                        }
                     }
                 }
 
                 //debug roads
-                //foreach (Road road in roads)
-                //{
-                //    //if (road.Width == 0)
-                //    {
-                //        Console.WriteLine(road.ToString());
-                //        Console.WriteLine();
-                //    }
-                //}
+                {
+                    //foreach (Road road in roads)
+                    //{
+                    //    //if (road.Width == 0)
+                    //    {
+                    //        Console.WriteLine(road.ToString());
+                    //        Console.WriteLine();
+                    //    }
+                    //}
+                }
 
                 // 교차로 정보 roadsRefs에 저장
                 for (int i = 0; i < roads.Count; i++)
@@ -637,6 +640,10 @@ namespace surveillance_system
                                     newRef.DSTNodeIndex = dstIdx;
                                     newRef.roadIndices.Add(i);
                                     newRef.roadIndices.Add(j);
+
+                                    newRef.minWidth = (roads[i].Width < roads[j].Width) ? roads[i].Width : roads[j].Width;
+                                    newRef.maxWidth = (roads[i].Width > roads[j].Width) ? roads[i].Width : roads[j].Width;
+
                                     roadsRefs.Add(newRef);
                                 }
                             }
@@ -644,22 +651,23 @@ namespace surveillance_system
                     }
                 }
 
-                //debug
-                //foreach (RoadRef dst in roadsRefs)
-                //{
-                //    //Console.WriteLine(dst.ToString());
+                //debug roadsRefs
+                {
+                    //foreach (RoadRef dst in roadsRefs)
+                    //{
+                    //    //Console.WriteLine(dst.ToString());
 
-                //    if (dst.roadIndices.Count > 1)
-                //    {
-                //        Console.WriteLine(dst.ToString());
-                //        for (int i = 0; i < dst.roadIndices.Count; i++)
-                //        {
-                //            Console.WriteLine(roads[dst.roadIndices[i]].ToString());
-                //        }
-                //    }
-                //    Console.WriteLine();
-                //}
-
+                    //    if (dst.roadIndices.Count > 1)
+                    //    {
+                    //        Console.WriteLine(dst.ToString());
+                    //        for (int i = 0; i < dst.roadIndices.Count; i++)
+                    //        {
+                    //            Console.WriteLine(roads[dst.roadIndices[i]].ToString());
+                    //        }
+                    //    }
+                    //    Console.WriteLine();
+                    //}
+                }
             }
 
             /* --------------------------------------
@@ -810,23 +818,23 @@ namespace surveillance_system
                     this.setPosZeros(cctvPos, this.Y_grid_num, this.X_grid_num);
                 }
 
-                double x_range = X_mapSize - width;
-                double y_range = Y_mapSize - width;
+                double x_range = X_mapSize;
+                double y_range = Y_mapSize;
                 int rootN = (int)Math.Sqrt((double)cctvs.Length);
 
                 // x좌표가 int 형식이라 캐스팅해서 완벽한 그리드는 아닐 수 있음
-                int x_intvl = (int)x_range / (rootN-1);
-                int y_intvl = (int)y_range / (rootN - 1);
+                int x_intvl = (int)x_range / (rootN + 1);
+                int y_intvl = (int)y_range / (rootN + 1);
                 Console.WriteLine("x_mapsize y_mapsize x_range y_range rootN x_intvl y_intvl {0} {1} {2} {3} {4} {5} {6}", 
                                     this.X_mapSize, this.Y_mapSize, x_range, y_range, rootN, x_intvl, y_intvl);
-                double startX = DST[0, 0];
-                double startY = DST[0, 1];
+                double startX = x_intvl;
+                double startY = y_intvl;
 
                 Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Set CCTV Position");
                 int cctvIdx = 0;
                 for(int i = 0; i < rootN; i ++)
                 {
-                    startX = DST[0, 0];
+                    startX = x_intvl;
                     for (int j = 0; j < rootN; j++)
                     {
                         cctvs[cctvIdx].X = (int)startX;
@@ -869,9 +877,13 @@ namespace surveillance_system
                 for (int i = 0; i < cctvs.Length; i++)
                 {
                     Random rand = new Random();
-                    int intersectidx = rand.Next(lane_num * lane_num);
-                    cctvs[i].X = (int)Math.Truncate(DST[intersectidx, 0]);
-                    cctvs[i].Y = (int)Math.Truncate(DST[intersectidx, 1]);
+                    int intersectidx = rand.Next(roadsRefs.Count);
+                    Node dst = nodes[roadsRefs[intersectidx].DSTNodeIndex];
+                    cctvs[i].X = (int)Math.Truncate(dst.x);
+                    cctvs[i].Y = (int)Math.Truncate(dst.y);
+
+                    //cctvs[i].X = (int)Math.Truncate(DST[intersectidx, 0]);
+                    //cctvs[i].Y = (int)Math.Truncate(DST[intersectidx, 1]);
 
                     // Console.WriteLine("cctv{0}\t{1, 6} {2, 6} ", i, cctvs[i].X, cctvs[i].Y);
                     // Console.WriteLine();
@@ -986,7 +998,7 @@ namespace surveillance_system
                 {
                     Random rand = new Random(randSeed);
                     // int intersectidx = rand.Next(9);
-                    int intersectidx = rand.Next(lane_num * lane_num);
+                    int intersectidx = rand.Next(roadsRefs.Count);
 
                     // Console.WriteLine(intersectidx);
                     double[,] newPos = getPointOfAdjacentRoad(intersectidx);
@@ -1021,6 +1033,8 @@ namespace surveillance_system
                 double[,] newPos = getPointOfAdjacentRoad(intersectidx);
                 ped.X = Math.Round(newPos[0, 0]);
                 ped.Y = Math.Round(newPos[0, 1]);
+                Console.WriteLine("ped.Y -> {0} / ped.X -> {1}", 
+                    Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X / 10000)));
 
                 /*Random rand = new Random();
                 double opt = rand.NextDouble();
@@ -1054,9 +1068,17 @@ namespace surveillance_system
                 for (int i = 0; i < cars.Length; i++)
                 {
                     Random rand = new Random(randSeed);
-                    int intersectidx = rand.Next(lane_num * lane_num);
-                    cars[i].X = DST[intersectidx, 0];
-                    cars[i].Y = DST[intersectidx, 1];
+                    int intersectidx = rand.Next(roadsRefs.Count);
+                    Node dst = nodes[roadsRefs[intersectidx].DSTNodeIndex];
+                    cars[i].X = dst.x;
+                    cars[i].Y = dst.y;
+
+                    //cars[i].X = DST[intersectidx, 0];
+                    //cars[i].Y = DST[intersectidx, 1];
+
+                    // 230802 박민제
+                    // 교차로를 지나는 도로 폭 중 가장 작은 것을 width로
+                    double width = roadsRefs[intersectidx].minWidth;
 
                     int carintersectidx = rand.Next(4); // 0, 1, 2, 3
                     if (carintersectidx == 0)
@@ -1089,8 +1111,16 @@ namespace surveillance_system
             {
                 //Random rand = new Random();
                 //int intersectidx = rand.Next(lane_num * lane_num);
-                car.X = DST[intersectidx, 0];
-                car.Y = DST[intersectidx, 1];
+                //car.X = DST[intersectidx, 0];
+                //car.Y = DST[intersectidx, 1];
+
+                Node dst = nodes[roadsRefs[intersectidx].DSTNodeIndex];
+                car.X = dst.x;
+                car.Y = dst.y;
+
+                // 230802 박민제
+                // 교차로를 지나는 도로 폭 중 가장 작은 것을 width로
+                double width = roadsRefs[intersectidx].minWidth;
 
                 //int carintersectidx = rand.Next(4); // 0, 1, 2, 3
                 if (carintersectidx == 0)
@@ -1152,20 +1182,44 @@ namespace surveillance_system
                 int i, j;
                 Random rand = new Random();
 
-                do
+                //do
+                //{
+                //    i = currAreaIdx / lane_num;
+                //    j = currAreaIdx % lane_num;
+
+                //    int opt = rand.Next(0, 4);
+                //    if (opt == 0) j += 1; // up
+                //    else if (opt == 1) j -= 1; // down
+                //    else if (opt == 2) i -= 1; // left
+                //    else if (opt == 3) i += 1; // right
+
+                //} while (i < 0 || i >= lane_num || j < 0 || j >= lane_num);
+
+                /** 230802 박민제
+                 * 현재 위치에서 가장 가까운 node로 목적지 설정
+                 */
+                // currAreaIdx에 해당하는 교차로 node
+                int dstNodeIdx = this.roadsRefs[currAreaIdx].DSTNodeIndex;
+
+                List<Node> adjacentNodes = new List<Node>();
+                foreach(int roadIdx in this.roadsRefs[currAreaIdx].roadIndices)
                 {
-                    i = currAreaIdx / lane_num;
-                    j = currAreaIdx % lane_num;
+                    int currentNodeIdx = -1;
+                    for (currentNodeIdx = 0; currentNodeIdx < this.roads[roadIdx].NodeIndices.Count; currentNodeIdx++)
+                    {
+                        if (this.roads[roadIdx].NodeIndices[currentNodeIdx] == dstNodeIdx)
+                        {
+                            break;
+                        }
+                    }
 
-                    int opt = rand.Next(0, 4);
-                    if (opt == 0) j += 1; // up
-                    else if (opt == 1) j -= 1; // down
-                    else if (opt == 2) i -= 1; // left
-                    else if (opt == 3) i += 1; // right
+                    if(currentNodeIdx - 1 >= 0)
+                        adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx - 1]]);
+                    if(currentNodeIdx + 1 < this.roads[roadIdx].NodeIndices.Count)
+                        adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx + 1]]);
+                }
 
-                } while (i < 0 || i >= lane_num || j < 0 || j >= lane_num);
-
-                int idx = lane_num * i + j;
+                //int idx = lane_num * i + j;
                 double[,] newPos = new double[1, 2];
                 // newPos[0,0] = DST[idx, 0] + rand.Next(-width, width) * rand.NextDouble();
                 // newPos[0,1] = DST[idx, 1] + rand.Next(-width, width) * rand.NextDouble();
@@ -1174,8 +1228,9 @@ namespace surveillance_system
                 // newPos[0, 0] = rand.Next((int)intersectionArea[idx, 0], (int)intersectionArea[idx, 1]);
                 // newPos[0, 1] = rand.Next((int)intersectionArea[idx, 2], (int)intersectionArea[idx, 3]);
 
-                newPos[0, 0] = DST[idx, 0];
-                newPos[0, 1] = DST[idx, 1];
+                Node nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+                newPos[0, 0] = nodeForNewPos.x;
+                newPos[0, 1] = nodeForNewPos.y;
 
                 // Console.WriteLine("newpos {0} {1}", newPos[0, 0], newPos[0, 1]);
                 return newPos;
@@ -1183,9 +1238,21 @@ namespace surveillance_system
 
             public int getIdxOfIntersection(double x, double y)
             {
-                for (int i = 0; i < intersectionArea.GetLength(0); i++)
+                //for (int i = 0; i < intersectionArea.GetLength(0); i++)
+                //{
+                //    if (x >= intersectionArea[i, 0] && x <= intersectionArea[i, 1] && y >= intersectionArea[i, 2] && y <= intersectionArea[i, 3])
+                //    {
+                //        // Console.WriteLine("getIdxIntersection return {0}", i);
+                //        return i;
+                //    }
+                //}
+
+                // 교차로의 큰 반지름 안의 점인지.
+                for (int i = 0; i < roadsRefs.Count; i++)
                 {
-                    if (x >= intersectionArea[i, 0] && x <= intersectionArea[i, 1] && y >= intersectionArea[i, 2] && y <= intersectionArea[i, 3])
+                    Node dst = nodes[roadsRefs[i].DSTNodeIndex];
+                    double powOfDist = Math.Pow(x - dst.x, 2) + Math.Pow(y - dst.y, 2);
+                    if (powOfDist <= Math.Pow(roadsRefs[i].maxWidth / 2, 2))
                     {
                         // Console.WriteLine("getIdxIntersection return {0}", i);
                         return i;
@@ -1203,74 +1270,104 @@ namespace surveillance_system
 
                 int i, j;
                 double curX, curY;
-                double midX = DST[currAreaIdx, 0];
-                double midY = DST[currAreaIdx, 1];
+
+                Node dst = this.nodes[this.roadsRefs[currAreaIdx].DSTNodeIndex];
+                double midX = dst.x;
+                double midY = dst.y;
+
+                double width = (this.roadsRefs[currAreaIdx].minWidth + this.roadsRefs[currAreaIdx].maxWidth) / 2;
 
                 Random rand = new Random();
 
                 // Console.WriteLine("getPointOfAdjacentIntersection x: {0}, y: {1}, midX: {2}, midY: {3}", x, y, midX, midY);
-                do
+                //do
+                //{
+                //    i = currAreaIdx / lane_num;
+                //    j = currAreaIdx % lane_num;
+                //    curX = x;
+                //    curY = y;
+
+                //    int opt = rand.Next(0, 2);
+
+                //    // 이 부분 수정 필요
+                //    if ( x < midX && y >= midY ){ // 0 down left
+                //        if (opt == 0)// down
+                //        {
+                //            curY -= width/2;
+                //        }
+                //        else if (opt == 1) //left
+                //        { 
+                //            curX -= (this.X_interval + width/2);
+                //            i -= 1;
+                //        }
+                //    }
+                //    else if ( x >= midX && y >= midY ){ // 1 up left
+                //        if (opt == 0) // up
+                //        {   
+                //            curY += (this.Y_interval + width/2);
+                //            j += 1; 
+                //        }
+                //        else if (opt == 1) // left
+                //        {
+                //            curX -= width/2;
+                //        }
+                //    }
+                //    else if ( x >= midX && y < midY ){ // 2 up right
+                //        if (opt == 0) // up
+                //        {
+                //            curY += width/2;
+                //        }
+                //        else if (opt == 1) // right
+                //        {
+                //            curX += (this.X_interval + width/2);
+                //            i += 1;
+                //        }                        
+                //    }
+                //    else if( x < midX && y < midY ){ // 3 down right
+                //        if (opt == 0) // down
+                //        {
+                //            curY -= (this.Y_interval + width/2);
+                //            j -= 1;
+                //        }
+                //        else if (opt == 1) // right
+                //        {
+                //            curX += width/2;
+                //        }
+                //    }
+
+                //} while (i< 0 || i >= lane_num || j < 0|| j >=  lane_num);
+
+                /** 230802 박민제
+                 * 현재 위치에서 가장 가까운 node로 목적지 설정
+                 */
+                // currAreaIdx에 해당하는 교차로 node
+                int dstNodeIdx = this.roadsRefs[currAreaIdx].DSTNodeIndex;
+
+                List<Node> adjacentNodes = new List<Node>();
+                foreach (int roadIdx in this.roadsRefs[currAreaIdx].roadIndices)
                 {
-                    i = currAreaIdx / lane_num;
-                    j = currAreaIdx % lane_num;
-                    curX = x;
-                    curY = y;
-
-                    int opt = rand.Next(0, 2);
-
-                    // 이 부분 수정 필요
-                    if ( x < midX && y >= midY ){ // 0 down left
-                        if (opt == 0)// down
+                    int currentNodeIdx = -1;
+                    for (currentNodeIdx = 0; currentNodeIdx < this.roads[roadIdx].NodeIndices.Count; currentNodeIdx++)
+                    {
+                        if (this.roads[roadIdx].NodeIndices[currentNodeIdx] == dstNodeIdx)
                         {
-                            curY -= width/2;
-                        }
-                        else if (opt == 1) //left
-                        { 
-                            curX -= (this.X_interval + width/2);
-                            i -= 1;
-                        }
-                    }
-                    else if ( x >= midX && y >= midY ){ // 1 up left
-                        if (opt == 0) // up
-                        {   
-                            curY += (this.Y_interval + width/2);
-                            j += 1; 
-                        }
-                        else if (opt == 1) // left
-                        {
-                            curX -= width/2;
-                        }
-                    }
-                    else if ( x >= midX && y < midY ){ // 2 up right
-                        if (opt == 0) // up
-                        {
-                            curY += width/2;
-                        }
-                        else if (opt == 1) // right
-                        {
-                            curX += (this.X_interval + width/2);
-                            i += 1;
-                        }                        
-                    }
-                    else if( x < midX && y < midY ){ // 3 down right
-                        if (opt == 0) // down
-                        {
-                            curY -= (this.Y_interval + width/2);
-                            j -= 1;
-                        }
-                        else if (opt == 1) // right
-                        {
-                            curX += width/2;
+                            break;
                         }
                     }
 
-                } while (i< 0 || i >= lane_num || j < 0|| j >=  lane_num);
+                    if (currentNodeIdx - 1 >= 0)
+                        adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx - 1]]);
+                    if (currentNodeIdx + 1 < this.roads[roadIdx].NodeIndices.Count)
+                        adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx + 1]]);
+                }
 
-                int idx = lane_num * i + j;
+                Node nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+
+                //int idx = lane_num * i + j;
                 double[,] newPos = new double[1, 2];
 
-                newPos[0, 0] = curX;
-                newPos[0, 1] = curY;
+                newPos[0, 0] = nodeForNewPos.x;
+                newPos[0, 1] = nodeForNewPos.y;
 
                 return newPos;
             }
@@ -1280,17 +1377,17 @@ namespace surveillance_system
             -------------------------------------- */
             public void printRoadInfo()
             {
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "DST");
-                for (int i = 0; i < DST.GetLength(0); i++)
-                {
-                    for (int j = 0; j < 2; j++)
-                    {
-                        if (j == 0) Console.Write("DST[{0, 2}].X = {1, 6}\t", i, DST[i, j]);
-                        if (j == 1) Console.Write("DST[{0, 2}].Y = {1, 6}\t", i, DST[i, j]);
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine("\n========================================================================================\n");
+                //Console.WriteLine("\n=================== {0, 25} ==========================================\n", "DST");
+                //for (int i = 0; i < DST.GetLength(0); i++)
+                //{
+                //    for (int j = 0; j < 2; j++)
+                //    {
+                //        if (j == 0) Console.Write("DST[{0, 2}].X = {1, 6}\t", i, DST[i, j]);
+                //        if (j == 1) Console.Write("DST[{0, 2}].Y = {1, 6}\t", i, DST[i, j]);
+                //    }
+                //    Console.WriteLine();
+                //}
+                //Console.WriteLine("\n========================================================================================\n");
 
                 /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
                    Console.WriteLine("\n========================lane Vector========================================");
@@ -1302,25 +1399,25 @@ namespace surveillance_system
                    Console.WriteLine("\n===========================================================================\n");
                 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane horizontal");
-                for (int i = 0; i < lane_h.GetLength(0); i++)
-                {
-                    Console.WriteLine("\n{0}번째 가로 도로 정보", i);
-                    Console.WriteLine("y좌표 : 위 - 중앙 - 아래");
-                    Console.WriteLine("       {0}   {1}   {2}", lane_h_upper[i,0],lane_h[i,0],lane_h_lower[i,0]);
-                }
-                Console.WriteLine("\n========================================================================================\n");
+                //Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane horizontal");
+                //for (int i = 0; i < lane_h.GetLength(0); i++)
+                //{
+                //    Console.WriteLine("\n{0}번째 가로 도로 정보", i);
+                //    Console.WriteLine("y좌표 : 위 - 중앙 - 아래");
+                //    Console.WriteLine("       {0}   {1}   {2}", lane_h_upper[i,0],lane_h[i,0],lane_h_lower[i,0]);
+                //}
+                //Console.WriteLine("\n========================================================================================\n");
 
                 
 
-                Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane vertical");
-                for (int i = 0; i < lane_h.GetLength(0); i++)
-                {
-                    Console.WriteLine("\n{0}번째 세로 도로 정보", i);
-                    Console.WriteLine("x좌표 : 왼쪽 - 중앙 - 오른쪽");
-                    Console.WriteLine("       {0}   {1}   {2}", lane_v_left[i, 0], lane_v[i, 0], lane_v_right[i, 0]);
-                }
-                Console.WriteLine("\n========================================================================================\n");
+                //Console.WriteLine("\n=================== {0, 25} ==========================================\n", "lane vertical");
+                //for (int i = 0; i < lane_h.GetLength(0); i++)
+                //{
+                //    Console.WriteLine("\n{0}번째 세로 도로 정보", i);
+                //    Console.WriteLine("x좌표 : 왼쪽 - 중앙 - 오른쪽");
+                //    Console.WriteLine("       {0}   {1}   {2}", lane_v_left[i, 0], lane_v[i, 0], lane_v_right[i, 0]);
+                //}
+                //Console.WriteLine("\n========================================================================================\n");
             }
 
             public void printCctvInfo(CCTV[] cctvs)

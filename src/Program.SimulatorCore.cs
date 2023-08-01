@@ -499,7 +499,7 @@ namespace surveillance_system
                     //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Peds.***");
                     //    //Environment.Exit(0);
                     //}
-                    this.peds[i] = mappingModule.pedFactory(this.map, randForPedsPos.Next(this.map.lane_num * this.map.lane_num));
+                    this.peds[i] = mappingModule.pedFactory(this.map, randForPedsPos.Next(this.map.roadsRefs.Count));
                 }
                 for(int i = 0; i < this.N_Car; i++)
                 {
@@ -515,7 +515,7 @@ namespace surveillance_system
                     //    //Console.WriteLine("***You can't access here yet. Program need update to user generated Cars.***");
                     //    //Environment.Exit(0);
                     //}
-                    this.cars[i] = mappingModule.carFactory(this.map, randForCarsPos.Next(this.map.lane_num * this.map.lane_num),
+                    this.cars[i] = mappingModule.carFactory(this.map, randForCarsPos.Next(this.map.roadsRefs.Count),
                         randForCarsPos.Next(4));
                 }
             }

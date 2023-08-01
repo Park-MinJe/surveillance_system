@@ -661,5 +661,22 @@ namespace surveillance_system
                 }
             }
         }
+
+        public class OsmWriter
+        {
+            // All ways we've parsed
+            public List<FOSMWayInfo> Ways { set; get; } = new List<FOSMWayInfo>();
+
+            // Maps node IDs to info about each node
+            public Dictionary<long, FOSMNodeInfo> NodeMap { set; get; } = new Dictionary<long, FOSMNodeInfo>();
+
+            // 230704 박민제 존재하는 감시 자원
+            public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; } = new Dictionary<long, FOSMSurvInfo>();
+
+            public void setOsmWriter(SimulatorCore simCore)
+            {
+
+            }
+        }
     }
 }
