@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using static surveillance_system.Program;
 
 namespace surveillance_system
@@ -605,6 +606,65 @@ namespace surveillance_system
                         }
                     }
                 }
+            }
+        }
+
+        public class TargetLogCSVReader
+        {
+            public class TargetLog
+            {
+                public double timeStemp { get; set; }
+                public double xLog { get; set; }
+                public double yLog { get; set; }
+                public int detectionType { get; set; }
+            }
+
+            List<TargetLog> targets = new List<TargetLog>();
+
+            public List<TargetLog> TraceLogFromCSV(int cctvSetIdx, int simIdx, int targetIdx)
+            {
+                string filename = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + targetIdx + ".csv";
+                try
+                {
+                    // 파일 위치 예시
+                    using (FileStream fs = new FileStream(@filename, FileMode.Open))
+                    {
+                        using (StreamReader sr = new StreamReader(fs, Encoding.UTF8, false))
+                        {
+                            string lines = null;
+                            //string[] keys = null;
+                            string[] values = null;
+
+                            while ((lines = sr.ReadLine()) != null)
+                            {
+                                if (string.IsNullOrEmpty(lines)) break;
+
+                                if (lines.Substring(0, 1).Equals("#"))  // 첫줄에 #이 있을 경우 Key로 처리
+                                {
+                                    continue;
+                                }
+
+                                values = lines.Split(",");
+
+                                //debug
+                                //Console.WriteLine(values[7] + "," + values[8]);
+                                TargetLog tl = new TargetLog();
+                                tl.timeStemp = Convert.ToDouble(values[0]);
+                                tl.xLog = Convert.ToDouble(values[1]);
+                                tl.yLog = Convert.ToDouble(values[2]);
+                                tl.detectionType = Convert.ToInt32(values[3]);
+
+                                targets.Add(tl);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+
+                return targets;
             }
         }
 

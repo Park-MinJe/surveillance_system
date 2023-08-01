@@ -35,6 +35,7 @@ namespace surveillance_system
 
         // osm data
         public static OsmReader osmReader = new OsmReader();
+        public static OsmWriter osmWriter = new OsmWriter();
 
         public static GuiManager gm = new GuiManager();
 
@@ -466,6 +467,8 @@ namespace surveillance_system
                 //pedestrianAtSim.Add(peds);
                 //carAtSim.Add(cars);
                 //sims[i].stopTimer();
+
+                
             }
 
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
@@ -544,6 +547,8 @@ namespace surveillance_system
                     sims[j].ShadowedLogToCSV(i, j);
 
                     sims[j].resetTimer();
+
+                    osmWriter.printAsOsm(sims[j], i, j);
                 }
                 successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSet);
             }

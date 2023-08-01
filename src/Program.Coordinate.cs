@@ -218,6 +218,46 @@ namespace surveillance_system
             return rt;
         }
 
+        // system 좌표계 to proj4_epsg4326
+        // 여러 점 한번에
+        public static Point[] indexOnProgToEpsg4326(Point[] ps, Point lowerCorner, Point upperCorner, double x_size, double y_size)
+        {
+            Point[] rt = new Point[ps.Length];
+            for (int i = 0; i < ps.Length; i++)
+            {
+                double x = ps[i].x;
+                double y = ps[i].y;
+
+                double x_proportion = x / x_size;
+                double y_proportion = y / y_size;
+
+                rt[i].setX(lowerCorner.x + (upperCorner.x - lowerCorner.x) * x_proportion);
+                rt[i].setY(upperCorner.y - (upperCorner.y - lowerCorner.y) * y_proportion);
+            }
+
+            return rt;
+        }
+
+        // system 좌표계 to proj4_epsg4326
+        // 한 개 점만
+        public static Point indexOnProgToEpsg4326(Point p, Point lowerCorner, Point upperCorner, double x_size, double y_size)
+        {
+            Point rt = new Point();
+            double x = p.x;
+            double y = p.y;
+
+            double x_proportion = x / x_size;
+            double y_proportion = y / y_size;
+
+            rt.setX(lowerCorner.x + (upperCorner.x - lowerCorner.x) * x_proportion);
+            rt.setY(upperCorner.y - (upperCorner.y - lowerCorner.y) * y_proportion);
+
+            //debug
+            //rt.printString();
+
+            return rt;
+        }
+
         public static double getDistanceBetweenPointsOfepsg4326(double lat0, double lon0, double lat1, double lon1)
         {
             double minlat = Math.Min(lat0, lat1);

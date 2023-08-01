@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -668,14 +669,49 @@ namespace surveillance_system
             public List<FOSMWayInfo> Ways { set; get; } = new List<FOSMWayInfo>();
 
             // Maps node IDs to info about each node
-            public Dictionary<long, FOSMNodeInfo> NodeMap { set; get; } = new Dictionary<long, FOSMNodeInfo>();
+            public List<FOSMNodeInfo> NodeMap { set; get; } = new List<FOSMNodeInfo> { };
 
             // 230704 박민제 존재하는 감시 자원
             public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; } = new Dictionary<long, FOSMSurvInfo>();
 
-            public void setOsmWriter(SimulatorCore simCore)
+            public void printAsOsm(SimulatorCore simCore, int cctvSetIdx, int simIdx)
             {
+                // xml writer setting
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+                settings.OmitXmlDeclaration = true;
 
+                string fn = "CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".XmlWriterTest.osm";
+                XmlWriter writer = XmlWriter.Create(fn, settings);
+
+                // get target movement log from csv file
+                Dictionary<int, List<TargetLogCSVReader.TargetLog>> targetsLogDict = new Dictionary<int, List<TargetLogCSVReader.TargetLog>>();
+                for(int i = 0; i < simCore.N_Target; i++)
+                {
+                    List<TargetLogCSVReader.TargetLog> targetLogs = new TargetLogCSVReader().TraceLogFromCSV(cctvSetIdx, simIdx, i);
+                    foreach(TargetLogCSVReader.TargetLog log in targetLogs)
+                    {
+                        // Convert coordination to epsg 4326 from program local coordination.
+                        Point convertTo4326 = indexOnProgToEpsg4326(new Point(log.xLog, log.yLog, 0), simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
+                        log.xLog = convertTo4326.x;
+                        log.yLog = convertTo4326.y;
+                    }
+                    targetsLogDict.Add(i, targetLogs);
+                }
+
+                
+
+                
+                //writer.WriteStartElement("way");
+                //writer.WriteAttributeString("id", "0");
+                //writer.WriteAttributeString("visible", "true");
+                //writer.WriteStartElement("nd");
+                //writer.WriteAttributeString("ref", "000");
+                //writer.WriteEndElement();
+                //writer.WriteEndElement();
+
+                writer.Flush();
+                writer.Close();
             }
         }
     }
