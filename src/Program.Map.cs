@@ -85,6 +85,7 @@ namespace surveillance_system
             // 점과 점사이 부분
             public List<PartOfRoad> Parts { set; get; }
             public RoadType RoadType { set; get; }
+            public EOSMWayType EOSMWayType { set; get; }
             public bool bIsOneWay { set; get; } = false;
 
             public Road()
@@ -481,6 +482,7 @@ namespace surveillance_system
                         newRoad.bIsOneWay = wayFromOsm.bIsOneWay;
 
                         // define Road Type and Width
+                        newRoad.EOSMWayType = wayFromOsm.WayType;
                         {
                             if (wayFromOsm.WayType == EOSMWayType.Motorway
                                 || wayFromOsm.WayType == EOSMWayType.Motorway_Link
@@ -509,9 +511,9 @@ namespace surveillance_system
                                 newRoad.Width = RoadWidth[Convert.ToInt32(newRoad.RoadType)];
                             }
                         }
-                        
+
                         // 도로를 이루는 node 탐색
-                        foreach(FOSMNodeInfo nodeFromOsm in wayFromOsm.Nodes)
+                        foreach (FOSMNodeInfo nodeFromOsm in wayFromOsm.Nodes)
                         {
                             Node newNode = new Node(nodeFromOsm.Longitude, nodeFromOsm.Latitude, 0.0);
                             //debug

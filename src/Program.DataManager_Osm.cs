@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using OpenTK.Core.Native;
 using OpenTK.Graphics.ES11;
+using Silk.NET.Core.Native;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -131,6 +132,14 @@ namespace surveillance_system
 
 
             ///
+            /// Target Traces
+            ///
+
+            /** Trace log of Surveilance Target */
+            TargetTrace,
+
+
+            ///
             /// UNSUPPORTED
             /// 
 
@@ -244,6 +253,14 @@ namespace surveillance_system
 
                 /** Default type of building.  A general catch-all. */
                 "Building",
+
+
+                ///
+                /// Target Traces
+                ///
+
+                /** Trace log of Surveilance Target */
+                "TargetTrace",
 
 
                 ///
@@ -666,10 +683,10 @@ namespace surveillance_system
         public class OsmWriter
         {
             // All ways we've parsed
-            public List<FOSMWayInfo> Ways { set; get; } = new List<FOSMWayInfo>();
+            public Dictionary<long, FOSMWayInfo> WaysMap { set; get; } = new Dictionary<long, FOSMWayInfo>();
 
             // Maps node IDs to info about each node
-            public List<FOSMNodeInfo> NodeMap { set; get; } = new List<FOSMNodeInfo> { };
+            public Dictionary<long, FOSMNodeInfo> NodesMap { set; get; } = new Dictionary<long, FOSMNodeInfo>();
 
             // 230704 박민제 존재하는 감시 자원
             public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; } = new Dictionary<long, FOSMSurvInfo>();
@@ -684,10 +701,164 @@ namespace surveillance_system
                 string fn = "CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".XmlWriterTest.osm";
                 XmlWriter writer = XmlWriter.Create(fn, settings);
 
-                // get target movement log from csv file
+                WaysMap.Clear();
+                NodesMap.Clear();
+                SurveillancesMap.Clear();
+
+                /** 230802 박민제
+                 * get nodes for roads from simCore.map.nodes
+                 * get roads from simCore.map.roads
+                 */
+                // node
+                for(int i = 0; i < simCore.map.nodes.Count; i++)
+                {
+                    Node curNode = simCore.map.nodes[i];
+                    Point convertTo4326 = indexOnProgToEpsg4326(new Point(curNode.x, curNode.y, 0), simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
+
+                    // define node used for representing road
+                    bool isNodeExist = false;
+                    for (int nodeIdx = 0; nodeIdx < NodesMap.Count; nodeIdx++)
+                    {
+                        if (NodesMap[nodeIdx].Longitude == convertTo4326.x && NodesMap[nodeIdx].Latitude == convertTo4326.y)
+                        {
+                            isNodeExist = true;
+                            break;
+                        }
+                    }
+                    if (!isNodeExist)
+                    {
+                        FOSMNodeInfo newNode = new FOSMNodeInfo();
+                        newNode.Latitude = convertTo4326.y;
+                        newNode.Longitude = convertTo4326.x;
+
+                        NodesMap.Add(NodesMap.Count, newNode);
+                    }
+                }
+                // way
+                for(int i = 0; i < simCore.map.roads.Count; i++)
+                {
+                    Road curRoad = simCore.map.roads[i];
+                    FOSMWayInfo newWay = new FOSMWayInfo();
+
+                    newWay.Name = curRoad.RoadName;
+                    newWay.Ref = curRoad.RoadRef;
+                    newWay.WayType = curRoad.EOSMWayType;
+                    newWay.Height = -1;     // not defined
+                    newWay.BuildingLevels = -1; // not defined
+                    newWay.bIsOneWay = curRoad.bIsOneWay;
+
+                    for(int j = 0; j < curRoad.NodeIndices.Count; j++)
+                    {
+                        Node tmpNode = simCore.map.nodes[curRoad.NodeIndices[j]];
+                        Point convertTo4326 = indexOnProgToEpsg4326(new Point(tmpNode.x, tmpNode.y, 0), simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
+                        
+                        for(int k = 0; k < NodesMap.Count; k++)
+                        {
+                            if (NodesMap[k].Latitude == convertTo4326.y && NodesMap[k].Longitude == convertTo4326.x)
+                            {
+                                newWay.Nodes.Add(NodesMap[k]);
+                                break;
+                            }
+                        }
+                    }
+
+                    WaysMap.Add(WaysMap.Count, newWay);
+                }
+
+                /** 230802 박민제
+                 * get buildings from simCore.buildings
+                 */
+                for(int i = 0; i < simCore.buildings.Count(); i++)
+                {
+                    FOSMWayInfo newWayInfo = new FOSMWayInfo();
+                    newWayInfo.Name = "NotDefined";
+                    newWayInfo.Ref = "NotDefined";
+                    newWayInfo.WayType = EOSMWayType.Building;
+                    newWayInfo.Height = simCore.buildings[i].H;
+                    newWayInfo.BuildingLevels = -1; // not defined
+
+                    for(int j = 0; j < simCore.buildings[i].pointsOfBottom.Count(); j++)
+                    {
+                        Point tmpPoint = new Point(simCore.buildings[i].pointsOfBottom[j]);
+                        Point convertTo4326 = indexOnProgToEpsg4326(tmpPoint, simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
+
+                        bool isNodeExist = false;
+                        for (int k = 0; k < NodesMap.Count; k++)
+                        {
+                            if (NodesMap[k].Latitude == convertTo4326.y && NodesMap[k].Longitude == convertTo4326.x)
+                            {
+                                isNodeExist = true;
+                                newWayInfo.Nodes.Add(NodesMap[k]);
+                                break;
+                            }
+                        }
+                        if (!isNodeExist)
+                        {
+                            FOSMNodeInfo newNode = new FOSMNodeInfo();
+                            newNode.Latitude = convertTo4326.y;
+                            newNode.Longitude = convertTo4326.x;
+                            NodesMap.Add(NodesMap.Count, newNode);
+
+                            newWayInfo.Nodes.Add(newNode);
+                        }
+                    }
+
+                    WaysMap.Add(WaysMap.Count, newWayInfo);
+                }
+
+                /** 230802 박민제
+                 * get cctv data from simCore.cctvs
+                 */
+                for(int i = 0; i < simCore.cctvs.Count(); i++)
+                {
+                    Point cctvPoint = new Point(simCore.cctvs[i].X, simCore.cctvs[i].Y, simCore.cctvs[i].Z);
+                    Point convertTo4326 = indexOnProgToEpsg4326(cctvPoint, simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
+
+                    FOSMSurvInfo newSurv = new FOSMSurvInfo();
+                    newSurv.Direction = simCore.cctvs[i].Direction;
+                    newSurv.MountType = "pole";
+                    newSurv.CameraType = "fixed";
+                    newSurv.Height = simCore.cctvs[i].Z;
+                    newSurv.Loc = "outdoor";
+                    newSurv.SurvType = "camera";
+                    newSurv.SurvZone = "building";
+
+                    bool isNodeExist = false;
+                    for (int k = 0; k < NodesMap.Count; k++)
+                    {
+                        if (NodesMap[k].Latitude == convertTo4326.y && NodesMap[k].Longitude == convertTo4326.x)
+                        {
+                            isNodeExist = true;
+                            NodesMap[k].SurvInfoExist = true;
+                            NodesMap[k].SurvInfo = newSurv;
+                            break;
+                        }
+                    }
+                    if (!isNodeExist)
+                    {
+                        FOSMNodeInfo newNode = new FOSMNodeInfo();
+                        newNode.Latitude = convertTo4326.y;
+                        newNode.Longitude = convertTo4326.x;
+
+                        newNode.SurvInfoExist = true;
+                        newNode.SurvInfo = newSurv;
+
+                        NodesMap.Add(NodesMap.Count, newNode);
+                    }
+
+                    SurveillancesMap.Add(SurveillancesMap.Count, newSurv);
+                }
+
+                /** 230802 박민제
+                 * get target movement log from csv file
+                 * define used nodes at NodesMap
+                 * define trace at WaysMap
+                 */
                 Dictionary<int, List<TargetLogCSVReader.TargetLog>> targetsLogDict = new Dictionary<int, List<TargetLogCSVReader.TargetLog>>();
                 for(int i = 0; i < simCore.N_Target; i++)
                 {
+                    FOSMWayInfo newWayInfo = new FOSMWayInfo();
+
                     List<TargetLogCSVReader.TargetLog> targetLogs = new TargetLogCSVReader().TraceLogFromCSV(cctvSetIdx, simIdx, i);
                     foreach(TargetLogCSVReader.TargetLog log in targetLogs)
                     {
@@ -695,13 +866,221 @@ namespace surveillance_system
                         Point convertTo4326 = indexOnProgToEpsg4326(new Point(log.xLog, log.yLog, 0), simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
                         log.xLog = convertTo4326.x;
                         log.yLog = convertTo4326.y;
+
+                        // define node used for trace log
+                        bool isNodeExist = false;
+                        for(int nodeIdx = 0; nodeIdx < NodesMap.Count; nodeIdx++)
+                        {
+                            if (NodesMap[nodeIdx].Longitude == log.xLog && NodesMap[nodeIdx].Latitude == log.yLog)
+                            {
+                                isNodeExist = true;
+                                newWayInfo.Nodes.Add(NodesMap[nodeIdx]);
+                                break;
+                            }
+                        }
+                        if (!isNodeExist)
+                        {
+                            FOSMNodeInfo newNode = new FOSMNodeInfo();
+                            newNode.Latitude = log.yLog;
+                            newNode.Longitude = log.xLog;
+
+                            NodesMap.Add(NodesMap.Count, newNode);
+
+                            newWayInfo.Nodes.Add(newNode);
+                        }
                     }
+
+                    newWayInfo.Name = "Target" + i;
+                    newWayInfo.Ref = "TraceLog.Target" + i;
+                    newWayInfo.WayType = EOSMWayType.TargetTrace;
+                    newWayInfo.Height = -1;    // 높이가 존재하지 않는다.
+                    newWayInfo.BuildingLevels = -1;    // 층 수가 존재하지 않는다.
+                    newWayInfo.bIsOneWay = false;
+                    WaysMap.Add(WaysMap.Count, newWayInfo);
+
                     targetsLogDict.Add(i, targetLogs);
                 }
 
-                
+                /** 230802 박민제
+                 * start writing osm file
+                 */
+                //~ "?xml" start
+                {
+                    //writer.WriteStartElement("/?xml");
+                    //writer.WriteAttributeString("version", "1.0");
+                    //writer.WriteAttributeString("encoding", "UTF-8");
+                    //writer.WriteEndElement();   // end of "?xml"
+                }
+                //~ "?xml" end
 
-                
+                //~ "osm" start
+                {
+                    writer.WriteStartElement("osm");
+                    writer.WriteAttributeString("version", "0.6");
+                    writer.WriteAttributeString("generator", "CGImap 0.8.8 (2403364 spike-06.openstreetmap.org)");
+                    writer.WriteAttributeString("copyright", "OpenStreetMap and contributors");
+                    writer.WriteAttributeString("attribution", "http://www.openstreetmap.org/copyright");
+                    writer.WriteAttributeString("license", "http://opendatacommons.org/licenses/odbl/1-0/");
+
+                    //~ "bound" start
+                    {
+                        writer.WriteStartElement("bounds");
+                        writer.WriteAttributeString("minlat", Convert.ToString(simCore.map.lowerCorner.y));
+                        writer.WriteAttributeString("minlon", Convert.ToString(simCore.map.lowerCorner.x));
+                        writer.WriteAttributeString("maxlat", Convert.ToString(simCore.map.upperCorner.y));
+                        writer.WriteAttributeString("maxlon", Convert.ToString(simCore.map.upperCorner.x));
+                        writer.WriteEndElement();   // end of "bound"
+                    }
+                    //~ "bound" end
+
+                    //~ "node"s start
+                    {
+                        for (int i = 0; i < NodesMap.Count; i++)
+                        {
+                            long nodeId = NodesMap.ElementAt(i).Key;
+                            FOSMNodeInfo node = NodesMap.ElementAt(i).Value;
+
+                            writer.WriteStartElement("node");
+                            writer.WriteAttributeString("id", Convert.ToString(nodeId));
+                            writer.WriteAttributeString("visible", "true");
+                            writer.WriteAttributeString("lat", Convert.ToString(Math.Round(node.Latitude, 7)));
+                            writer.WriteAttributeString("lon", Convert.ToString(Math.Round(node.Longitude, 7)));
+
+                            if (node.SurvInfoExist)
+                            {
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "camera:direction");
+                                writer.WriteAttributeString("v", Convert.ToString(node.SurvInfo.Direction));
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "camera:mount");
+                                writer.WriteAttributeString("v", node.SurvInfo.MountType);
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "camera:type");
+                                writer.WriteAttributeString("v", node.SurvInfo.CameraType);
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "height");
+                                writer.WriteAttributeString("v", Convert.ToString(node.SurvInfo.Height));
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "surveillance");
+                                writer.WriteAttributeString("v", node.SurvInfo.Loc);
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "surveillance:type");
+                                writer.WriteAttributeString("v", node.SurvInfo.SurvType);
+                                writer.WriteEndElement();   // end of "tag"
+
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "surveillance:zone");
+                                writer.WriteAttributeString("v", node.SurvInfo.SurvZone);
+                                writer.WriteEndElement();   // end of "tag"
+                            }
+
+                            writer.WriteEndElement();   // end of "node"
+                        }
+                    }
+                    //~ "node"s end
+
+                    //~ "way"s start
+                    {
+                        for (int i = 0; i < WaysMap.Count; i++)
+                        {
+                            long wayId = WaysMap.ElementAt(i).Key;
+                            FOSMWayInfo way = WaysMap.ElementAt(i).Value;
+
+                            writer.WriteStartElement("way");
+                            writer.WriteAttributeString("id", Convert.ToString(wayId));
+
+                            // nd
+                            for(int j = 0; j < way.Nodes.Count; j++)
+                            {
+                                writer.WriteStartElement("nd");
+                                long ndId = -1;
+                                for(int k = 0; k < NodesMap.Count; k++)
+                                {
+                                    if (NodesMap[k].Latitude == way.Nodes[j].Latitude 
+                                        && NodesMap[k].Longitude == way.Nodes[j].Longitude)
+                                    {
+                                        ndId = NodesMap.ElementAt(k).Key;
+                                        break;
+                                    }
+                                }
+                                writer.WriteAttributeString("ref", Convert.ToString(ndId));
+                                writer.WriteEndElement();   // end of "nd"
+                            }
+
+                            // tag "name"
+                            writer.WriteStartElement("tag");
+                            writer.WriteAttributeString("k", "name");
+                            writer.WriteAttributeString("v", way.Name);
+                            writer.WriteEndElement();   // end of tag "name"
+
+                            // tag "ref"
+                            writer.WriteStartElement("tag");
+                            writer.WriteAttributeString("k", "ref");
+                            writer.WriteAttributeString("v", way.Ref);
+                            writer.WriteEndElement();   // end of tag "ref"
+
+                            // tag "highway"
+                            writer.WriteStartElement("tag");
+                            writer.WriteAttributeString("k", "highway");
+                            writer.WriteAttributeString("v", EOSMWayTypeName[Convert.ToInt32(way.WayType)].ToLower());
+                            writer.WriteEndElement();   // end of tag "highway"
+
+                            if(way.WayType == EOSMWayType.Building)
+                            {
+                                // tag "building"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "building");
+                                writer.WriteAttributeString("v", "yes");
+                                writer.WriteEndElement();   // end of tag "building"
+
+                                // tag "height"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "height");
+                                writer.WriteAttributeString("v", Convert.ToString(way.Height));
+                                writer.WriteEndElement();   // end of tag "height"
+
+                                if(way.BuildingLevels != -1)
+                                {
+                                    // tag "building:levels"
+                                    writer.WriteStartElement("tag");
+                                    writer.WriteAttributeString("k", "building:levels");
+                                    writer.WriteAttributeString("v", Convert.ToString(way.BuildingLevels));
+                                    writer.WriteEndElement();   // end of tag "building:levels"
+                                }
+                            }
+
+                            // tag "oneway"
+                            writer.WriteStartElement("tag");
+                            writer.WriteAttributeString("k", "oneway");
+                            if (way.bIsOneWay)
+                            {
+                                writer.WriteAttributeString("v", "yes");
+                            }
+                            else
+                            {
+                                writer.WriteAttributeString("v", "no");
+                            }
+                            writer.WriteEndElement();   // end of tag "oneway"
+
+                            writer.WriteEndElement();   // end of "way"
+                        }
+                    }
+                    //~ "way"s end
+
+                    writer.WriteEndElement();   // end of "osm"
+                }
+                //~ "osm" end
+
                 //writer.WriteStartElement("way");
                 //writer.WriteAttributeString("id", "0");
                 //writer.WriteAttributeString("visible", "true");
