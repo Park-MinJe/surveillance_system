@@ -698,7 +698,7 @@ namespace surveillance_system
                 settings.Indent = true;
                 settings.OmitXmlDeclaration = true;
 
-                string fn = "CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".XmlWriterTest.osm";
+                string fn = "CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".SimLog.osm";
                 XmlWriter writer = XmlWriter.Create(fn, settings);
 
                 WaysMap.Clear();
@@ -1030,10 +1030,23 @@ namespace surveillance_system
                             writer.WriteEndElement();   // end of tag "ref"
 
                             // tag "highway"
-                            writer.WriteStartElement("tag");
-                            writer.WriteAttributeString("k", "highway");
-                            writer.WriteAttributeString("v", EOSMWayTypeName[Convert.ToInt32(way.WayType)].ToLower());
-                            writer.WriteEndElement();   // end of tag "highway"
+                            if (way.WayType != EOSMWayType.Building
+                                && way.WayType != EOSMWayType.TargetTrace)
+                            {
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "highway");
+                                writer.WriteAttributeString("v", EOSMWayTypeName[Convert.ToInt32(way.WayType)].ToLower());
+                                writer.WriteEndElement();   // end of tag "highway"
+                            }
+
+                            // tag "target:trace"
+                            if(way.WayType == EOSMWayType.TargetTrace)
+                            {
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "target:trace");
+                                writer.WriteAttributeString("v", "yes");
+                                writer.WriteEndElement();   // end of tag "target:trace"
+                            }
 
                             if(way.WayType == EOSMWayType.Building)
                             {
@@ -1057,20 +1070,20 @@ namespace surveillance_system
                                     writer.WriteAttributeString("v", Convert.ToString(way.BuildingLevels));
                                     writer.WriteEndElement();   // end of tag "building:levels"
                                 }
-                            }
 
-                            // tag "oneway"
-                            writer.WriteStartElement("tag");
-                            writer.WriteAttributeString("k", "oneway");
-                            if (way.bIsOneWay)
-                            {
-                                writer.WriteAttributeString("v", "yes");
+                                // tag "oneway"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "oneway");
+                                if (way.bIsOneWay)
+                                {
+                                    writer.WriteAttributeString("v", "yes");
+                                }
+                                else
+                                {
+                                    writer.WriteAttributeString("v", "no");
+                                }
+                                writer.WriteEndElement();   // end of tag "oneway"
                             }
-                            else
-                            {
-                                writer.WriteAttributeString("v", "no");
-                            }
-                            writer.WriteEndElement();   // end of tag "oneway"
 
                             writer.WriteEndElement();   // end of "way"
                         }
@@ -1080,14 +1093,6 @@ namespace surveillance_system
                     writer.WriteEndElement();   // end of "osm"
                 }
                 //~ "osm" end
-
-                //writer.WriteStartElement("way");
-                //writer.WriteAttributeString("id", "0");
-                //writer.WriteAttributeString("visible", "true");
-                //writer.WriteStartElement("nd");
-                //writer.WriteAttributeString("ref", "000");
-                //writer.WriteEndElement();
-                //writer.WriteEndElement();
 
                 writer.Flush();
                 writer.Close();

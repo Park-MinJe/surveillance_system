@@ -1035,8 +1035,8 @@ namespace surveillance_system
                 double[,] newPos = getPointOfAdjacentRoad(intersectidx);
                 ped.X = Math.Round(newPos[0, 0]);
                 ped.Y = Math.Round(newPos[0, 1]);
-                Console.WriteLine("ped.Y -> {0} / ped.X -> {1}", 
-                    Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X / 10000)));
+                //Console.WriteLine("ped.Y -> {0} / ped.X -> {1}", 
+                //    Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X / 10000)));
 
                 /*Random rand = new Random();
                 double opt = rand.NextDouble();
