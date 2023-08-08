@@ -297,6 +297,15 @@ namespace surveillance_system
                 return rt;
             }
         }
+
+        public class FOSMTargetInfo
+        {
+            public string Type { set; get; }
+            public double Width { set; get; }
+            public double Length { set; get; }
+            public double Height { set; get; }
+        }
+
         public class FOSMWayRef
         {
             // Way that we're referencing at this node
@@ -358,6 +367,10 @@ namespace surveillance_system
 
             // If true, way is only traversable in the order the nodes are listed in the Nodes list
             public bool bIsOneWay { set; get; } = false;
+
+            // If way is about target trace log
+            public FOSMTargetInfo TargetInfo { set; get; }
+            public bool TargetInfoExist { set; get; } = false;
 
             public FOSMWayInfo()
             {
@@ -859,9 +872,28 @@ namespace surveillance_system
                 {
                     FOSMWayInfo newWayInfo = new FOSMWayInfo();
 
+                    // basic info of target
+                    newWayInfo.TargetInfoExist = true;
+                    newWayInfo.TargetInfo = new FOSMTargetInfo();
+                    if (i < simCore.N_Ped)
+                    {
+                        newWayInfo.TargetInfo.Type = "Pedestrian";
+                        newWayInfo.TargetInfo.Width = simCore.peds[i].W / 1000;
+                        newWayInfo.TargetInfo.Length = simCore.peds[i].W2 / 1000;
+                        newWayInfo.TargetInfo.Height = simCore.peds[i].H / 1000;
+                    }
+                    else
+                    {
+                        newWayInfo.TargetInfo.Type = "Car";
+                        newWayInfo.TargetInfo.Width = simCore.cars[i - simCore.N_Ped].W / 1000;
+                        newWayInfo.TargetInfo.Length = simCore.cars[i - simCore.N_Ped].W2 / 1000;
+                        newWayInfo.TargetInfo.Height = simCore.cars[i - simCore.N_Ped].H / 1000;
+                    }
+
                     List<TargetLogCSVReader.TargetLog> targetLogs = new TargetLogCSVReader().TraceLogFromCSV(cctvSetIdx, simIdx, i);
                     foreach(TargetLogCSVReader.TargetLog log in targetLogs)
                     {
+
                         // Convert coordination to epsg 4326 from program local coordination.
                         Point convertTo4326 = indexOnProgToEpsg4326(new Point(log.xLog, log.yLog, 0), simCore.map.lowerCorner, simCore.map.upperCorner, simCore.map.X_mapSize, simCore.map.Y_mapSize);
                         log.xLog = convertTo4326.x;
@@ -965,7 +997,7 @@ namespace surveillance_system
 
                                 writer.WriteStartElement("tag");
                                 writer.WriteAttributeString("k", "height");
-                                writer.WriteAttributeString("v", Convert.ToString(node.SurvInfo.Height));
+                                writer.WriteAttributeString("v", Convert.ToString(node.SurvInfo.Height / 1000));
                                 writer.WriteEndElement();   // end of "tag"
 
                                 writer.WriteStartElement("tag");
@@ -1039,13 +1071,38 @@ namespace surveillance_system
                                 writer.WriteEndElement();   // end of tag "highway"
                             }
 
-                            // tag "target:trace"
+                            // tag about surveillance target
                             if(way.WayType == EOSMWayType.TargetTrace)
                             {
+                                // tag "target:trace"
                                 writer.WriteStartElement("tag");
                                 writer.WriteAttributeString("k", "target:trace");
                                 writer.WriteAttributeString("v", "yes");
                                 writer.WriteEndElement();   // end of tag "target:trace"
+
+                                // tag "Type"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "target:type");
+                                writer.WriteAttributeString("v", way.TargetInfo.Type);
+                                writer.WriteEndElement();   // end of tag "target:type"
+
+                                // tag "Width"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "target:width");
+                                writer.WriteAttributeString("v", Convert.ToString(way.TargetInfo.Width));
+                                writer.WriteEndElement();   // end of tag "target:width"
+
+                                // tag "Length"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "target:length");
+                                writer.WriteAttributeString("v", Convert.ToString(way.TargetInfo.Length));
+                                writer.WriteEndElement();   // end of tag "target:length"
+
+                                // tag "Height"
+                                writer.WriteStartElement("tag");
+                                writer.WriteAttributeString("k", "target:height");
+                                writer.WriteAttributeString("v", Convert.ToString(way.TargetInfo.Height));
+                                writer.WriteEndElement();   // end of tag "target:height"
                             }
 
                             if(way.WayType == EOSMWayType.Building)
