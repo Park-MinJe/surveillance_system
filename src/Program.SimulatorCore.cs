@@ -1385,14 +1385,15 @@ namespace surveillance_system
                             {
                                 // len equals Dist
                                 int len = cctvs[i].H_FOV.X0.GetLength(0);
+                                double[] X = { 1, 0 };      // x 단위 벡터
                                 double[] A = { cctvs[i].H_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].H_FOV.Y0[len - 1] - cctvs[i].Y };
                                 double[] B = new double[2];
 
                                 // 밑면의 점 중 H1과 H2를 구한다.
                                 // x 단위 벡터와의 각도를 기준으로 가장 작은 점이 H1, 가장 큰 점이 H2가 된다.
                                 // 각도는 라디안
-                                cosine_Building_h1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
-                                cosine_Building_h2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
+                                double cosine_Building_h1_from_X = -2;       // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
+                                double cosine_Building_h2_from_X = 2;      // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
 
                                 foreach (Point pointOfBottom in buildings[j].pointsOfBottom)
                                 //Parallel.ForEach(buildings[j].pointsOfBottom, pointOfBottom =>
@@ -1403,9 +1404,18 @@ namespace surveillance_system
                                     B[0] = pointOfBottom.x - cctvs[i].X;
                                     B[1] = pointOfBottom.y - cctvs[i].Y;
 
-                                    double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
-                                    cosine_Building_h1[i, j] = (cosine_Building_h1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_h1[i, j];
-                                    cosine_Building_h2[i, j] = (cosine_Building_h2[i, j] > tmp_cosine) ? cosine_Building_h2[i, j] : tmp_cosine;
+                                    double tmp_cosine_from_X = InnerProduct(X, B) / (Norm(X) * Norm(B));
+                                    double tmp_cosine_halfAOV = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                    if (cosine_Building_h1_from_X < tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_h1_from_X = tmp_cosine_from_X;
+                                        cosine_Building_h1[i, j] = tmp_cosine_halfAOV;
+                                    }
+                                    if (cosine_Building_h2_from_X > tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_h2_from_X = tmp_cosine_from_X;
+                                        cosine_Building_h2[i, j] = tmp_cosine_halfAOV;
+                                    }
                                 }
 
                                 // horizontal 각도 검사 
@@ -1424,10 +1434,14 @@ namespace surveillance_system
                             if (candidate_detected_building_v[i, j] == 1)
                             {
                                 int len = cctvs[i].V_FOV.X0.GetLength(0);
+                                double[] X = { 1, 0 };
                                 double[] A = { cctvs[i].V_FOV.X0[len - 1] - cctvs[i].X, cctvs[i].V_FOV.Z0[len - 1] - cctvs[i].Z };
                                 double[] B = new double[2];
 
                                 // 수평 각도 검사와 동일
+                                double cosine_Building_v1_from_X = -2;       // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
+                                double cosine_Building_v2_from_X = 2;      // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
+
                                 cosine_Building_v1[i, j] = 2;       // 가장 작은 값을 얻기 위해 가장 큰 값으로 초기화
                                 cosine_Building_v2[i, j] = -2;      // 가장 큰 값을 얻기 위해 가장 작은 값으로 초기화
 
@@ -1442,9 +1456,18 @@ namespace surveillance_system
                                     B[0] = pointOfBottom.x - cctvs[i].X;
                                     B[1] = pointOfBottom.z - cctvs[i].Z;
 
-                                    double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
-                                    cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];
-                                    cosine_Building_v2[i, j] = (cosine_Building_v2[i, j] > tmp_cosine) ? cosine_Building_v2[i, j] : tmp_cosine;
+                                    double tmp_cosine_from_X = InnerProduct(X, B) / (Norm(X) * Norm(B));
+                                    double tmp_cosine_halfAOV = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                    if (cosine_Building_v1_from_X < tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_v1_from_X = tmp_cosine_from_X;
+                                        cosine_Building_v1[i, j] = tmp_cosine_halfAOV;
+                                    }
+                                    if (cosine_Building_v2_from_X > tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_v2_from_X = tmp_cosine_from_X;
+                                        cosine_Building_v2[i, j] = tmp_cosine_halfAOV;
+                                    }
                                 }
                                 // 윗면의 점들
                                 foreach (Point pointOfTop in buildings[j].pointsOfTop)
@@ -1456,9 +1479,18 @@ namespace surveillance_system
                                     B[0] = pointOfTop.x - cctvs[i].X;
                                     B[1] = pointOfTop.z - cctvs[i].Z;
 
-                                    double tmp_cosine = InnerProduct(A, B) / (Norm(A) * Norm(B));
-                                    cosine_Building_v1[i, j] = (cosine_Building_v1[i, j] > tmp_cosine) ? tmp_cosine : cosine_Building_v1[i, j];
-                                    cosine_Building_v2[i, j] = (cosine_Building_v2[i, j] > tmp_cosine) ? cosine_Building_v2[i, j] : tmp_cosine;
+                                    double tmp_cosine_from_X = InnerProduct(X, B) / (Norm(X) * Norm(B));
+                                    double tmp_cosine_halfAOV = InnerProduct(A, B) / (Norm(A) * Norm(B));
+                                    if (cosine_Building_v1_from_X < tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_v1_from_X = tmp_cosine_from_X;
+                                        cosine_Building_v1[i, j] = tmp_cosine_halfAOV;
+                                    }
+                                    if (cosine_Building_v2_from_X > tmp_cosine_from_X)
+                                    {
+                                        cosine_Building_v2_from_X = tmp_cosine_from_X;
+                                        cosine_Building_v2[i, j] = tmp_cosine_halfAOV;
+                                    }
                                 }
 
                                 if (cosine_Building_v1[i, j] >= cosine_V_AOV || cosine_Building_v2[i, j] >= cosine_V_AOV)
