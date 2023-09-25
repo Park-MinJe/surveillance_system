@@ -242,29 +242,39 @@ namespace surveillance_system
         // 한 개 점만
         public static Point indexOnProgToEpsg4326(Point p, Point lowerCorner, Point upperCorner, double x_size, double y_size)
         {
+
             Point rt = new Point();
             double x = p.x;
             double y = p.y;
-            double G = 60 * 1.1515 * 1.609344 * 1000 * 1000 * (Math.PI / 180);
 
-            Point leftUpperCorner = new Point(lowerCorner.x, upperCorner.y, 0);
+            // 단순 비율 이용
+            double x_proportion = x / x_size;
+            double y_proportion = y / y_size;
 
-            rt.setX(
-                Math.Round(
-                    Math.Acos((Math.Cos(x / G) - Math.Pow(Math.Sin(leftUpperCorner.y * (Math.PI / 180)), 2))
-                     / Math.Pow(Math.Cos(leftUpperCorner.y * (Math.PI / 180)), 2)) * 180 / Math.PI + leftUpperCorner.x,
-                    7
-                    )
-                );
-            
-            double possibleLat1 = Math.Round(
-                y / G * 180 / Math.PI + leftUpperCorner.y,
-                7);
-            double possibleLat2 = Math.Round(
-                360 - y / G * 180 / Math.PI + leftUpperCorner.y,
-                7);
+            rt.setX(lowerCorner.x + (upperCorner.x - lowerCorner.x) * x_proportion);
+            rt.setY(upperCorner.y - (upperCorner.y - lowerCorner.y) * y_proportion);
 
-            rt.setY(possibleLat1);
+            // 역함수 이용
+            //double G = 60 * 1.1515 * 1.609344 * 1000 * 1000 * (Math.PI / 180);
+
+            //Point leftUpperCorner = new Point(lowerCorner.x, upperCorner.y, 0);
+
+            //rt.setX(
+            //    Math.Round(
+            //        Math.Acos((Math.Cos(x / G) - Math.Pow(Math.Sin(leftUpperCorner.y * (Math.PI / 180)), 2))
+            //         / Math.Pow(Math.Cos(leftUpperCorner.y * (Math.PI / 180)), 2)) * 180 / Math.PI + leftUpperCorner.x,
+            //        7
+            //        )
+            //    );
+
+            //double possibleLat1 = Math.Round(
+            //    y / G * 180 / Math.PI + leftUpperCorner.y,
+            //    7);
+            //double possibleLat2 = Math.Round(
+            //    360 - y / G * 180 / Math.PI + leftUpperCorner.y,
+            //    7);
+
+            //rt.setY(possibleLat1);
             //Console.WriteLine("possibleLat1 = " + possibleLat1);
             //Console.WriteLine("possibleLat2 = " + possibleLat2);
             //if(possibleLat1 > lowerCorner.y && possibleLat1 < upperCorner.y)
@@ -274,14 +284,14 @@ namespace surveillance_system
             //else rt.setY(possibleLat2);
 
             //debug
-            p.printString();
+            //p.printString();
             //lowerCorner.printString();
             //upperCorner.printString();
-            leftUpperCorner.printString();
+            //leftUpperCorner.printString();
             //Console.WriteLine("x radian = " + Math.Acos((Math.Cos(x / G) - Math.Pow(Math.Sin(leftUpperCorner.y * (Math.PI / 180)), 2))
             //         / Math.Pow(Math.Cos(leftUpperCorner.y * (Math.PI / 180)), 2)) * 180 / Math.PI);
             //Console.WriteLine("y radian = " + Math.Atan((Math.Cos(y / G) - Math.Cos(leftUpperCorner.y * (Math.PI / 180))) / Math.Sin(leftUpperCorner.y * (Math.PI / 180))));
-            rt.printString();
+            //rt.printString();
 
             return rt;
         }
