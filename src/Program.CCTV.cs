@@ -20,6 +20,30 @@ namespace surveillance_system
 
             public double[] Angle_2;
 
+            public Angle3D() { }
+
+            // 230504 pmj
+            // initalizer used to clone
+            public Angle3D(Angle3D angle3D)
+            {
+                this.Angle_0 = new double[angle3D.Angle_0.Length];
+                this.Angle_1 = new double[angle3D.Angle_1.Length];
+                this.Angle_2 = new double[angle3D.Angle_2.Length];
+
+                for(int i = 0; i < angle3D.Angle_0.Length; i++)
+                {
+                    this.Angle_0[i] = angle3D.Angle_0[i];
+                }
+                for (int i = 0; i < angle3D.Angle_1.Length; i++)
+                {
+                    this.Angle_1[i] = angle3D.Angle_1[i];
+                }
+                for (int i = 0; i < angle3D.Angle_2.Length; i++)
+                {
+                    this.Angle_2[i] = angle3D.Angle_2[i];
+                }
+            }
+
             public Angle3D(int size)
             {
                 if (size <= 0) return;
@@ -74,6 +98,90 @@ namespace surveillance_system
             public double[] Z1;
 
             public double[] Z2;
+
+            public FOV() { }
+
+            // 230504 pmj
+            // initalizer used to clone
+            public FOV(FOV fov)
+            {
+                this.X = new Angle3D(fov.X);
+
+                if(fov.X0 != null)
+                {
+                    this.X0 = new double[fov.X0.Length];
+                    for (int i = 0; i < fov.X0.Length; i++)
+                    {
+                        this.X0[i] = fov.X0[i];
+                    }
+                }
+                if (fov.X1 != null)
+                {
+                    this.X1 = new double[fov.X1.Length];
+                    for (int i = 0; i < fov.X1.Length; i++)
+                    {
+                        this.X1[i] = fov.X1[i];
+                    }
+                }
+                if (fov.X2 != null)
+                {
+                    this.X2 = new double[fov.X2.Length];
+                    for (int i = 0; i < fov.X2.Length; i++)
+                    {
+                        this.X2[i] = fov.X2[i];
+                    }
+                }
+
+                if (fov.Y0 != null)
+                {
+                    this.Y0 = new double[fov.Y0.Length];
+                    for (int i = 0; i < fov.Y0.Length; i++)
+                    {
+                        this.Y0[i] = fov.Y0[i];
+                    }
+                }
+                if (fov.Y1 != null)
+                {
+                    this.Y1 = new double[fov.Y1.Length];
+                    for (int i = 0; i < fov.Y1.Length; i++)
+                    {
+                        this.Y1[i] = fov.Y1[i];
+                    }
+                }
+                if (fov.Y2 != null)
+                {
+                    this.Y2 = new double[fov.Y2.Length];
+                    for (int i = 0; i < fov.Y2.Length; i++)
+                    {
+                        this.Y2[i] = fov.Y2[i];
+                    }
+                }
+
+                if (fov.Z0 != null)
+                {
+                    this.Z0 = new double[fov.Z0.Length];
+                    for (int i = 0; i < fov.Z0.Length; i++)
+                    {
+                        this.Z0[i] = fov.Z0[i];
+                    }
+                }
+                if (fov.Z1 != null)
+                {
+                    this.Z1 = new double[fov.Z1.Length];
+                    for (int i = 0; i < fov.Z1.Length; i++)
+                    {
+                        this.Z1[i] = fov.Z1[i];
+                    }
+                }
+                if (fov.Z2 != null)
+                {
+                    this.Z2 = new double[fov.Z2.Length];
+                    for (int i = 0; i < fov.Z2.Length; i++)
+                    {
+                        this.Z2[i] = fov.Z2[i];
+                    }
+                }
+            }
 
             // initialize with 'new' keyword
             public void Init_X012(int size)
@@ -214,6 +322,65 @@ namespace surveillance_system
 
             public FOV V_FOV;
 
+            // public double Angle;
+            public double[] SurvDist_H;
+
+            public double[] SurvDist_V;
+
+            public double[] PPM_H;
+
+            public double[] PPM_V;
+
+            public CCTV() { }
+
+            // 230504 pmj
+            // initalizer used to clone
+            public CCTV(CCTV c)
+            {
+                this.X = c.X;
+                this.Y = c.Y;
+                this.Z = c.Z;
+
+                this.WD = c.WD;
+                this.HE = c.HE;
+                this.H_AOV= c.H_AOV;
+                this.V_AOV= c.V_AOV;
+                this.imW= c.imW;
+                this.imH= c.imH;
+                this.Focal_Length= c.Focal_Length;
+                this.ViewAngleH= c.ViewAngleH;
+                this.ViewAngleH = c.ViewAngleH;
+                this.Eff_Dist_From = c.Eff_Dist_From;
+                this.Eff_Dist_To= c.Eff_Dist_To;
+                this.Direction = c.Direction;
+                this.isFixed= c.isFixed;
+                this.Max_Dist= c.Max_Dist;
+
+                this.H_FOV = new FOV(c.H_FOV);
+                this.V_FOV = new FOV(c.V_FOV);
+
+                this.SurvDist_H = new double[c.SurvDist_H.Length];
+                for(int i = 0; i < c.SurvDist_H.Length; i++)
+                {
+                    this.SurvDist_H[i] = c.SurvDist_H[i];
+                }
+                this.SurvDist_V = new double[c.SurvDist_V.Length];
+                for(int i = 0; i < c.SurvDist_V.Length; i++)
+                {
+                    this.SurvDist_V[i] = c.SurvDist_V[i];
+                }
+                this.PPM_H = new double[c.PPM_H.Length];
+                for(int i = 0; i < c.PPM_H.Length; i++)
+                {
+                    this.PPM_H[i] = c.PPM_H[i];
+                }
+                this.PPM_V = new double[c.PPM_V.Length];
+                for (int i = 0; i < c.PPM_V.Length; i++)
+                {
+                    this.PPM_V[i] = c.PPM_V[i];
+                }
+            }
+
             public void setZ(int z)
             {
               if (z >= 3000) // 3000: minimum z
@@ -261,8 +428,8 @@ namespace surveillance_system
             {
                 Point p = calcMidpointOfPolygon(face);
                 // 이차원 상 거리
-                return Math.Sqrt(Math.Pow(Math.Abs(X - p.getX()), 2)
-                                + Math.Pow(Math.Abs(Y - p.getY()), 2));
+                return Math.Sqrt(Math.Pow(Math.Abs(X - p.x), 2)
+                                + Math.Pow(Math.Abs(Y - p.y), 2));
             }
             public void calcEffDistToPed(double height)  // 22-02-01, modified by 0BoO
             {
@@ -462,15 +629,6 @@ namespace surveillance_system
                                   i);
                 }
             }
-
-            // public double Angle;
-            public double[] SurvDist_H;
-
-            public double[] SurvDist_V;
-
-            public double[] PPM_H;
-
-            public double[] PPM_V;
 
             public void get_PixelDensity(
                 double[] dist,

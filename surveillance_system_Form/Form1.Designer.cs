@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.gisInfoPage = new System.Windows.Forms.Panel();
             this.cb_srsName = new System.Windows.Forms.ComboBox();
             this.btn_gisConfirm = new System.Windows.Forms.Button();
@@ -48,7 +47,16 @@
             this.lb_pnu = new System.Windows.Forms.Label();
             this.lb_maxFeature = new System.Windows.Forms.Label();
             this.simOptionInfoPage = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
+            this.tb_carNumber = new System.Windows.Forms.TextBox();
+            this.tb_pedNumber = new System.Windows.Forms.TextBox();
+            this.lb_carNumber = new System.Windows.Forms.Label();
+            this.lb_pedNumber = new System.Windows.Forms.Label();
+            this.btn_simulationSettingConfirm = new System.Windows.Forms.Button();
+            this.tb_cctvNumber = new System.Windows.Forms.TextBox();
+            this.cb_cctvLocMode = new System.Windows.Forms.ComboBox();
+            this.tb_simNum = new System.Windows.Forms.TextBox();
+            this.tb_cctvSetNum = new System.Windows.Forms.TextBox();
+            this.lb_cctvNumber = new System.Windows.Forms.Label();
             this.lb_cctvLocMode = new System.Windows.Forms.Label();
             this.lb_simNum = new System.Windows.Forms.Label();
             this.lb_cctvSetNum = new System.Windows.Forms.Label();
@@ -106,7 +114,8 @@
             "국토교통부 GIS건물일반정보WMS조회",
             "국토교통부 GIS건물일반정보WFS조회",
             "국토교통부 GIS건물집합정보WMS조회",
-            "국토교통부 GIS건물집합정보WFS조회"});
+            "국토교통부 GIS건물집합정보WFS조회",
+            "GetFeature"});
             this.cb_methodNM.Location = new System.Drawing.Point(251, 32);
             this.cb_methodNM.Name = "cb_methodNM";
             this.cb_methodNM.Size = new System.Drawing.Size(121, 23);
@@ -337,7 +346,16 @@
             // 
             // simOptionInfoPage
             // 
-            this.simOptionInfoPage.Controls.Add(this.label1);
+            this.simOptionInfoPage.Controls.Add(this.tb_carNumber);
+            this.simOptionInfoPage.Controls.Add(this.tb_pedNumber);
+            this.simOptionInfoPage.Controls.Add(this.lb_carNumber);
+            this.simOptionInfoPage.Controls.Add(this.lb_pedNumber);
+            this.simOptionInfoPage.Controls.Add(this.btn_simulationSettingConfirm);
+            this.simOptionInfoPage.Controls.Add(this.tb_cctvNumber);
+            this.simOptionInfoPage.Controls.Add(this.cb_cctvLocMode);
+            this.simOptionInfoPage.Controls.Add(this.tb_simNum);
+            this.simOptionInfoPage.Controls.Add(this.tb_cctvSetNum);
+            this.simOptionInfoPage.Controls.Add(this.lb_cctvNumber);
             this.simOptionInfoPage.Controls.Add(this.lb_cctvLocMode);
             this.simOptionInfoPage.Controls.Add(this.lb_simNum);
             this.simOptionInfoPage.Controls.Add(this.lb_cctvSetNum);
@@ -346,19 +364,93 @@
             this.simOptionInfoPage.Size = new System.Drawing.Size(483, 316);
             this.simOptionInfoPage.TabIndex = 1;
             // 
-            // label1
+            // tb_carNumber
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(107, 110);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 15);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "label1";
+            this.tb_carNumber.Location = new System.Drawing.Point(251, 173);
+            this.tb_carNumber.Name = "tb_carNumber";
+            this.tb_carNumber.Size = new System.Drawing.Size(100, 23);
+            this.tb_carNumber.TabIndex = 14;
+            // 
+            // tb_pedNumber
+            // 
+            this.tb_pedNumber.Location = new System.Drawing.Point(251, 144);
+            this.tb_pedNumber.Name = "tb_pedNumber";
+            this.tb_pedNumber.Size = new System.Drawing.Size(100, 23);
+            this.tb_pedNumber.TabIndex = 13;
+            // 
+            // lb_carNumber
+            // 
+            this.lb_carNumber.AutoSize = true;
+            this.lb_carNumber.Location = new System.Drawing.Point(197, 176);
+            this.lb_carNumber.Name = "lb_carNumber";
+            this.lb_carNumber.Size = new System.Drawing.Size(47, 15);
+            this.lb_carNumber.TabIndex = 12;
+            this.lb_carNumber.Text = "차량 수";
+            // 
+            // lb_pedNumber
+            // 
+            this.lb_pedNumber.AutoSize = true;
+            this.lb_pedNumber.Location = new System.Drawing.Point(185, 147);
+            this.lb_pedNumber.Name = "lb_pedNumber";
+            this.lb_pedNumber.Size = new System.Drawing.Size(59, 15);
+            this.lb_pedNumber.TabIndex = 11;
+            this.lb_pedNumber.Text = "보행자 수";
+            // 
+            // btn_simulationSettingConfirm
+            // 
+            this.btn_simulationSettingConfirm.Location = new System.Drawing.Point(199, 269);
+            this.btn_simulationSettingConfirm.Name = "btn_simulationSettingConfirm";
+            this.btn_simulationSettingConfirm.Size = new System.Drawing.Size(75, 23);
+            this.btn_simulationSettingConfirm.TabIndex = 10;
+            this.btn_simulationSettingConfirm.Text = "다음";
+            this.btn_simulationSettingConfirm.UseVisualStyleBackColor = true;
+            // 
+            // tb_cctvNumber
+            // 
+            this.tb_cctvNumber.Location = new System.Drawing.Point(251, 115);
+            this.tb_cctvNumber.Name = "tb_cctvNumber";
+            this.tb_cctvNumber.Size = new System.Drawing.Size(100, 23);
+            this.tb_cctvNumber.TabIndex = 9;
+            // 
+            // cb_cctvLocMode
+            // 
+            this.cb_cctvLocMode.FormattingEnabled = true;
+            this.cb_cctvLocMode.Items.AddRange(new object[] {
+            "CCTV as Grid",
+            "CCTV at DST",
+            "CCTV as Random"});
+            this.cb_cctvLocMode.Location = new System.Drawing.Point(251, 90);
+            this.cb_cctvLocMode.Name = "cb_cctvLocMode";
+            this.cb_cctvLocMode.Size = new System.Drawing.Size(121, 23);
+            this.cb_cctvLocMode.TabIndex = 8;
+            // 
+            // tb_simNum
+            // 
+            this.tb_simNum.Location = new System.Drawing.Point(251, 63);
+            this.tb_simNum.Name = "tb_simNum";
+            this.tb_simNum.Size = new System.Drawing.Size(100, 23);
+            this.tb_simNum.TabIndex = 7;
+            // 
+            // tb_cctvSetNum
+            // 
+            this.tb_cctvSetNum.Location = new System.Drawing.Point(251, 35);
+            this.tb_cctvSetNum.Name = "tb_cctvSetNum";
+            this.tb_cctvSetNum.Size = new System.Drawing.Size(100, 23);
+            this.tb_cctvSetNum.TabIndex = 6;
+            // 
+            // lb_cctvNumber
+            // 
+            this.lb_cctvNumber.AutoSize = true;
+            this.lb_cctvNumber.Location = new System.Drawing.Point(181, 118);
+            this.lb_cctvNumber.Name = "lb_cctvNumber";
+            this.lb_cctvNumber.Size = new System.Drawing.Size(65, 15);
+            this.lb_cctvNumber.TabIndex = 5;
+            this.lb_cctvNumber.Text = "CCTV 대수";
             // 
             // lb_cctvLocMode
             // 
             this.lb_cctvLocMode.AutoSize = true;
-            this.lb_cctvLocMode.Location = new System.Drawing.Point(107, 70);
+            this.lb_cctvLocMode.Location = new System.Drawing.Point(153, 93);
             this.lb_cctvLocMode.Name = "lb_cctvLocMode";
             this.lb_cctvLocMode.Size = new System.Drawing.Size(93, 15);
             this.lb_cctvLocMode.TabIndex = 4;
@@ -367,7 +459,7 @@
             // lb_simNum
             // 
             this.lb_simNum.AutoSize = true;
-            this.lb_simNum.Location = new System.Drawing.Point(59, 45);
+            this.lb_simNum.Location = new System.Drawing.Point(105, 68);
             this.lb_simNum.Name = "lb_simNum";
             this.lb_simNum.Size = new System.Drawing.Size(141, 15);
             this.lb_simNum.TabIndex = 3;
@@ -376,7 +468,7 @@
             // lb_cctvSetNum
             // 
             this.lb_cctvSetNum.AutoSize = true;
-            this.lb_cctvSetNum.Location = new System.Drawing.Point(79, 20);
+            this.lb_cctvSetNum.Location = new System.Drawing.Point(124, 43);
             this.lb_cctvSetNum.Name = "lb_cctvSetNum";
             this.lb_cctvSetNum.Size = new System.Drawing.Size(121, 15);
             this.lb_cctvSetNum.TabIndex = 2;
@@ -401,7 +493,6 @@
         }
 
         #endregion
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private Panel gisInfoPage;
         private ComboBox cb_srsName;
         private Button btn_gisConfirm;
@@ -421,9 +512,18 @@
         private Label lb_pnu;
         private Label lb_maxFeature;
         private Panel simOptionInfoPage;
-        private Label label1;
+        private Label lb_cctvNumber;
         private Label lb_cctvLocMode;
         private Label lb_simNum;
         private Label lb_cctvSetNum;
+        private TextBox tb_cctvNumber;
+        private ComboBox cb_cctvLocMode;
+        private TextBox tb_simNum;
+        private TextBox tb_cctvSetNum;
+        private Button btn_simulationSettingConfirm;
+        private Label lb_pedNumber;
+        private Label lb_carNumber;
+        private TextBox tb_carNumber;
+        private TextBox tb_pedNumber;
     }
 }

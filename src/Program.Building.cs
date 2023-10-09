@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.NET.Vulkan.Video;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Schema;
@@ -28,6 +29,9 @@ namespace surveillance_system
             public double Z;
 
             public double H;
+
+            public Point upperCorner;
+            public Point lowerCorner;
 
             // Polygon
             public Point[] pointsOfBottom;
@@ -73,6 +77,60 @@ namespace surveillance_system
                 this.Pos_V2[1] = 0;
             }*/
 
+            // 230504 pmj
+            // initalizer used to clone
+            public Building() { }
+
+            public Building(Building b)
+            {
+                this.X = b.X;
+                this.Y = b.Y;
+                this.Z = b.Z;
+                this.H = b.H;
+
+                this.pointsOfBottom = new Point[b.pointsOfBottom.Length];
+                for(int i = 0; i < b.pointsOfBottom.Length;i++)
+                {
+                    this.pointsOfBottom[i] = new Point(b.pointsOfBottom[i]);
+                }
+
+                this.pointsOfTop = new Point[b.pointsOfTop.Length];
+                for (int i = 0; i < b.pointsOfTop.Length; i++)
+                {
+                    this.pointsOfTop[i] = new Point(b.pointsOfTop[i]);
+                }
+
+                this.Directions = new double[b.Directions.Length];
+                for (int i = 0; i < b.Directions.Length; i++)
+                {
+                    this.Directions[i] = b.Directions[i];
+                }
+
+                this.midPoints = new Point[b.midPoints.Length];
+                for (int i = 0; i < b.midPoints.Length; i++)
+                {
+                    this.midPoints[i] = new Point(b.midPoints[i]);
+                }
+
+                this.H_Segment = new Segment[b.H_Segment.Length];
+                for (int i = 0; i < b.H_Segment.Length; i++)
+                {
+                    this.H_Segment[i] = new Segment(b.H_Segment[i]);
+                }
+
+                this.V_Segment = new Segment[b.V_Segment.Length];
+                for (int i = 0; i < b.V_Segment.Length; i++)
+                {
+                    this.V_Segment[i] = new Segment(b.V_Segment[i]);
+                }
+
+                this.facesOfBuilding = new Polygon[b.facesOfBuilding.Length];
+                for (int i = 0; i < b.facesOfBuilding.Length; i++)
+                {
+                    this.facesOfBuilding[i] = new Polygon(b.facesOfBuilding[i]);
+                }
+            }
+
             // 실제 data를 이용해 건물 객체 생성
             public void define_Building(Point[] p, double h)
             {
@@ -81,10 +139,22 @@ namespace surveillance_system
 
                 this.pointsOfBottom = new Point[dotCnt];
                 this.pointsOfTop = new Point[dotCnt];
+                this.lowerCorner = new Point(p[0].x, p[0].y, 0);
+                this.upperCorner = new Point(p[0].x, p[0].y, 0);
                 for (int i = 0; i < dotCnt; i++)
                 {
-                    this.pointsOfBottom[i] = new Point(p[i].getX(), p[i].getY(), 0);
-                    this.pointsOfTop[i] = new Point(p[i].getX(), p[i].getY(), this.H);
+                    this.pointsOfBottom[i] = new Point(p[i].x, p[i].y, 0);
+                    this.pointsOfTop[i] = new Point(p[i].x, p[i].y, this.H);
+
+                    if (this.lowerCorner.x > p[i].x)
+                        this.lowerCorner.setX(p[i].x);
+                    if (this.lowerCorner.y > p[i].y)
+                        this.lowerCorner.setY(p[i].y);
+
+                    if (this.upperCorner.x < p[i].x)
+                        this.upperCorner.setX(p[i].x);
+                    if (this.upperCorner.x < p[i].y)
+                        this.upperCorner.setY(p[i].y);
                 }
 
                 this.facesOfBuilding = new Polygon[dotCnt + 1];
@@ -99,7 +169,7 @@ namespace surveillance_system
                 /*---------------------- 다각형과 H가 이루는 다면체의 각 면마다 연산 필요 ----------------------*/
                 for(int i = 0; i< dotCnt - 1; i++)
                 {
-                    this.H_Segment[i] = facesOfBuilding[0].getSegmentByIdx(i);
+                    this.H_Segment[i] = facesOfBuilding[0].segments[i];
 
                     this.V_Segment[i] = new Segment(this.pointsOfBottom[i], this.pointsOfTop[i]);
 
@@ -113,16 +183,16 @@ namespace surveillance_system
                     Segment[] segments = new Segment[4];
                     segments[0] = this.H_Segment[i];
                     segments[1] = this.V_Segment[(i + 1) % (dotCnt - 1)];
-                    segments[2] = facesOfBuilding[1].getSegmentByIdx(i);
+                    segments[2] = facesOfBuilding[1].segments[i];
                     segments[3] = this.V_Segment[i];
 
                     this.facesOfBuilding[faceIdx] = new Polygon(segments);
                 }
 
                 Point midpointOfPolygon = calcMidpointOfPolygon(facesOfBuilding[0]);
-                this.X = midpointOfPolygon.getX();
-                this.Y = midpointOfPolygon.getY();
-                this.Z = midpointOfPolygon.getZ();
+                this.X = midpointOfPolygon.x;
+                this.Y = midpointOfPolygon.y;
+                this.Z = midpointOfPolygon.z;
             }
 
             // 벡터 H1H2의 직교 벡터를 이용해 Direction 연산
@@ -130,14 +200,14 @@ namespace surveillance_system
             {
                 double rt;
 
-                lVector H1H2Vector = new lVector(l.getP2().getX() - l.getP1().getX(), 
-                                                    l.getP2().getY() - l.getP1().getY());
+                lVector H1H2Vector = new lVector(l.p2.x - l.p1.x, 
+                                                    l.p2.y - l.p1.y);
 
-                lVector verticalVector = new lVector(-H1H2Vector.getComponetY(), H1H2Vector.getComponetX());
+                lVector verticalVector = new lVector(-H1H2Vector.componet_y, H1H2Vector.componet_x);
 
                 lVector XunitVector = new lVector(0.001, 0);
                 rt = Math.Round(Math.Acos(InnerProduct(verticalVector, XunitVector) / (Norm(verticalVector) * Norm(XunitVector))), 8);
-                if (verticalVector.getComponetY() < 0)
+                if (verticalVector.componet_y < 0)
                 {
                     rt = Math.Round(2 * Math.PI - rt, 8);
                 }
@@ -152,14 +222,14 @@ namespace surveillance_system
                 for (int i = 0; i < facesOfBuilding.Length; i++)
                 {
                     Console.Write("#면 {0}", i);
-                    int segmentNum = facesOfBuilding[i].getSegmentCnt();
+                    int segmentNum = facesOfBuilding[i].segments.Length;
                     for(int j = 0; j<segmentNum; j++)
                     {
                         Console.WriteLine("\t-선분 {0}", j);
-                        Segment tmp = facesOfBuilding[i].getSegmentByIdx(j);
+                        Segment tmp = facesOfBuilding[i].segments[j];
                         Console.WriteLine("\t  P1 : ({0},{1},{2})   P2 : ({3},{4},{5})",
-                            tmp.getP1().getX(), tmp.getP1().getY(), tmp.getP1().getZ(),
-                            tmp.getP2().getX(), tmp.getP2().getY(), tmp.getP2().getZ());
+                            tmp.p1.x, tmp.p1.y, tmp.p1.z,
+                            tmp.p2.x, tmp.p2.y, tmp.p2.z);
                     }
                 }
 
@@ -171,11 +241,11 @@ namespace surveillance_system
                 for(int i = 0; i<this.H_Segment.Length; i++)
                 {
                     Console.WriteLine("\nPos_H1 : ({0},{1},{2})   Pos_H2 : ({3},{4},{5})",
-                        this.H_Segment[i].getP1().getX(), this.H_Segment[i].getP1().getY(), this.H_Segment[i].getP1().getZ(), 
-                        this.H_Segment[i].getP2().getX(), this.H_Segment[i].getP2().getY(), this.H_Segment[i].getP1().getZ());
+                        this.H_Segment[i].p1.x, this.H_Segment[i].p1.y, this.H_Segment[i].p1.z, 
+                        this.H_Segment[i].p2.x, this.H_Segment[i].p2.y, this.H_Segment[i].p2.z);
                     Console.WriteLine("Pos_V1 : ({0},{1},{2})   Pos_V2 : ({3},{4},{5})",
-                        this.V_Segment[i].getP1().getX(), this.V_Segment[i].getP1().getY(), this.V_Segment[i].getP1().getZ(), 
-                        this.V_Segment[i].getP2().getX(), this.V_Segment[i].getP2().getY(), this.V_Segment[i].getP2().getZ());
+                        this.V_Segment[i].p1.x, this.V_Segment[i].p1.y, this.V_Segment[i].p1.z, 
+                        this.V_Segment[i].p2.x, this.V_Segment[i].p2.y, this.V_Segment[i].p2.z);
                 }
             }
         }

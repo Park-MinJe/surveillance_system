@@ -5,7 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="surveillance_system_Form\**" />
@@ -14,6 +15,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotSpatial.Projections" Version="4.0.656" />
+    <PackageReference Include="OpenTK" Version="4.7.5" />
+    <PackageReference Include="Silk.NET" Version="2.16.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
   </ItemGroup>
 
 </Project>

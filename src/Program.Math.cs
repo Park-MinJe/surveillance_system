@@ -21,7 +21,7 @@ namespace surveillance_system
         // lVector를 이용한 내적
         public static double InnerProduct(lVector a, lVector b)
         {
-            return a.getComponetX() * b.getComponetX() + a.getComponetY() * b.getComponetY();
+            return a.componet_x * b.componet_x + a.componet_y * b.componet_y;
         }
 
         public static double Norm(double[] a)
@@ -31,7 +31,7 @@ namespace surveillance_system
         // lVector를 이용한 벡터 Norm
         public static double Norm(lVector a)
         {
-            return Math.Sqrt(a.getComponetX() * a.getComponetX() + a.getComponetY() * a.getComponetY());
+            return Math.Sqrt(a.componet_x * a.componet_x + a.componet_y * a.componet_y);
         }
 
         public static double RadToDeg(double angle)
@@ -77,8 +77,8 @@ namespace surveillance_system
         {
             Point rt = new Point();
 
-            rt.setX((l.getP1().getX() + l.getP2().getX()) / 2);
-            rt.setY((l.getP1().getY() + l.getP2().getY()) / 2);
+            rt.setX((l.p1.x + l.p2.x) / 2);
+            rt.setY((l.p1.y + l.p2.y) / 2);
 
             return rt;
         }
@@ -91,13 +91,13 @@ namespace surveillance_system
                 ySum = 0, 
                 zSum = 0;
 
-            foreach(Segment s in p.getSegments())
+            foreach(Segment s in p.segments)
             {
-                xSum += s.getP1().getX();
-                ySum += s.getP1().getY();
-                zSum += s.getP1().getZ();
+                xSum += s.p1.x;
+                ySum += s.p1.y;
+                zSum += s.p1.z;
             }
-            int segNum = p.getSegmentCnt();
+            int segNum = p.segments.Length;
             rt.setX(xSum / segNum);
             rt.setY(ySum / segNum);
             rt.setZ(zSum / segNum);
