@@ -2052,8 +2052,8 @@ namespace surveillance_system
                 Console.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
                 sw.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
 
-                Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}", N_CCTV, N_Ped, N_Car);
-                sw.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}", N_CCTV, N_Ped, N_Car);
+                Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", N_CCTV, N_Ped, N_Car, N_Building);
+                sw.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", N_CCTV, N_Ped, N_Car, N_Building);
 
                 Console.WriteLine("[Result]");
                 sw.WriteLine("[Result]");
