@@ -287,7 +287,9 @@ namespace surveillance_system
                 inputCctvRotate = "N",
                 inputNPedOption = "N",
                 inputNCarOption = "N",
-                InputcreateCSV = "N";
+                InputcreateCSV = "N",
+                InputcreateOSM = "N";
+            bool printResultAsOSM = false;
 
             List<double> successRates = new List<double>();
             List<long> opTime = new List<long>();
@@ -380,11 +382,23 @@ namespace surveillance_system
 
             while (true)
             {
-                Console.Write("Do you wand results as csv file(Y/N)? ");
+                Console.Write("Do you want results as csv file(Y/N)? ");
                 InputcreateCSV = Console.ReadLine();
 
                 if (InputcreateCSV == "N" || InputcreateCSV == "n") { break; }
                 else if (InputcreateCSV == "Y" || InputcreateCSV == "y") { break; }
+                else { continue; }
+            }
+
+            Console.WriteLine("");
+
+            while (true)
+            {
+                Console.Write("Do you want results as osm file(Y/N)? ");
+                InputcreateOSM = Console.ReadLine();
+
+                if (InputcreateOSM == "N" || InputcreateOSM == "n") { printResultAsOSM = false; break; }
+                else if (InputcreateOSM == "Y" || InputcreateOSM == "y") { printResultAsOSM = true; break; }
                 else { continue; }
             }
 
@@ -435,9 +449,12 @@ namespace surveillance_system
             int[] cctvRandomSeeds = new int[numberOfCCTVSet];
             int[] pedRandomSeeds = new int[simulationTimesForCCTVSet];
             int[] carRandomSeeds = new int[simulationTimesForCCTVSet];
-            for (int i = 0; i < simulationTimesForCCTVSet; i++)
+            for(int i = 0; i < numberOfCCTVSet; i++)
             {
                 cctvRandomSeeds[i] = randomForSeed.Next();
+            }
+            for (int i = 0; i < simulationTimesForCCTVSet; i++)
+            {
                 pedRandomSeeds[i] = randomForSeed.Next();
                 carRandomSeeds[i] = randomForSeed.Next();
 
@@ -489,7 +506,7 @@ namespace surveillance_system
                     if (i > 1 && numberOfCCTVSet > 2)
                     {
                         sims[j].initNCctv(nCctv);
-                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+                        sims[j].initSimCctvs(cctvRandomSeeds[i]);
 
                         switch (cctvMode)
                         {
@@ -513,7 +530,7 @@ namespace surveillance_system
                     else if (i == 1 && numberOfCCTVSet > 1)
                     {
                         sims[j].initNCctv(nCctv);
-                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+                        sims[j].initSimCctvs(cctvRandomSeeds[i]);
 
                         cw.setCctvCSVWriter(sims[j].N_CCTV);
                         cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
@@ -521,7 +538,7 @@ namespace surveillance_system
                     else
                     {
                         sims[j].initNCctv(mappingModule.N_CCTV);
-                        sims[j].initSimCctvs(cctvRandomSeeds[j]);
+                        sims[j].initSimCctvs(cctvRandomSeeds[i]);
 
                         cw.setCctvCSVWriter(sims[j].N_CCTV);
                         cw.CctvsToCSV("DigitalMappingResult.CctvSet", sims[j].cctvs);
@@ -548,7 +565,7 @@ namespace surveillance_system
 
                     sims[j].resetTimer();
 
-                    osmWriter.printAsOsm(sims[j], i, j);
+                    if (printResultAsOSM) osmWriter.printAsOsm(sims[j], i, j);
                 }
                 successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSet);
             }

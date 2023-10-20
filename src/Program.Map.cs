@@ -1019,7 +1019,12 @@ namespace surveillance_system
                         peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
                         peds[i].Y = Math.Round(laneVector.Max() * opt);
                     }*/
-                    pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
+
+                    //debug
+                    Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
+                    int posIdxY = Convert.ToInt32((peds[i].Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((peds[i].Y) / 10000) : this.Y_grid_num - 1;
+                    int posIdxX = Convert.ToInt32((peds[i].X) / 10000) < this.X_grid_num ? Convert.ToInt32((peds[i].X) / 10000) : this.X_grid_num - 1;
+                    pedPos[posIdxY, posIdxX] += 1;
                 }
                 // for문 끝나고
 
@@ -1050,7 +1055,12 @@ namespace surveillance_system
                     peds[i].X =lane_v[rand.Next(0, lane_v.GetLength(0)), 0];
                     peds[i].Y = Math.Round(laneVector.Max() * opt);
                 }*/
-                pedPos[Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X / 10000))] += 1;
+
+                //debug
+                Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X) / 10000), this.Y_grid_num, this.X_grid_num);
+                int posIdxY = Convert.ToInt32((ped.Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((ped.Y) / 10000) : this.Y_grid_num-1;
+                int posIdxX = Convert.ToInt32((ped.X) / 10000) < this.X_grid_num ? Convert.ToInt32((ped.X) / 10000) : this.X_grid_num-1;
+                pedPos[posIdxY, posIdxX] += 1;
 
                 //this.printPedPos();
             }
@@ -1103,7 +1113,12 @@ namespace surveillance_system
                         cars[i].X -= width / 4;
                         cars[i].Y -= width / 4;
                     }
-                    carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
+
+                    //debug
+                    Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
+                    int posIdxY = Convert.ToInt32((cars[i].Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((cars[i].Y) / 10000) : this.Y_grid_num - 1;
+                    int posIdxX = Convert.ToInt32((cars[i].X) / 10000) < this.X_grid_num ? Convert.ToInt32((cars[i].X) / 10000) : this.X_grid_num - 1;
+                    carPos[posIdxY, posIdxX] += 1;
                 }
                 // for문 끝나고
 
@@ -1145,7 +1160,11 @@ namespace surveillance_system
                     car.X -= width / 4;
                     car.Y -= width / 4;
                 }
-                carPos[Convert.ToInt32((car.Y) / 10000), Convert.ToInt32((car.X / 10000))] += 1;
+                //debug
+                Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((car.Y) / 10000), Convert.ToInt32((car.X) / 10000), this.Y_grid_num, this.X_grid_num);
+                int posIdxY = Convert.ToInt32((car.Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((car.Y) / 10000) : this.Y_grid_num - 1;
+                int posIdxX = Convert.ToInt32((car.X) / 10000) < this.X_grid_num ? Convert.ToInt32((car.X) / 10000) : this.X_grid_num - 1;
+                carPos[posIdxY, posIdxX] += 1;
                 
 
                 //this.printCarPos();

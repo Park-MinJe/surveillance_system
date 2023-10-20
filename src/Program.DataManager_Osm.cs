@@ -711,7 +711,7 @@ namespace surveillance_system
                 settings.Indent = true;
                 settings.OmitXmlDeclaration = true;
 
-                string fn = "CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".SimLog.osm";
+                string fn = "osm\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".SimLog.osm";
                 XmlWriter writer = XmlWriter.Create(fn, settings);
 
                 WaysMap.Clear();

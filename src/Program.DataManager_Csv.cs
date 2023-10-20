@@ -850,5 +850,10 @@ namespace surveillance_system
                 }
             }
         }
+
+        public class SimulationResultLogWriter
+        {
+
+        }
     }
 }
