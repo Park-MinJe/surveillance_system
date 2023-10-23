@@ -7,6 +7,7 @@ using Tutorial;
 using System.IO;
 using System.Collections;
 using System.Xml;
+using System.Collections.Specialized;
 
 namespace surveillance_system
 {
@@ -466,13 +467,13 @@ namespace surveillance_system
                 sims[i].setgetPedNumFromUser(inputNPedOption);
                 sims[i].setgetCarNumFromUser(inputNCarOption);
 
-                sims[i].initNBuilding(mappingModule.N_Building);
+                sims[i].initNBuilding(nBuilding);
                 sims[i].initNPed(nPed);
                 sims[i].initNCar(nCar);
 
+                sims[i].initSimulatorCoreVariables(randomForSeed.Next());
                 sims[i].initSimBuildings();
                 sims[i].initSimTargetObjs(pedRandomSeeds[i], carRandomSeeds[i]);
-                sims[i].initSimulatorCoreVariables(randomForSeed.Next());
 
                 sims[i].initTimer();
 
@@ -488,7 +489,10 @@ namespace surveillance_system
                 
             }
 
-            StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
+            String logFileName = "log\\Simulation-ResultLog_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+            StreamWriter sw = new StreamWriter(logFileName);      // 병렬처리 사용 실험 결과 로그
+            sw.WriteLine("#cctv_set_idx,sim_idx,size_map_x,size_map_y,n_building,n_cctv,n_ped,n_car,t_success,t_out_of_range,t_direction_error,t_shadowd_by_building,t_execution");
+            //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 
             for (int i = 0; i < numberOfCCTVSet; i++)
@@ -496,8 +500,8 @@ namespace surveillance_system
                 double successRateForCCTVSet = 0.0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    sims[j].map.setPedswithCSV("Sim" + i + ".Peds", sims[j].peds);
-                    sims[j].map.setCarswithCSV("Sim" + i + ".Cars", sims[j].cars);
+                    sims[j].map.setPedswithCSV("Sim" + j + ".Peds", sims[j].peds);
+                    sims[j].map.setCarswithCSV("Sim" + j + ".Cars", sims[j].cars);
                     //sims[j].road.setPedsArrPos(sims[j].peds, pedRandomSeeds[j]);
                     //sims[j].road.setCarsArrPos(sims[j].cars, carRandomSeeds[j]);
 
@@ -554,6 +558,9 @@ namespace surveillance_system
                     sims[j].map.printAllPos();
 
                     Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
+                    Console.WriteLine("x map size: {0} / y map size: {1}", sims[j].map.X_mapSize, sims[j].map.Y_mapSize);
+                    Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", sims[j].N_CCTV, sims[j].N_Ped, sims[j].N_Car, sims[j].N_Building);
+
                     sims[j].operateSim(i, j);
                     sims[j].stopTimer();
                     sims[j].TraceLogToCSV(i, j);
@@ -574,7 +581,7 @@ namespace surveillance_system
             int totalSimTimes = numberOfCCTVSet * simulationTimesForCCTVSet;
 
             Console.WriteLine("\n- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime / totalSimTimes);
-            sw.WriteLine("\n- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime/totalSimTimes);
+            //sw.WriteLine("\n- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime/totalSimTimes);
 
             sw.Close();
 
@@ -598,21 +605,22 @@ namespace surveillance_system
                 bestCctvSet[i] = new CCTV(mappingModule.cctvs[i]);
             }*/
 
-            if (bestCCTVIdx == 0)
-            {
-                Console.WriteLine("====== Real World CCTV set ======");
-                realRoadClone = new Map(mappingModule.map);
-                //realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
-                realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("DigitalMappingResult.CctvSet"));
-            }
-            else
-            {
-                Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
-                realRoadClone = new Map(sims[bestCCTVIdx].map);
-                //realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
-                realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("CctvSet" + bestCCTVIdx));
-            }
-            realRoadClone.printPos(realRoadClone.cctvPos);
+            // 231023 건물에 의한 영항 파악 실험으로 인해 비활성화
+            //if (bestCCTVIdx == 0)
+            //{
+            //    Console.WriteLine("====== Real World CCTV set ======");
+            //    realRoadClone = new Map(mappingModule.map);
+            //    //realRoadClone.setCctvswithCSV("DigitalMappingResult.CctvSet", bestCctvSet);
+            //    realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("DigitalMappingResult.CctvSet"));
+            //}
+            //else
+            //{
+            //    Console.WriteLine("====== CCTV set {0} ======", bestCCTVIdx);
+            //    realRoadClone = new Map(sims[bestCCTVIdx].map);
+            //    //realRoadClone.setCctvswithCSV("CctvSet" + bestCCTVIdx, bestCctvSet);
+            //    realRoadClone.getPosOfCctvs(cr.CctvsFromCsvAsArray("CctvSet" + bestCCTVIdx));
+            //}
+            //realRoadClone.printPos(realRoadClone.cctvPos);
         }
     }
 }

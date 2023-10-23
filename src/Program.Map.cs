@@ -5,6 +5,7 @@ using System.Linq;
 using static surveillance_system.Program;
 using OpenTK.Windowing.Desktop;
 using static surveillance_system.Program.OsmReader;
+using System.Collections.Specialized;
 
 namespace surveillance_system
 {
@@ -717,6 +718,7 @@ namespace surveillance_system
 
                 for(int i = 0;i < peds.Length ; i++)
                 {
+                    Console.WriteLine(peds[i].Y + " / " + peds[i].X);
                     pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
                 }
             }

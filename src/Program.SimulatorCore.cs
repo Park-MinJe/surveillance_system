@@ -433,11 +433,18 @@ namespace surveillance_system
             public void initSimBuildings()
             {
                 this.buildings = new Building[this.N_Building];
+                
+                bool[] selected = Enumerable.Repeat<bool>(false, this.N_Building).ToArray<bool>();
+                
                 for (int i = 0; i < this.N_Building; i++)
                 {
                     if (i < mappingModule.buildings.Length)
                     {
-                        this.buildings[i] = new Building(mappingModule.buildings[i]);
+                        int idx = rand.Next(this.N_Building);
+                        while (selected[idx] == true)
+                            idx = (idx + 1) % this.N_Building;
+                        selected[idx] = true;
+                        this.buildings[i] = new Building(mappingModule.buildings[idx]);
                     }
                     else
                     {
@@ -608,9 +615,25 @@ namespace surveillance_system
 
                 // simulation
                 // Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start");
+                const char _block = '■';
                 while (Now < Sim_Time)
                 {
-                    Console.Write(".");
+                    // check progress
+                    Console.CursorVisible = false;
+                    Console.Write("[");
+                    var p = (int)(((Now/Sim_Time*100) / 10f) + .5f);
+                    for (var i = 0; i < 10; ++i)
+                    {
+                        if (i >= p)
+                            Console.Write(' ');
+                        else
+                            Console.Write(_block);
+                    }
+                    Console.Write("] {0,3:##0}% {1,3:##0}/{2}", Now / Sim_Time * 100, Now, Sim_Time);
+                    Console.SetCursorPosition(0, Console.CursorTop);
+
+                    //Console.Write(".");
+
                     // 추적 검사
                     int[] res = this.checkDetectionWithParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 사용
                     //int[] res = this.checkDetectionWithoutParallel(Now, N_Building, N_CCTV, N_Ped, N_Car);     // 병렬처리 미사용
@@ -2042,43 +2065,54 @@ namespace surveillance_system
             public double printResultRate(StreamWriter sw, List<long> opTime, int cctvSetIdx, int simIdx)
             {
                 double totalSimCount = Sim_Time / aUnitTime * N_Target;
-                double outOfRangeRate = 100 * outOfRange.Sum() / totalSimCount;
-                double directionErrorRate = 100 * directionError.Sum() / totalSimCount;
-                double shadowedRate = 100 * shadowedByBuilding.Sum() / totalSimCount;
+                double outOfRangeSum = outOfRange.Sum();
+                double outOfRangeRate = 100 * outOfRangeSum / totalSimCount;
+                double directionErrorSum = directionError.Sum();
+                double directionErrorRate = 100 * directionErrorSum / totalSimCount;
+                double shadowedSum = shadowedByBuilding.Sum();
+                double shadowedRate = 100 * shadowedSum / totalSimCount;
 
-                double successRate = 100 * R_Surv_Time.Sum() / totalSimCount;
+                double successSum = R_Surv_Time.Sum();
+                double successRate = 100 * successSum / totalSimCount;
 
                 // 결과(탐지율)
                 Console.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
-                sw.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
+                //sw.WriteLine("====== Surveillance{0}-{1} Time Result ======", cctvSetIdx, simIdx);
+
+                Console.WriteLine("x map size: {0} / y map size: {1}", this.map.X_mapSize, this.map.Y_mapSize);
+                //sw.WriteLine("x map size: {0} / y map size: {1}", this.map.X_mapSize, this.map.Y_mapSize);
 
                 Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", N_CCTV, N_Ped, N_Car, N_Building);
-                sw.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", N_CCTV, N_Ped, N_Car, N_Building);
+                //sw.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", N_CCTV, N_Ped, N_Car, N_Building);
 
                 Console.WriteLine("[Result]");
-                sw.WriteLine("[Result]");
+                //sw.WriteLine("[Result]");
 
                 opTime.Add(stopwatch.ElapsedMilliseconds);
                 Console.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
-                sw.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
+                //sw.WriteLine("  - Execution time : {0}", stopwatch.ElapsedMilliseconds + "ms");
 
                 Console.WriteLine("[Fail]");
-                sw.WriteLine("[Fail]");
+                //sw.WriteLine("[Fail]");
 
-                Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
-                sw.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
+                Console.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRangeSum, totalSimCount);
+                //sw.WriteLine("  - Out of Range: {0:F2}% ({1}/{2})", outOfRangeRate, outOfRange.Sum(), totalSimCount);
 
-                Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
-                sw.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
+                Console.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionErrorSum, totalSimCount);
+                //sw.WriteLine("  - Direction Error: {0:F2}% ({1}/{2})", directionErrorRate, directionError.Sum(), totalSimCount);
 
-                Console.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedByBuilding.Sum(), totalSimCount);
-                sw.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedByBuilding.Sum(), totalSimCount);
+                Console.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedSum, totalSimCount);
+                //sw.WriteLine("  - Shadowed by Building: {0:F2}% ({1}/{2})", shadowedRate, shadowedByBuilding.Sum(), totalSimCount);
 
                 Console.WriteLine("[Success]");
-                sw.WriteLine("[Success]");
+                //sw.WriteLine("[Success]");
 
-                Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
-                sw.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
+                Console.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, successSum, totalSimCount);
+                //sw.WriteLine("  - Surveillance Time: {0:F2}% ({1}/{2})\n", successRate, R_Surv_Time.Sum(), totalSimCount);
+
+                double map_size_x = Math.Round(map.X_mapSize / 1000, 2),
+                    map_size_y = Math.Round(map.Y_mapSize / 1000, 2);
+                sw.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", cctvSetIdx, simIdx, map_size_x, map_size_y, N_Building, N_CCTV, N_Ped, N_Car, successSum, outOfRangeSum, directionErrorSum, shadowedSum, stopwatch.ElapsedMilliseconds);
 
                 return successRate;
             }
