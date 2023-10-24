@@ -731,6 +731,7 @@ namespace surveillance_system
 
                 for (int i = 0; i < cars.Length; i++)
                 {
+                    Console.WriteLine(cars[i].Y + " / " + cars[i].X);
                     carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
                 }
             }

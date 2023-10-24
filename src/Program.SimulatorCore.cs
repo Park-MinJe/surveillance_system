@@ -1180,7 +1180,7 @@ namespace surveillance_system
                                     //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
-                                    peds[j].upVelocity();
+                                    //peds[j].upVelocity();
                                 }
                                 else
                                 {
@@ -1195,7 +1195,7 @@ namespace surveillance_system
                                     //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
-                                    cars[j - N_Ped].upVelocity();
+                                    //cars[j - N_Ped].upVelocity();
                                 }
                             }
                             // 건물에 가림
@@ -1813,7 +1813,8 @@ namespace surveillance_system
                                     //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Pedestrian", j, Math.Round(peds[j].X, 2), Math.Round(peds[j].Y, 2), Math.Round(peds[j].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
-                                    peds[j].upVelocity();
+                                    // 231024 실험의 위해 속도 변화 제한
+                                    //peds[j].upVelocity();
                                 }
                                 else
                                 {
@@ -1828,7 +1829,8 @@ namespace surveillance_system
                                     //clog.DetectedLogToCSV(this.cctvSetIdx, this.simIdx, i, "Car", carIdx, Math.Round(cars[carIdx].X, 2), Math.Round(cars[carIdx].Y, 2), Math.Round(cars[carIdx].Velocity, 2), Math.Round(nowTime, 2));
 
                                     // Increase Velocity
-                                    cars[j - N_Ped].upVelocity();
+                                    // 231024 실험의 위해 속도 변화 제한
+                                    //cars[j - N_Ped].upVelocity();
                                 }
                             }
                             // 건물에 가림
