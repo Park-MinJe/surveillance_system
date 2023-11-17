@@ -467,9 +467,9 @@ namespace surveillance_system
                 this.Y_mapSize = getDistanceBetweenPointsOfepsg4326(this.lowerCorner.x, this.lowerCorner.y, this.lowerCorner.x, this.upperCorner.y);
                 //Console.WriteLine("y map size: {0}", this.Y_mapSize);
 
-                this.X_grid_num = (int)Math.Truncate(X_mapSize) / 10000 + 2;
+                this.X_grid_num = Convert.ToInt32(Math.Ceiling(X_mapSize) / 10000) + 2;
                 //Console.WriteLine("x grid num: {0}", this.X_grid_num);
-                this.Y_grid_num = (int)Math.Truncate(Y_mapSize) / 10000 + 2;
+                this.Y_grid_num = Convert.ToInt32(Math.Ceiling(Y_mapSize) / 10000) + 2;
                 //Console.WriteLine("y grid num: {0}", this.Y_grid_num);
 
                 foreach (FOSMWayInfo wayFromOsm in osmReader.Ways)
@@ -718,8 +718,9 @@ namespace surveillance_system
 
                 for(int i = 0;i < peds.Length ; i++)
                 {
-                    Console.WriteLine(peds[i].Y + " / " + peds[i].X);
-                    pedPos[Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X / 10000))] += 1;
+                    //Console.WriteLine(peds[i].Y / 10000 + " / " + peds[i].X / 10000);
+                    //Console.WriteLine(Convert.ToInt32(Math.Truncate(peds[i].Y / 10000)) + " / " + Convert.ToInt32(Math.Truncate(peds[i].X / 10000)));
+                    pedPos[Convert.ToInt32(Math.Truncate(peds[i].Y / 10000)), Convert.ToInt32(Math.Truncate(peds[i].X / 10000))] += 1;
                 }
             }
 
@@ -731,8 +732,8 @@ namespace surveillance_system
 
                 for (int i = 0; i < cars.Length; i++)
                 {
-                    Console.WriteLine(cars[i].Y + " / " + cars[i].X);
-                    carPos[Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X / 10000))] += 1;
+                    //Console.WriteLine(cars[i].Y + " / " + cars[i].X);
+                    carPos[Convert.ToInt32(Math.Truncate(cars[i].Y / 10000)), Convert.ToInt32(Math.Truncate(cars[i].X / 10000))] += 1;
                 }
             }
 
@@ -744,7 +745,7 @@ namespace surveillance_system
 
                 for (int i = 0; i < cctvs.Length; i++)
                 {
-                    cctvPos[Convert.ToInt32((cctvs[i].Y) / 10000), Convert.ToInt32((cctvs[i].X / 10000))] += 1;
+                    cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].X) / 10000))] += 1;
                 }
 
                 foreach (CCTV cctv in cctvs)
@@ -850,7 +851,7 @@ namespace surveillance_system
                         startX += x_intvl;
 
                         //debug
-			            cctvPos[(cctvs[cctvIdx].Y)/10000, (cctvs[cctvIdx].X)/10000] += 1;
+			            cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[cctvIdx].Y)/10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[cctvIdx].X)/10000))] += 1;
                         
                         cctvIdx++;
 
@@ -894,7 +895,7 @@ namespace surveillance_system
                     // Console.WriteLine();
 
                     //debug
-                    cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                    cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].X) / 10000))] += 1;
                 }
 
                 // this.printCctvPos();
@@ -925,7 +926,7 @@ namespace surveillance_system
                     // Console.WriteLine();
 
                     //debug
-                    cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                    cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].X) / 10000))] += 1;
                 }
 
                 // this.printCctvPos();
@@ -943,7 +944,7 @@ namespace surveillance_system
                 Console.WriteLine();
 
                 //debug
-                cctvPos[(cctv.Y) / 10000, (cctv.X) / 10000] += 1;
+                cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctv.Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctv.X) / 10000))] += 1;
 
                 // this.printCctvPos();
             }
@@ -979,7 +980,7 @@ namespace surveillance_system
                         //Console.WriteLine();
 
                         //debug
-                        cctvPos[(cctvs[j].Y) / 10000, (cctvs[j].X) / 10000] += 1;
+                        cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[j].Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[j].X) / 10000))] += 1;
                     }
                 }
 
@@ -1024,9 +1025,9 @@ namespace surveillance_system
                     }*/
 
                     //debug
-                    Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
-                    int posIdxY = Convert.ToInt32((peds[i].Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((peds[i].Y) / 10000) : this.Y_grid_num - 1;
-                    int posIdxX = Convert.ToInt32((peds[i].X) / 10000) < this.X_grid_num ? Convert.ToInt32((peds[i].X) / 10000) : this.X_grid_num - 1;
+                    //Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((peds[i].Y) / 10000), Convert.ToInt32((peds[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
+                    int posIdxY = Convert.ToInt32(Math.Truncate(peds[i].Y / 10000)) < this.Y_grid_num ? Convert.ToInt32(Math.Truncate(peds[i].Y / 10000)) : this.Y_grid_num - 1;
+                    int posIdxX = Convert.ToInt32(Math.Truncate(peds[i].X / 10000)) < this.X_grid_num ? Convert.ToInt32(Math.Truncate(peds[i].X / 10000)) : this.X_grid_num - 1;
                     pedPos[posIdxY, posIdxX] += 1;
                 }
                 // for문 끝나고
@@ -1060,9 +1061,9 @@ namespace surveillance_system
                 }*/
 
                 //debug
-                Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X) / 10000), this.Y_grid_num, this.X_grid_num);
-                int posIdxY = Convert.ToInt32((ped.Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((ped.Y) / 10000) : this.Y_grid_num-1;
-                int posIdxX = Convert.ToInt32((ped.X) / 10000) < this.X_grid_num ? Convert.ToInt32((ped.X) / 10000) : this.X_grid_num-1;
+                //Console.Write("pedPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((ped.Y) / 10000), Convert.ToInt32((ped.X) / 10000), this.Y_grid_num, this.X_grid_num);
+                int posIdxY = Convert.ToInt32(Math.Truncate(ped.Y / 10000)) < this.Y_grid_num ? Convert.ToInt32(Math.Truncate(ped.Y / 10000)) : this.Y_grid_num-1;
+                int posIdxX = Convert.ToInt32(Math.Truncate(ped.X / 10000)) < this.X_grid_num ? Convert.ToInt32(Math.Truncate(ped.X / 10000)) : this.X_grid_num-1;
                 pedPos[posIdxY, posIdxX] += 1;
 
                 //this.printPedPos();
@@ -1118,9 +1119,9 @@ namespace surveillance_system
                     }
 
                     //debug
-                    Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
-                    int posIdxY = Convert.ToInt32((cars[i].Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((cars[i].Y) / 10000) : this.Y_grid_num - 1;
-                    int posIdxX = Convert.ToInt32((cars[i].X) / 10000) < this.X_grid_num ? Convert.ToInt32((cars[i].X) / 10000) : this.X_grid_num - 1;
+                    //Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((cars[i].Y) / 10000), Convert.ToInt32((cars[i].X) / 10000), this.Y_grid_num, this.X_grid_num);
+                    int posIdxY = Convert.ToInt32(Math.Truncate(cars[i].Y / 10000)) < this.Y_grid_num ? Convert.ToInt32(Math.Truncate(cars[i].Y / 10000)) : this.Y_grid_num - 1;
+                    int posIdxX = Convert.ToInt32(Math.Truncate(cars[i].X / 10000)) < this.X_grid_num ? Convert.ToInt32(Math.Truncate(cars[i].X / 10000)) : this.X_grid_num - 1;
                     carPos[posIdxY, posIdxX] += 1;
                 }
                 // for문 끝나고
@@ -1164,9 +1165,9 @@ namespace surveillance_system
                     car.Y -= width / 4;
                 }
                 //debug
-                Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((car.Y) / 10000), Convert.ToInt32((car.X) / 10000), this.Y_grid_num, this.X_grid_num);
-                int posIdxY = Convert.ToInt32((car.Y) / 10000) < this.Y_grid_num ? Convert.ToInt32((car.Y) / 10000) : this.Y_grid_num - 1;
-                int posIdxX = Convert.ToInt32((car.X) / 10000) < this.X_grid_num ? Convert.ToInt32((car.X) / 10000) : this.X_grid_num - 1;
+                //Console.Write("carPos[y, x]: [{0}, {1}] - yGrid:xGrid = {2}:{3}\n", Convert.ToInt32((car.Y) / 10000), Convert.ToInt32((car.X) / 10000), this.Y_grid_num, this.X_grid_num);
+                int posIdxY = Convert.ToInt32(Math.Truncate(car.Y / 10000)) < this.Y_grid_num ? Convert.ToInt32(Math.Truncate(car.Y / 10000)) : this.Y_grid_num - 1;
+                int posIdxX = Convert.ToInt32(Math.Truncate(car.X / 10000)) < this.X_grid_num ? Convert.ToInt32(Math.Truncate(car.X / 10000)) : this.X_grid_num - 1;
                 carPos[posIdxY, posIdxX] += 1;
                 
 
@@ -1189,7 +1190,7 @@ namespace surveillance_system
 
                 for (int i = 0; i < cctvs.Length; i++)
                 {
-                    cctvPos[(cctvs[i].Y) / 10000, (cctvs[i].X) / 10000] += 1;
+                    cctvPos[Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].Y) / 10000)), Convert.ToInt32(Math.Truncate(Convert.ToDouble(cctvs[i].X) / 10000))] += 1;
                 }
             }
 
@@ -1237,9 +1238,100 @@ namespace surveillance_system
                         }
                     }
 
-                    if(currentNodeIdx - 1 >= 0)
+                    Node adjacentNode;
+                    Node currentNode = this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx]];
+                    if (currentNodeIdx - 1 >= 0)
+                    {
+                        adjacentNode = this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx - 1]];
+                        if(adjacentNode.x >= X_mapSize)
+                        {
+                            adjacentNode.setY(currentNode.y + (X_mapSize - 1 - currentNode.x) * (adjacentNode.y - currentNode.y) / (adjacentNode.x - currentNode.x));
+                            adjacentNode.setX(X_mapSize - 1);
+                        }
+                        if(adjacentNode.y >= Y_mapSize)
+                        {
+                            adjacentNode.setX((Y_mapSize - 1 - currentNode.y) * (currentNode.x - adjacentNode.x) / (currentNode.y - adjacentNode.y) + currentNode.x);
+                            adjacentNode.setY(Y_mapSize - 1);
+                        }
+                        adjacentNodes.Add(adjacentNode);
+                    }
+                    if (currentNodeIdx + 1 < this.roads[roadIdx].NodeIndices.Count)
+                    {
+                        adjacentNode = this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx + 1]];
+                        if (adjacentNode.x >= X_mapSize)
+                        {
+                            adjacentNode.setY(currentNode.y + (X_mapSize - 1 - currentNode.x) * (adjacentNode.y - currentNode.y) / (adjacentNode.x - currentNode.x));
+                            adjacentNode.setX(X_mapSize - 1);
+                        }
+                        if (adjacentNode.y >= Y_mapSize)
+                        {
+                            adjacentNode.setX((Y_mapSize - 1 - currentNode.y) * (currentNode.x - adjacentNode.x) / (currentNode.y - adjacentNode.y) + currentNode.x);
+                            adjacentNode.setY(Y_mapSize - 1);
+                        }
+                        adjacentNodes.Add(adjacentNode);
+                    }
+                }
+
+                //int idx = lane_num * i + j;
+                double[,] newPos = new double[1, 2];
+                // newPos[0,0] = DST[idx, 0] + rand.Next(-width, width) * rand.NextDouble();
+                // newPos[0,1] = DST[idx, 1] + rand.Next(-width, width) * rand.NextDouble();
+
+                //20220512
+                // newPos[0, 0] = rand.Next((int)intersectionArea[idx, 0], (int)intersectionArea[idx, 1]);
+                // newPos[0, 1] = rand.Next((int)intersectionArea[idx, 2], (int)intersectionArea[idx, 3]);
+
+                Node nodeForNewPos = adjacentNodes.ElementAt<Node>(rand.Next(adjacentNodes.Count));
+                newPos[0, 0] = nodeForNewPos.x;
+                newPos[0, 1] = nodeForNewPos.y;
+
+                // Console.WriteLine("newpos {0} {1}", newPos[0, 0], newPos[0, 1]);
+                return newPos;
+            }
+            public double[,] getPointOfAdjacentRoad(int currAreaIdx, double x, double y)
+            {
+                if (currAreaIdx == -1)
+                {
+                    return new double[,] { { 0, 0 } };
+                }
+
+                int i, j;
+                Random rand = new Random();
+
+                //do
+                //{
+                //    i = currAreaIdx / lane_num;
+                //    j = currAreaIdx % lane_num;
+
+                //    int opt = rand.Next(0, 4);
+                //    if (opt == 0) j += 1; // up
+                //    else if (opt == 1) j -= 1; // down
+                //    else if (opt == 2) i -= 1; // left
+                //    else if (opt == 3) i += 1; // right
+
+                //} while (i < 0 || i >= lane_num || j < 0 || j >= lane_num);
+
+                /** 230802 박민제
+                 * 현재 위치에서 가장 가까운 node로 목적지 설정
+                 */
+                // currAreaIdx에 해당하는 교차로 node
+                int dstNodeIdx = this.roadsRefs[currAreaIdx].DSTNodeIndex;
+
+                List<Node> adjacentNodes = new List<Node>();
+                foreach (int roadIdx in this.roadsRefs[currAreaIdx].roadIndices)
+                {
+                    int currentNodeIdx = -1;
+                    for (currentNodeIdx = 0; currentNodeIdx < this.roads[roadIdx].NodeIndices.Count; currentNodeIdx++)
+                    {
+                        if (this.roads[roadIdx].NodeIndices[currentNodeIdx] == dstNodeIdx)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (currentNodeIdx - 1 >= 0)
                         adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx - 1]]);
-                    if(currentNodeIdx + 1 < this.roads[roadIdx].NodeIndices.Count)
+                    if (currentNodeIdx + 1 < this.roads[roadIdx].NodeIndices.Count)
                         adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx + 1]]);
                 }
 
@@ -1252,7 +1344,52 @@ namespace surveillance_system
                 // newPos[0, 0] = rand.Next((int)intersectionArea[idx, 0], (int)intersectionArea[idx, 1]);
                 // newPos[0, 1] = rand.Next((int)intersectionArea[idx, 2], (int)intersectionArea[idx, 3]);
 
-                Node nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+                //231114 pmj
+                // 다음 node가 영역 밖인 경우, 구역 경계와의 교점으로 목적지 설정
+                List<int> unselectedNodeIndies = new List<int>(adjacentNodes.Count);
+                for (i = 0; i < adjacentNodes.Count; ++i)
+                {
+                    unselectedNodeIndies.Insert(i, i);
+                }
+                int nextNodeIdx = rand.Next(unselectedNodeIndies.Count);
+                Node nodeForNewPos = adjacentNodes[unselectedNodeIndies[nextNodeIdx]];
+                unselectedNodeIndies.Remove(nextNodeIdx);
+                while ((nodeForNewPos.x < 0 || nodeForNewPos.x > X_mapSize
+                    || nodeForNewPos.y < 0 || nodeForNewPos.y > Y_mapSize)
+                    && unselectedNodeIndies.Count != 0)
+                {
+                    nextNodeIdx = rand.Next(unselectedNodeIndies.Count);
+                    nodeForNewPos = adjacentNodes[unselectedNodeIndies[nextNodeIdx]];
+                    unselectedNodeIndies.Remove(nextNodeIdx);
+                }
+
+                if (unselectedNodeIndies.Count == 0)
+                {
+                    nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+                    if (nodeForNewPos.x < 0)
+                    {
+                        nodeForNewPos.setY(y - x * (nodeForNewPos.y - y) / (nodeForNewPos.x - x));
+                        nodeForNewPos.setX(0);
+                    }
+                    else if (nodeForNewPos.x > X_mapSize)
+                    {
+                        nodeForNewPos.setY(y + (X_mapSize - x) * (nodeForNewPos.y - y) / (nodeForNewPos.x - x));
+                        nodeForNewPos.setX(X_mapSize);
+                    }
+
+                    if (nodeForNewPos.y < 0)
+                    {
+                        nodeForNewPos.setX((0 - y) * (x - nodeForNewPos.x) / (y - nodeForNewPos.y) + x);
+                        nodeForNewPos.setY(0);
+                    }
+                    else if (nodeForNewPos.y > Y_mapSize)
+                    {
+                        nodeForNewPos.setX((Y_mapSize - y) * (x - nodeForNewPos.x) / (y - nodeForNewPos.y) + x);
+                        nodeForNewPos.setY(Y_mapSize);
+                    }
+                }
+
+                //Node nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
                 newPos[0, 0] = nodeForNewPos.x;
                 newPos[0, 1] = nodeForNewPos.y;
 
@@ -1385,7 +1522,50 @@ namespace surveillance_system
                         adjacentNodes.Add(this.nodes[this.roads[roadIdx].NodeIndices[currentNodeIdx + 1]]);
                 }
 
-                Node nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+                //231114 pmj
+                // 다음 node가 영역 밖인 경우, 구역 경계와의 교점으로 목적지 설정
+                List<int> unselectedNodeIndies = new List<int>(adjacentNodes.Count);
+                for(i = 0; i < adjacentNodes.Count; ++i)
+                {
+                    unselectedNodeIndies.Insert(i, i);
+                }
+                int nextNodeIdx = rand.Next(unselectedNodeIndies.Count);
+                Node nodeForNewPos = adjacentNodes[unselectedNodeIndies[nextNodeIdx]];
+                unselectedNodeIndies.Remove(nextNodeIdx);
+                while ((nodeForNewPos.x < 0 || nodeForNewPos.x > X_mapSize
+                    || nodeForNewPos.y < 0 || nodeForNewPos.y > Y_mapSize)
+                    && unselectedNodeIndies.Count != 0)
+                {
+                    nextNodeIdx = rand.Next(unselectedNodeIndies.Count);
+                    nodeForNewPos = adjacentNodes[unselectedNodeIndies[nextNodeIdx]];
+                    unselectedNodeIndies.Remove(nextNodeIdx);
+                }
+
+                if(unselectedNodeIndies.Count == 0)
+                {
+                    nodeForNewPos = adjacentNodes[rand.Next(adjacentNodes.Count)];
+                    if(nodeForNewPos.x < 0)
+                    {
+                        nodeForNewPos.setY(y - x * (nodeForNewPos.y - y) / (nodeForNewPos.x - x));
+                        nodeForNewPos.setX(0);
+                    }
+                    else if(nodeForNewPos.x > X_mapSize)
+                    {
+                        nodeForNewPos.setY(y + (X_mapSize - x) * (nodeForNewPos.y - y) / (nodeForNewPos.x - x));
+                        nodeForNewPos.setX(X_mapSize);
+                    }
+
+                    if (nodeForNewPos.y < 0)
+                    {
+                        nodeForNewPos.setX((0 - y) * (x - nodeForNewPos.x) / (y - nodeForNewPos.y) + x);
+                        nodeForNewPos.setY(0);
+                    }
+                    else if (nodeForNewPos.y > Y_mapSize)
+                    {
+                        nodeForNewPos.setX((Y_mapSize - y) * (x - nodeForNewPos.x) / (y - nodeForNewPos.y) + x);
+                        nodeForNewPos.setY(Y_mapSize);
+                    }
+                }
 
                 //int idx = lane_num * i + j;
                 double[,] newPos = new double[1, 2];

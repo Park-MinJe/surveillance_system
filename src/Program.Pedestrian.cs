@@ -331,6 +331,7 @@ namespace surveillance_system
             public void updateDestination(Map map)
             {
                 // Console.WriteLine("update destination1");
+                //double[,] newPos = map.getPointOfAdjacentIntersection(map.getIdxOfIntersection(X, Y), X, Y);
                 double[,] newPos = map.getPointOfAdjacentIntersection(map.getIdxOfIntersection(X, Y), X, Y);
                 // Console.WriteLine("update destination2");
                 DST_X = Math.Round(newPos[0, 0]);

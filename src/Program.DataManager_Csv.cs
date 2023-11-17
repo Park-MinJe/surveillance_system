@@ -592,11 +592,11 @@ namespace surveillance_system
              * Print CSV
             -------------------------------------- */
 
-            public void TraceLogToCSV(int cctvSetIdx, int simIdx)
+            public void TraceLogToCSV(int cctvSetIdx, int simIdx, string genDateTime)
             {
                 for (int i = 0; i < N_Target; i++)
                 {
-                    string fn = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + ".csv";
+                    string fn = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + i + "_" + genDateTime + ".csv";
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                     {
                         file.WriteLine("#header,traffic_x,traffic_y,detection");
@@ -621,9 +621,9 @@ namespace surveillance_system
 
             List<TargetLog> targets = new List<TargetLog>();
 
-            public List<TargetLog> TraceLogFromCSV(int cctvSetIdx, int simIdx, int targetIdx)
+            public List<TargetLog> TraceLogFromCSV(int cctvSetIdx, int simIdx, int targetIdx, string genDateTime)
             {
-                string filename = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + targetIdx + ".csv";
+                string filename = "trace\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".target" + targetIdx + "_" + genDateTime + ".csv";
                 try
                 {
                     // 파일 위치 예시

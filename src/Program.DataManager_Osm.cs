@@ -704,14 +704,14 @@ namespace surveillance_system
             // 230704 박민제 존재하는 감시 자원
             public Dictionary<long, FOSMSurvInfo> SurveillancesMap { set; get; } = new Dictionary<long, FOSMSurvInfo>();
 
-            public void printAsOsm(SimulatorCore simCore, int cctvSetIdx, int simIdx)
+            public void printAsOsm(SimulatorCore simCore, int cctvSetIdx, int simIdx, string genTime)
             {
                 // xml writer setting
                 XmlWriterSettings settings = new XmlWriterSettings();
                 settings.Indent = true;
                 settings.OmitXmlDeclaration = true;
 
-                string fn = "osm\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".SimLog.osm";
+                string fn = "osm\\CctvSet" + cctvSetIdx + ".Sim" + simIdx + ".SimLog_" + genTime + ".osm";
                 XmlWriter writer = XmlWriter.Create(fn, settings);
 
                 WaysMap.Clear();
@@ -890,7 +890,7 @@ namespace surveillance_system
                         newWayInfo.TargetInfo.Height = simCore.cars[i - simCore.N_Ped].H / 1000;
                     }
 
-                    List<TargetLogCSVReader.TargetLog> targetLogs = new TargetLogCSVReader().TraceLogFromCSV(cctvSetIdx, simIdx, i);
+                    List<TargetLogCSVReader.TargetLog> targetLogs = new TargetLogCSVReader().TraceLogFromCSV(cctvSetIdx, simIdx, i, genTime);
                     foreach(TargetLogCSVReader.TargetLog log in targetLogs)
                     {
 

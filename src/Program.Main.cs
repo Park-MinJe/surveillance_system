@@ -8,11 +8,14 @@ using System.IO;
 using System.Collections;
 using System.Xml;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace surveillance_system
 {
     public partial class Program
     {
+        public static Logger _globalLoger = new Logger("Global");
+
         // Data Handler
         public static BuildingCSVWriter bw = new BuildingCSVWriter();
         public static BuildingCSVReader br = new BuildingCSVReader();
@@ -447,10 +450,18 @@ namespace surveillance_system
 
 
             SimulatorCore[] sims = new SimulatorCore[simulationTimesForCCTVSet];
+
             int[] cctvRandomSeeds = new int[numberOfCCTVSet];
             int[] pedRandomSeeds = new int[simulationTimesForCCTVSet];
             int[] carRandomSeeds = new int[simulationTimesForCCTVSet];
-            for(int i = 0; i < numberOfCCTVSet; i++)
+
+            string[] buildingFileName = new string[simulationTimesForCCTVSet];
+            string[] pedsFileName = new string[simulationTimesForCCTVSet];
+            string[] carsFileName = new string[simulationTimesForCCTVSet];
+
+            string genTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            for (int i = 0; i < numberOfCCTVSet; i++)
             {
                 cctvRandomSeeds[i] = randomForSeed.Next();
             }
@@ -479,33 +490,46 @@ namespace surveillance_system
 
                 // sims[i].startTimer();
                 //sims[i].initMap(cctvMode, buildingfromApi.getMapUpperCorner(), buildingfromApi.getMapLowerCorner());
-                bw.BuildingsToCSV("Sim" + i + ".Buildings", sims[i].buildings);
-                tw.PedsToCSV("Sim" + i + ".Peds", sims[i].peds);
-                tw.CarsToCSV("Sim" + i + ".Cars", sims[i].cars);
+
+                buildingFileName[i] = "Sim" + i + ".Buildings_" + genTime;
+                pedsFileName[i] = "Sim" + i + ".Peds_" + genTime;
+                carsFileName[i] = "Sim" + i + ".Cars_" + genTime;
+
+                bw.BuildingsToCSV(buildingFileName[i], sims[i].buildings);
+                tw.PedsToCSV(pedsFileName[i], sims[i].peds);
+                tw.CarsToCSV(carsFileName[i], sims[i].cars);
                 //pedestrianAtSim.Add(peds);
                 //carAtSim.Add(cars);
                 //sims[i].stopTimer();
-
-                
             }
 
-            String logFileName = "log\\Simulation-ResultLog_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+            String logFileName = "log\\Simulation-ResultLog_" + genTime + ".csv";
             StreamWriter sw = new StreamWriter(logFileName);      // 병렬처리 사용 실험 결과 로그
             sw.WriteLine("#cctv_set_idx,sim_idx,size_map_x,size_map_y,n_building,n_cctv,n_ped,n_car,t_success,t_out_of_range,t_direction_error,t_shadowd_by_building,t_execution");
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 
+            double[] successRateForCCTVSetList = new double[simulationTimesForCCTVSet];
             for (int i = 0; i < numberOfCCTVSet; i++)
             {
-                double successRateForCCTVSet = 0.0;
+                //double successRateForCCTVSet = 0.0;
+
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 {
-                    sims[j].map.setPedswithCSV("Sim" + j + ".Peds", sims[j].peds);
-                    sims[j].map.setCarswithCSV("Sim" + j + ".Cars", sims[j].cars);
+                    sims[j].map.setPedswithCSV(pedsFileName[j], sims[j].peds);
+                    sims[j].map.setCarswithCSV(carsFileName[j], sims[j].cars);
+
+                    successRateForCCTVSetList[j] = 0;
+                }
+
+                //for (int j = 0; j < simulationTimesForCCTVSet; j++)
+                Parallel.For(0, simulationTimesForCCTVSet, (j) =>
+                {
                     //sims[j].road.setPedsArrPos(sims[j].peds, pedRandomSeeds[j]);
                     //sims[j].road.setCarsArrPos(sims[j].cars, carRandomSeeds[j]);
 
                     sims[j].startTimer();
+                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} is initializing.",j, i));
                     // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
                     if (i > 1 && numberOfCCTVSet > 2)
                     {
@@ -528,24 +552,27 @@ namespace surveillance_system
 
                                 break;
                         }
-                        cw.setCctvCSVWriter(sims[j].N_CCTV);
-                        cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
+                        // 231117 temporary blocked for journal writing
+                        //cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        //cw.CctvsToCSV("CctvSet" + i + "_" + genTime, sims[j].cctvs);
                     }
                     else if (i == 1 && numberOfCCTVSet > 1)
                     {
                         sims[j].initNCctv(nCctv);
                         sims[j].initSimCctvs(cctvRandomSeeds[i]);
 
-                        cw.setCctvCSVWriter(sims[j].N_CCTV);
-                        cw.CctvsToCSV("CctvSet" + i, sims[j].cctvs);
+                        // 231117 temporary blocked for journal writing
+                        //cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        //cw.CctvsToCSV("CctvSet" + i + "_" + genTime, sims[j].cctvs);
                     }
                     else
                     {
                         sims[j].initNCctv(mappingModule.N_CCTV);
                         sims[j].initSimCctvs(cctvRandomSeeds[i]);
 
-                        cw.setCctvCSVWriter(sims[j].N_CCTV);
-                        cw.CctvsToCSV("DigitalMappingResult.CctvSet", sims[j].cctvs);
+                        // 231117 temporary blocked for journal writing
+                        //cw.setCctvCSVWriter(sims[j].N_CCTV);
+                        //cw.CctvsToCSV("DigitalMappingResult.CctvSet_" + genTime, sims[j].cctvs);
                     }
                     //cctvAtSim.Add(cctvs);
 
@@ -555,26 +582,38 @@ namespace surveillance_system
 
 
                     //cctvPosAtSim.Add(road.cctvPos);
-                    sims[j].map.printAllPos();
+                    //sims[j].map.printAllPos();
 
-                    Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
-                    Console.WriteLine("x map size: {0} / y map size: {1}", sims[j].map.X_mapSize, sims[j].map.Y_mapSize);
-                    Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", sims[j].N_CCTV, sims[j].N_Ped, sims[j].N_Car, sims[j].N_Building);
+                    //Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulatioin Start " + i + " - " + j);
+                    //Console.WriteLine("x map size: {0} / y map size: {1}", sims[j].map.X_mapSize, sims[j].map.Y_mapSize);
+                    //Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", sims[j].N_CCTV, sims[j].N_Ped, sims[j].N_Car, sims[j].N_Building);
 
+                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} starts operating detectness calculation.", j, i));
                     sims[j].operateSim(i, j);
                     sims[j].stopTimer();
-                    sims[j].TraceLogToCSV(i, j);
+                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} is finished", j, i));
+                    //sims[j].TraceLogToCSV(i, j, genTime);
                     double successRate = sims[j].printResultRate(sw, opTime, i, j);
-                    successRateForCCTVSet += successRate;
+                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} success rate is {2}", j, i, successRate));
+                    successRateForCCTVSetList[j] = successRate;
                     //sims[j].printDetectedResults();
-                    sims[j].DetectedResultsToCSV(i, j);
-                    sims[j].ShadowedLogToCSV(i, j);
+                    //sims[j].DetectedResultsToCSV(i, j);
+                    //sims[j].ShadowedLogToCSV(i, j);
 
                     sims[j].resetTimer();
 
-                    if (printResultAsOSM) osmWriter.printAsOsm(sims[j], i, j);
+                    if (printResultAsOSM) osmWriter.printAsOsm(sims[j], i, j, genTime);
+                });
+
+                double sumOfSuccessRate = 0;
+                for (int j = 0; j < simulationTimesForCCTVSet; j++)
+                {
+                    sumOfSuccessRate += successRateForCCTVSetList[j];
                 }
-                successRates.Add(successRateForCCTVSet / simulationTimesForCCTVSet);
+                double meanOfSuccessRate = sumOfSuccessRate / simulationTimesForCCTVSet;
+                _globalLoger.info(string.Format("The mean of success rates for cctv set {0} is {1}", i, meanOfSuccessRate));
+
+                successRates.Add(meanOfSuccessRate);
             }
 
             long totalOpTime = opTime.Sum();
