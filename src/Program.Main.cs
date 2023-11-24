@@ -3,18 +3,16 @@ using static surveillance_system.Program;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tutorial;
 using System.IO;
-using System.Collections;
-using System.Xml;
-using System.Collections.Specialized;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace surveillance_system
 {
     public partial class Program
     {
-        public static Logger _globalLoger = new Logger("Global");
+        public static Logger _mainLoger = new Logger("Main");
+        public static Stopwatch _globalStopwatch = new Stopwatch();
 
         // Data Handler
         public static BuildingCSVWriter bw = new BuildingCSVWriter();
@@ -522,6 +520,11 @@ namespace surveillance_system
                     successRateForCCTVSetList[j] = 0;
                 }
 
+                int leftSimsToInitialize = simulationTimesForCCTVSet;
+                int leftSimsInOperating = simulationTimesForCCTVSet;
+                int leftSimsToFinish = simulationTimesForCCTVSet;
+
+                _globalStopwatch.Start();
                 //for (int j = 0; j < simulationTimesForCCTVSet; j++)
                 Parallel.For(0, simulationTimesForCCTVSet, (j) =>
                 {
@@ -529,7 +532,7 @@ namespace surveillance_system
                     //sims[j].road.setCarsArrPos(sims[j].cars, carRandomSeeds[j]);
 
                     sims[j].startTimer();
-                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} is initializing.",j, i));
+                    _mainLoger.debug(string.Format("Simulation {0} for cctv set {1} is initializing. {2} sims are left to init.", j, i, leftSimsToInitialize--));
                     // 첫번째 시뮬레이터는 디지털 매핑 결과를 이용
                     if (i > 1 && numberOfCCTVSet > 2)
                     {
@@ -588,13 +591,13 @@ namespace surveillance_system
                     //Console.WriteLine("x map size: {0} / y map size: {1}", sims[j].map.X_mapSize, sims[j].map.Y_mapSize);
                     //Console.WriteLine("N_CCTV: {0}, N_Ped: {1}, N_Car: {2}, N_Building: {3}", sims[j].N_CCTV, sims[j].N_Ped, sims[j].N_Car, sims[j].N_Building);
 
-                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} starts operating detectness calculation.", j, i));
+                    _mainLoger.debug(string.Format("Simulation {0} for cctv set {1} starts operating detectness calculation. {2} sims are left to start operation.", j, i, leftSimsInOperating--));
                     sims[j].operateSim(i, j);
                     sims[j].stopTimer();
-                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} is finished", j, i));
+                    _mainLoger.debug(string.Format("Simulation {0} for cctv set {1} is finished. {2} sims are left to finish.", j, i, leftSimsToFinish--));
                     //sims[j].TraceLogToCSV(i, j, genTime);
                     double successRate = sims[j].printResultRate(sw, opTime, i, j);
-                    sims[j]._simLog.debug(string.Format("Simulation {0} for cctv set {1} success rate is {2}", j, i, successRate));
+                    _mainLoger.debug(string.Format("Simulation {0} for cctv set {1} success rate is {2}. ", j, i, successRate));
                     successRateForCCTVSetList[j] = successRate;
                     //sims[j].printDetectedResults();
                     //sims[j].DetectedResultsToCSV(i, j);
@@ -604,6 +607,9 @@ namespace surveillance_system
 
                     if (printResultAsOSM) osmWriter.printAsOsm(sims[j], i, j, genTime);
                 });
+                _globalStopwatch.Stop();
+                _mainLoger.info(string.Format("{0} sims are finished in {1} ms.", simulationTimesForCCTVSet, _globalStopwatch.ElapsedMilliseconds));
+                _globalStopwatch.Reset();
 
                 double sumOfSuccessRate = 0;
                 for (int j = 0; j < simulationTimesForCCTVSet; j++)
@@ -611,7 +617,7 @@ namespace surveillance_system
                     sumOfSuccessRate += successRateForCCTVSetList[j];
                 }
                 double meanOfSuccessRate = sumOfSuccessRate / simulationTimesForCCTVSet;
-                _globalLoger.info(string.Format("The mean of success rates for cctv set {0} is {1}", i, meanOfSuccessRate));
+                _mainLoger.info(string.Format("The mean of success rates for cctv set {0} is {1}", i, meanOfSuccessRate));
 
                 successRates.Add(meanOfSuccessRate);
             }
@@ -619,7 +625,7 @@ namespace surveillance_system
             long totalOpTime = opTime.Sum();
             int totalSimTimes = numberOfCCTVSet * simulationTimesForCCTVSet;
 
-            Console.WriteLine("\n- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime / totalSimTimes);
+            _mainLoger.info(string.Format("- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime / totalSimTimes));
             //sw.WriteLine("\n- Average Simulation Time: {0}/{1} = {2} ms per simulation", totalOpTime, totalSimTimes, totalOpTime/totalSimTimes);
 
             sw.Close();

@@ -622,8 +622,14 @@ namespace surveillance_system
                 //const char _block = '■';
                 while (Now < Sim_Time)
                 {
+                    //long simTimeNowInMsec = _globalStopwatch.ElapsedMilliseconds;
+                    // stamp progress log per 60 sec.
                     double progressRate = Math.Round(Now / Sim_Time * 100, 2);
-                    _simLog.debug(string.Format("Simulation {0} for cctv set {1} progress: {2}% ({3} / {4})", simIdx, cctvSetIdx, progressRate, Math.Round(Now), Sim_Time));
+                    if (progressRate % 10 == 0)
+                    {
+                        _simLog.info(string.Format("Simulation {0} for cctv set {1} progress: {2}% ({3} / {4}) in {5}ms", simIdx, cctvSetIdx, progressRate, Math.Round(Now), Sim_Time, stopwatch.ElapsedMilliseconds));
+                    }
+                    
                     // Comment processing beause of parallel operation
                     // check progress
                     //Console.CursorVisible = false;
@@ -693,6 +699,7 @@ namespace surveillance_system
                     // debug
                     // Console.WriteLine("while simulation 3");
                 }
+                _simLog.info(string.Format("Simulation {0} for cctv set {1} simulating operation is finished in {2}ms.", simIdx, cctvSetIdx, stopwatch.ElapsedMilliseconds));
 
                 //Console.WriteLine("\n=================== {0, 25} ==========================================\n", "Simulation Completed");
             }
