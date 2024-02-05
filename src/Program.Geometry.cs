@@ -168,6 +168,16 @@ namespace surveillance_system
                     segments[i] = new Segment(vertexes[i], vertexes[i + 1]);
                 }
             }
+
+            public double getPolygonArea()
+            {
+                double area = 0;
+                for(int i = 0; i < segments.Length; i++)
+                {
+                    area += (segments[i].p2.x - segments[i].p1.x) * (segments[i].p2.y + segments[i].p1.y) / 2;
+                }
+                return Math.Abs(area);
+            }
         }
 
         public static int getPositionOfPointRelativeToSegment(Segment AB, Point anotherP)

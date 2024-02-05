@@ -503,7 +503,10 @@ namespace surveillance_system
 
             String logFileName = "log\\Simulation-ResultLog_" + genTime + ".csv";
             StreamWriter sw = new StreamWriter(logFileName);      // 병렬처리 사용 실험 결과 로그
-            sw.WriteLine("#cctv_set_idx,sim_idx,size_map_x,size_map_y,n_building,n_cctv,n_ped,n_car,t_success,t_out_of_range,t_direction_error,t_shadowd_by_building,t_execution");
+            sw.WriteLine("#cctv_set_idx,sim_idx,size_map_x,size_map_y," +
+                "n_building,n_cctv,n_ped,n_car,t_success,t_out_of_range,t_direction_error,t_shadowd_by_building,t_execution," +
+                "total_building_area,percent_of_building_area," +
+                "total_building_volume,percent_of_building_volume");
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog.txt");      // 병렬처리 사용 실험 결과 로그
             //StreamWriter sw = new StreamWriter("log\\Simulation-ResultLog-withoutParallel.txt");      // 일반 for문 사용 실험 결과 로그
 

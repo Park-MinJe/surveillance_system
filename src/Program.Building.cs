@@ -30,6 +30,8 @@ namespace surveillance_system
 
             public double H;
 
+            public double areaOfBottom;
+
             public Point upperCorner;
             public Point lowerCorner;
 
@@ -87,6 +89,8 @@ namespace surveillance_system
                 this.Y = b.Y;
                 this.Z = b.Z;
                 this.H = b.H;
+
+                this.areaOfBottom = b.areaOfBottom;
 
                 this.pointsOfBottom = new Point[b.pointsOfBottom.Length];
                 for(int i = 0; i < b.pointsOfBottom.Length;i++)
@@ -160,6 +164,9 @@ namespace surveillance_system
                 this.facesOfBuilding = new Polygon[dotCnt + 1];
                 this.facesOfBuilding[0] = new Polygon(this.pointsOfBottom);
                 this.facesOfBuilding[1] = new Polygon(this.pointsOfTop);
+
+                // 240205 pmj 건물 밑면의 넓이
+                this.areaOfBottom = this.facesOfBuilding[0].getPolygonArea();
 
                 this.Directions = new double[dotCnt - 1];
                 this.midPoints = new Point[dotCnt - 1];

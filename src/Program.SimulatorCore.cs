@@ -63,6 +63,10 @@ namespace surveillance_system
             private double road_min_y = 0;
             private double road_max_y;
 
+            private double building_max_h = 0;
+            private double building_total_area = 0;
+            private double building_total_volume = 0;
+
             /* ---------------------------시뮬레이션 결과----------------------------*/
             // Console.WriteLine(">>> Simulating . . . \n");
             int cctvSetIdx = 0,
@@ -447,6 +451,18 @@ namespace surveillance_system
                             idx = (idx + 1) % this.N_Building;
                         selected[idx] = true;
                         this.buildings[i] = new Building(mappingModule.buildings[idx]);
+
+                        // 240205 pmj 시뮬레이션 대상 건물 중 최고 높이
+                        if (this.buildings[i].H > this.building_max_h)
+                        {
+                            this.building_max_h = this.buildings[i].H;
+                        }
+                        // 240205 pmj 전체 건물 영역과 부피
+                        // 좌표는 mm단위, 높이는 m단위
+                        // m, m^2, m^3으로 단위 통일
+                        double areaOfBottomToMeter = this.buildings[i].areaOfBottom / Math.Pow(10, 6);
+                        this.building_total_area += Math.Round(areaOfBottomToMeter, 2);
+                        this.building_total_volume += Math.Round(areaOfBottomToMeter * this.buildings[i].H, 2);
                     }
                     else
                     {
@@ -2128,7 +2144,16 @@ namespace surveillance_system
 
                 double map_size_x = Math.Round(map.X_mapSize / 1000, 2),
                     map_size_y = Math.Round(map.Y_mapSize / 1000, 2);
-                sw.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", cctvSetIdx, simIdx, map_size_x, map_size_y, N_Building, N_CCTV, N_Ped, N_Car, successSum, outOfRangeSum, directionErrorSum, shadowedSum, stopwatch.ElapsedMilliseconds);
+                // 240205 건물이 차지하는 영역과 부피 출력
+                double map_area = Math.Round(map_size_x * map_size_y, 2);
+                double map_volume = Math.Round(map_area * building_max_h, 2);
+                double coverage_of_building_2d = Math.Round(this.building_total_area / map_area * 100, 2);
+                double coverage_of_building_3d = Math.Round(this.building_total_volume / map_volume * 100, 2);
+                sw.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16}", 
+                    cctvSetIdx, simIdx, map_size_x, map_size_y, N_Building, N_CCTV, N_Ped, N_Car, 
+                    successSum, outOfRangeSum, directionErrorSum, shadowedSum, stopwatch.ElapsedMilliseconds,
+                    this.building_total_area, coverage_of_building_2d, 
+                    this.building_total_volume, coverage_of_building_3d);
 
                 return successRate;
             }

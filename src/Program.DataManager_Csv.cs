@@ -63,10 +63,10 @@ namespace surveillance_system
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@fn))
                 {
                     //Console.WriteLine("{0}", buildings.Length);
-                    file.WriteLine("#idx,X,Y,Z,H");
+                    file.WriteLine("#idx,X,Y,Z,H,Area");
                     for (int j = 0; j < N_Building; j++)
                     {
-                        file.WriteLine("{0},{1},{2},{3},{4}", j, buildings[j].X, buildings[j].Y, buildings[j].Z, buildings[j].H);
+                        file.WriteLine("{0},{1},{2},{3},{4},{5}", j, buildings[j].X, buildings[j].Y, buildings[j].Z, buildings[j].H, buildings[j].areaOfBottom);
                     }
                 }
             }
